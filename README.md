@@ -1,7 +1,7 @@
 # 🔐 Kali Portable Full - Entorno de Pentesting en Docker
 
 > **Autor:** Diego Arriagada Zamora  
-> **GitHub:** [diegoarriagadazamora](https://github.com/V0rt3xS0urc3)  
+> **GitHub:** [Vort3x_S0urc3](https://github.com/V0rt3xS0urc3)  
 > **LinkedIn:** [Diego Arriagada](https://linkedin.com/in/diegoarriagadazamora)  
 > **Versión:** 1.0  
 > **Tamaño de imagen:** ~8 GB  
