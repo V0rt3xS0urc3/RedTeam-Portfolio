@@ -7,7 +7,21 @@
 > **Tamaño de imagen:** ~8.57 GB  
 
 ---
+## 📥 Descarga Rápida (Imagen Precompilada)
 
+Si prefieres no construir la imagen desde el Dockerfile, descarga la versión precompilada (~8GB):
+
+### Opción A: GitHub Release (Recomendado)
+
+# Descargar todas las partes desde:
+https://github.com/diegoarriagadazamora/redteam-portfolio/releases/tag/kali-portable-v1.0
+
+# Unir, descomprimir y cargar
+cat kali-pentest-full-part_* > kali-pentest-full.tar.gz
+gunzip kali-pentest-full.tar.gz
+docker load -i kali-pentest-full.tar
+---
+```bash
 ## 📋 Descripción
 
 **Kali Portable Full** es una imagen de Docker preconfigurada con un entorno completo de pentesting, optimizado para auditorías de seguridad, certificaciones profesionales (eJPT, eWPT, OSCP) y laboratorios de práctica (HackTheBox, TryHackMe).
