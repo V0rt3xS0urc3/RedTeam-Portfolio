@@ -20,6 +20,18 @@ https://github.com/diegoarriagadazamora/redteam-portfolio/releases/tag/kali-port
 cat kali-pentest-full-part_* > kali-pentest-full.tar.gz
 gunzip kali-pentest-full.tar.gz
 docker load -i kali-pentest-full.tar
+
+Luego en carpeta scripts ejecuta;
+./scripts/install-on-new-pc.sh
+
+El script hará automáticamente:
+
+    ✅ Verificará que Docker esté instalado (lo instala si no está)
+    ✅ Detectará tu GPU NVIDIA (configura el toolkit si falta)
+    ✅ Cargará la imagen .tar en Docker
+    ✅ Creará la estructura de carpetas data/
+    ✅ Ajustará permisos para evitar errores de escritura
+    ✅ Hará una prueba final para confirmar que todo funciona
 ---
 ```bash
 ## 📋 Descripción
