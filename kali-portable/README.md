@@ -16,6 +16,66 @@ Si prefieres no construir la imagen desde el Dockerfile, descarga la versión pr
 # Descargar todas las partes desde:
 https://github.com/diegoarriagadazamora/redteam-portfolio/releases/tag/kali-portable-v1.0
 
+🚀 ¿Qué herramientas necesitas para cada certificación de ciberseguridad?
+
+Te lo resumo en mi nuevo proyecto "Kali Portable Full":
+
+📗 eJPT (Junior):
+→ Nmap, Metasploit, Burp Suite, Hydra
+→ 100% cubierto ✅
+
+📘 CEH (Intermedio):
+→ +100 herramientas: Maltego, SET, Veil, SQLMap, APKTool
+→ 100% cubierto ✅
+
+📙 eCPPT (Profesional):
+→ Active Directory: BloodHound, NetExec, Impacket
+→ Pivoting: Chisel, SSHuttle, Ligolo-ng
+→ 100% cubierto ✅
+
+📕 OSCP (Avanzado):
+→ Escaneo rápido: RustScan, Masscan
+→ Explotación: Metasploit, SearchSploit
+→ Pivoting: Proxychains, Chisel
+→ 100% cubierto ✅
+
+🎮 Plataformas:
+→ TryHackMe: OpenVPN + todas las herramientas ✅
+→ HackTheBox: OpenVPN + todas las herramientas ✅
+→ VulnHub: Sin VPN, herramientas locales ✅
+
+Todo esto en un contenedor Docker portable con GPU acceleration.
+
+🔗 Link en los comentarios 👇
+
+#Ciberseguridad #Pentesting #CEH #OSCP #eJPT #Ha
+ckTheBox #TryHackMe #Docker #KaliLinux
+
+🎨 Infografía de Cobertura
+┌─────────────────────────────────────────────────────────────┐
+│         KALI PORTABLE FULL - COBERTURA DE CERTIFICACIONES   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  eJPT     ████████████████████████████████████████ 100% ✅  │
+│  CEH      ████████████████████████████████████████ 100% ✅  │
+│  eCPPT    ████████████████████████████████████████ 100% ✅  │
+│  OSCP     ████████████████████████████████████████ 100% ✅  │
+│  PNPT     ████████████████████████████████████████ 100% ✅  │
+│                                                             │
+│  TryHackMe ███████████████████████████████████████ 100% ✅  │
+│  HackTheBox ██████████████████████████████████████ 100% ✅  │
+│  VulnHub   ███████████████████████████████████████ 100% ✅  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+"Con Kali Portable Full tienes TODO lo necesario para:
+✅ Aprobar certificaciones desde eJPT hasta OSCP
+✅ Practicar en plataformas como THM, HTB y VulnHub
+✅ Trabajar como pentester profesional
+✅ Todo en un USB portable con aceleración GPU  
+No necesitas instalar nada más. Solo descarga, ejecuta y empieza a hackear éticamente."
+
+
 # Unir, descomprimir y cargar
 cat kali-pentest-full-part_* > kali-pentest-full.tar.gz
 gunzip kali-pentest-full.tar.gz
