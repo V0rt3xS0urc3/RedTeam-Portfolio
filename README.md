@@ -91,7 +91,7 @@ Tiempo de instalación: ~30-45 minutos (depende de tu conexión a internet)
 📱 Mobile Hacking
 
     APKTool, Dex2Jar - Ingeniería inversa Android
-    JD-GUI - Descompilador Java
+    JADX - Descompilador Java
     MobSF - Mobile Security Framework
 
 🌐 IoT y SCADA
