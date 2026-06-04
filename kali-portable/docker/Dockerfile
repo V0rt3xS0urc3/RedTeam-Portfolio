@@ -170,6 +170,16 @@ RUN curl -sL https://github.com/ffuf/ffuf/releases/download/v2.1.0/ffuf_2.1.0_li
     curl -sL https://github.com/projectdiscovery/subfinder/releases/download/v2.6.7/subfinder_2.6.7_linux_amd64.zip -o /tmp/subfinder.zip && \
     unzip -q /tmp/subfinder.zip subfinder -d /usr/local/bin/ && rm -f /tmp/subfinder.zip
 
+# Herramientas Web y Pentesting faltantes
+RUN apt update && apt install -y --no-install-recommends \
+    ncrack \
+    weevely \
+    wrk \
+    && apt clean && rm -rf /var/lib/apt/lists/*
+
+# Herramientas Python para Web (tplmap y jwt_tool)
+RUN pip3 install --no-cache-dir --break-system-packages tplmap jwt_tool
+
 # =============================================================================
 # 12. REDES Y PROTOCOLOS
 # =============================================================================
