@@ -138,7 +138,8 @@ Todos se descargan durante la instalación desde fuentes oficiales (Kali Linux, 
     Pwncat - Shell mejorada
     
  🎮 Plataformas de Práctica
-
+   
+    ✅ HackLabs - VMs locales
     ✅ TryHackMe - Con OpenVPN configurado
     ✅ HackTheBox - Con OpenVPN configurado
     ✅ VulnHub - VMs locales
@@ -152,6 +153,11 @@ Todos se descargan durante la instalación desde fuentes oficiales (Kali Linux, 
 
 ![Kali Portable Full Banner](kali-portable/Images/ru-kali-normal.jpeg)
 
+
+Este proyecto trabaja perfectamente con HackLabs
+https://github.com/afsh4ck/HackLabs
+Un proyecto creado por Alex Fernández Santos
+https://www.linkedin.com/in/afsh4ck
 
 📡 Guía Completa: Crackeo WPA2 con Kali Portable Full
 ⚠️ AVISO LEGAL
@@ -438,7 +444,7 @@ Este proyecto está bajo la licencia MIT - ver el archivo LICENSE
  para más detalles.
  
 ##  👤 Autor
-Diego Arriagada (V0rt3x_S0urc3)
+Diego Arriagada Zamora(V0rt3x_S0urc3)
 
     GitHub: @V0rt3xS0urc3
     LinkedIn: Diego Arriagada
