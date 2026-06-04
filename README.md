@@ -1,4 +1,4 @@
-# 🔐 Kali Portable Full - Red Team Edition
+⁸# 🔐 Kali Portable Full - Red Team Edition
 
 **Estación de pentesting completa en Docker con aceleración GPU**
 
@@ -77,6 +77,11 @@ Todos se descargan durante la instalación desde fuentes oficiales (Kali Linux, 
     Burp Suite Community - Proxy interceptor
     SQLMap - SQL Injection automático
     Gobuster, FFUF, Wfuzz - Fuzzing avanzado
+    Burp Suite, SQLMap, tplmap - Explotación web y SSTI
+    jwt_tool - Análisis y ataques a JWT
+    Gobuster, FFUF, Wfuzz, Nikto - Fuzzing y reconocimiento
+    Weevely - Webshells y post-explotación web
+    wrk - Benchmarking y pruebas de estrés HTTP
 
  📡 Auditoría WiFi y Cracking
 
