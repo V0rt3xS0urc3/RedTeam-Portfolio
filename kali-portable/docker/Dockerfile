@@ -3,7 +3,7 @@
 # Arsenal 100% completo para CEH, eJPT, eCPPT, THM, HTB
 # Autor: Diego Arriagada (V0rt3x_S0urc3)
 # =============================================================================
-FROM kalilinux/kali-rolling
+FROM kalilinux/kali-rolling:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV HASHCAT_RULES_PATH=/usr/share/hashcat/rules
