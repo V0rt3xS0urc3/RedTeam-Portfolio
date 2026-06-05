@@ -57,6 +57,17 @@ Todos se descargan durante la instalación desde fuentes oficiales (Kali Linux, 
 
  Tiempo de instalación: ~30-45 minutos (depende de tu conexión a internet)
 
+## 🔄 Actualización de la Imagen
+
+Para mantener Kali Portable actualizado con las últimas herramientas y paquetes:
+
+```bash
+cd kali-portable/docker
+docker build --pull --no-cache -t kali-pentest-full .
+```
+
+**Frecuencia recomendada:** Cada 3-6 meses, o cuando se publiquen actualizaciones importantes de Kali Linux.
+
  📦 ¿Qué incluye?
  🛠️ Arsenal Completo de Red Team
  🔍 Escaneo y Reconocimiento
