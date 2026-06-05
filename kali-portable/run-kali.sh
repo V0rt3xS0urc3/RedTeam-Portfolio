@@ -40,8 +40,16 @@ else
 fi
 
 # --- CONSTRUIR COMANDO DOCKER ---
-CMD_BASE="docker run --rm -it --network host --cap-add NET_RAW --cap-add NET_ADMIN ${GPU_FLAG} -e DISPLAY=${DISPLAY} -v /tmp/.X11-unix:/tmp/.X11-unix -v ${DATA_DIR}:/root/pentest -v ${SCRIPTS_DIR}:/root/pentest/scripts:ro -v /usr/share/wordlists:/host-wordlists:ro"
-
+CMD_BASE="docker run --rm -it \\
+  --network host \\
+  --cap-add NET_RAW \\
+  --cap-add NET_ADMIN \\
+  ${GPU_FLAG} \\
+  -e DISPLAY=${DISPLAY} \\
+  -v /tmp/.X11-unix:/tmp/.X11-unix \\
+  -v ${DATA_DIR}:/root/pentest \\
+  -v ${SCRIPTS_DIR}:/root/pentest/scripts:ro \\
+  -v /usr/share/wordlists:/host-wordlists:ro"
 
 # --- EJECUTAR SEGÚN EL MODO ---
 if [ "$MODE" == "wpa2" ]; then
