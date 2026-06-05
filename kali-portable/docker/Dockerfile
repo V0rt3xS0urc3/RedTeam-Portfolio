@@ -1,6 +1,6 @@
 # =============================================================================
 # KALI PORTABLE FULL - CEH COMPLETE EDITION (Kali 2024+)
-# Arsenal 100% completo para CEH, eJPT, eCPPT, THM, HTB
+# Arsenal 100% completo para CEHPC, eJPT, eCPPT, THM, HTB
 # Autor: Diego Arriagada (V0rt3x_S0urc3)
 # =============================================================================
 FROM kalilinux/kali-rolling:latest
@@ -163,11 +163,11 @@ RUN apt update && apt install -y --no-install-recommends \
     burpsuite \
     && apt clean && rm -rf /var/lib/apt/lists/*
 
-# Foxy Proxy (descargar extensión para Firefox)
+# Foxy Proxy (descargar extensión para Firefox desde GitHub)
 RUN mkdir -p /root/pentest/tools/browser-extensions && \
-    wget -q https://addons.mozilla.org/firefox/downloads/latest/foxy-proxy-standard/latest.xpi -O /root/pentest/tools/browser-extensions/foxyproxy.xpi && \
-    echo "✅ Foxy Proxy descargado en /root/pentest/tools/browser-extensions/" && \
-    echo "   Para instalar: Firefox → about:addons → Instalar desde archivo"
+    curl -sL https://github.com/foxyproxy/firefox-extension/releases/download/v8.10/foxyproxy_for_firefox-8.10.xpi \
+    -o /root/pentest/tools/browser-extensions/foxyproxy.xpi && \
+    echo "✅ Foxy Proxy descargado en /root/pentest/tools/browser-extensions/"
 
 
 # Herramientas web modernas desde GitHub
@@ -184,8 +184,14 @@ RUN apt update && apt install -y --no-install-recommends \
     wrk \
     && apt clean && rm -rf /var/lib/apt/lists/*
 
-# Herramientas Python para Web (tplmap y jwt_tool)
-RUN pip3 install --no-cache-dir --break-system-packages tplmap jwt_tool
+# Herramientas Python para Web (tplmap y jwt_tool desde GitHub)
+RUN git clone https://github.com/epinna/tplmap.git /opt/tplmap && \
+    chmod +x /opt/tplmap/tplmap.py && \
+    ln -s /opt/tplmap/tplmap.py /usr/local/bin/tplmap && \
+    git clone https://github.com/ticarpi/jwt_tool.git /opt/jwt_tool && \
+    chmod +x /opt/jwt_tool/jwt_tool.py && \
+    ln -s /opt/jwt_tool/jwt_tool.py /usr/local/bin/jwt_tool && \
+    echo "✅ tplmap y jwt_tool instalados desde GitHub"
 
 # =============================================================================
 # 12. REDES Y PROTOCOLOS
@@ -317,8 +323,8 @@ RUN mkdir -p /root/pentest/{scripts,wordlists,loot,reports,tools,handshakes,pcap
     && echo 'echo ""' >> /root/.bashrc \
     && echo 'echo "╔════════════════════════════════════════════════════════╗"' >> /root/.bashrc \
     && echo 'echo "║  KALI PORTABLE FULL - CEH COMPLETE EDITION            ║"' >> /root/.bashrc \
-    && echo 'echo "║  100% listo para: CEH, eJPT, eCPPT, THM, HTB          ║"' >> /root/.bashrc \
-    && echo 'echo "║  Autor: Diego Arriagada (V0rt3x_S0urc3)               ║"' >> /root/.bashrc \
+    && echo 'echo "║  100% listo para: CEHPC, eJPT, eCPPT, THM, HTB          ║"' >> /root/.bashrc \
+    && echo 'echo "║  Autor: Diego Arriagada Zamora (V0rt3x_S0urc3)               ║"' >> /root/.bashrc \
     && echo 'echo "╚════════════════════════════════════════════════════════╝"' >> /root/.bashrc \
     && echo 'echo ""' >> /root/.bashrc
 
