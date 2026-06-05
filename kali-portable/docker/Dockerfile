@@ -163,6 +163,13 @@ RUN apt update && apt install -y --no-install-recommends \
     burpsuite \
     && apt clean && rm -rf /var/lib/apt/lists/*
 
+# Foxy Proxy (descargar extensión para Firefox)
+RUN mkdir -p /root/pentest/tools/browser-extensions && \
+    wget -q https://addons.mozilla.org/firefox/downloads/latest/foxy-proxy-standard/latest.xpi -O /root/pentest/tools/browser-extensions/foxyproxy.xpi && \
+    echo "✅ Foxy Proxy descargado en /root/pentest/tools/browser-extensions/" && \
+    echo "   Para instalar: Firefox → about:addons → Instalar desde archivo"
+
+
 # Herramientas web modernas desde GitHub
 RUN curl -sL https://github.com/ffuf/ffuf/releases/download/v2.1.0/ffuf_2.1.0_linux_amd64.tar.gz | tar xz -C /usr/local/bin && \
     curl -sL https://github.com/projectdiscovery/httpx/releases/download/v1.6.9/httpx_1.6.9_linux_amd64.zip -o /tmp/httpx.zip && \
