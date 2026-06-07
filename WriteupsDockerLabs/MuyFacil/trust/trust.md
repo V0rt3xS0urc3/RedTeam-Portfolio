@@ -19,13 +19,13 @@ Trust es una máquina vulnerable en docker en categoria "Súper Fácil" de la we
 
 Al descargar la máquina, es necesario descomprimir.
 
-**unzip firsthacking.zip.**
+**unzip trust.zip.**
 
 ![unzip Trust](img/unzip.png)
 
 Obtendremos dos ficheros:
 - **Auto_deploy.sh:** Script Bash para desplegar nuestra máquina localmente.
-- **firsthacking.tar:** Máquina vulnerable contenizada.
+- **trust.tar:** Máquina vulnerable contenizada.
 
 Para desplegar el servicio será necesario permisos de ejecución a auto_deploy.sh, ya que por defecto tiene permisos 644. Para ello, usaremos el comando:
 
