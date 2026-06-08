@@ -6,7 +6,7 @@
 
 ## ❓ ¿De qué se trata Trust?
 
-Trust es una máquina vulnerable en docker en categoria "Súper Fácil" de la web **[DockerLabs](https://dockerlabs.es/)**, en la cual podremos practicar enumeración web, uso de hydra para fuerza bruta y escalada de privilegios con abuso de sudoers segun la descripción.
+Trust es una máquina vulnerable en docker en categoria "Súper Fácil" de la web **[DockerLabs](https://dockerlabs.es/)**, en la cual podremos practicar Hacking a Infraestructura; enumeración web, uso de hydra para fuerza bruta y escalada de privilegios con abuso de sudoers segun la descripción.
 
 <img src="img/trust.png" width="400">
 
