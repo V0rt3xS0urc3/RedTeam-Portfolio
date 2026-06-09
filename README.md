@@ -457,7 +457,7 @@ Este proyecto está bajo la licencia MIT - ver el archivo LICENSE
 ##  👤 Autor
 Diego Arriagada Zamora(V0rt3x_S0urc3)
 
-<img src="https://github.com/V0rt3xS0urc3/RedTeam-Portfolio/blob/main/WriteupsDockerLabs/img/Micaricatura.png" width="400">
+<img src="RedTeam-Portfolio/blob/main/WriteupsDockerLabs/img/Micaricatura.png" width="400">
 
     GitHub: @V0rt3xS0urc3
     LinkedIn: Diego Arriagada
