@@ -1,0 +1,25 @@
+# Archivos de máquinas virtuales y comprimidos pesados
+*.tar
+*.tar.gz
+*.vmdk
+*.vdi
+*.ova
+*.ovf
+
+# Capturas de red
+*.pcap
+*.pcapng
+
+# Archivos de contraseñas y hashes (¡muy importante para seguridad!)
+hashes.txt
+creds.txt
+passwords.txt
+*.key
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Carpetas temporales
+temp/
+tmp/

@@ -14,11 +14,17 @@ ENV SECLISTS_PATH=/usr/share/seclists
 # 1. UTILIDADES BASE DEL SISTEMA
 # =============================================================================
 RUN apt update && apt install -y --no-install-recommends \
-    nano vim tmux less tree \
+    nano vim tmux less tree util-linux \
     net-tools iputils-ping dnsutils procps \
     curl wget git unzip zip p7zip-full \
     jq build-essential cmake libssl-dev pkg-config \
     && apt clean && rm -rf /var/lib/apt/lists/*
+    
+# FIX: En Kali 2026.2 a veces falta el binario 'rev'. Lo recreamos con Python si no existe.
+RUN if ! command -v rev &> /dev/null; then \
+        printf '#!/usr/bin/env python3\nimport sys\nfor line in sys.stdin:\n    print(line.rstrip("\\n")[::-1])\n' > /usr/local/bin/rev && \
+        chmod +x /usr/local/bin/rev; \
+    fi
 
 # =============================================================================
 # 2. PYTHON Y ENTORNO DE DESARROLLO
@@ -182,6 +188,7 @@ RUN apt update && apt install -y --no-install-recommends \
     ncrack \
     weevely \
     wrk \
+    wfuzz \
     && apt clean && rm -rf /var/lib/apt/lists/*
 
 # Herramientas Python para Web (tplmap y jwt_tool desde GitHub)
@@ -301,6 +308,7 @@ RUN ln -sf ${SECLISTS_PATH}/Discovery/Web-Content/common.txt ${WORDLISTS_PATH}/c
     ln -sf ${SECLISTS_PATH}/Discovery/Web-Content/directory-list-2.3-medium.txt ${WORDLISTS_PATH}/directory-list-medium.txt 2>/dev/null || \
     echo "⚠ directory-list-medium.txt no encontrado en SecLists" && \
     echo "✅ Wordlists para gobuster configuradas"
+    
 
 # =============================================================================
 # 21. CONFIGURACIÓN DE ENTORNO Y ALIASES
