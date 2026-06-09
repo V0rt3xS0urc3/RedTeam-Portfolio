@@ -432,7 +432,7 @@ kali-portable/
 │   └── vpn/                   # Archivos VPN
 ├── README.md
 └── LICENSE
-
+```
 ## 🔧 Requisitos
 
     Docker 20.10 o superior
