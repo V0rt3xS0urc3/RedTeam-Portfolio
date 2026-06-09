@@ -1,7 +1,7 @@
 <center><h1>WriteUps de DockerLabs.es</h1></center>  
 <p align="center">
 
-<img src="img/banner.png" width="400">
+<img src="img/Banner.png" width="400">
 
 
 ## ❓ ¿De qué se trata DockerLabs?
