@@ -4,7 +4,7 @@
 
 
 
-<img src="img/Micaricatura.png" width="400">
+<img src="img/Dockerlabs.png" width="400">
 
 </div>
 
@@ -16,12 +16,13 @@ DockerLabs aloja 193 Máquinas Vulnerables para poner en práctica nuestros cono
 
 
 
-<img src="img/Dificultades.png" width="400">
+<img align="center" src="img/Dificultades.png" width="400">
 
 
-> [!NOTE]
+> [WriteUps Links]
 >
-> Puede ingresar y ser parte de los participantes en **[DockerLabs](https://dockerlabs.es)**
+> WriteUps de Infraestructura;
+**[DockerLabs](WriteupsDockerLabs/HackingInfraestructura)**
 
 
 

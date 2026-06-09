@@ -462,6 +462,8 @@ Diego Arriagada Zamora(V0rt3x_S0urc3)
     GitHub: @V0rt3xS0urc3
     LinkedIn: Diego Arriagada
     
+<img src="img/Micaricatura.png" width="400">
+    
 ## ⚠️ Disclaimer
 Este proyecto es para fines educativos y auditorías autorizadas. El uso indebido de estas herramientas es responsabilidad exclusiva del usuario. Respeta siempre las leyes y obtén autorización antes de realizar pruebas de penetración.
 

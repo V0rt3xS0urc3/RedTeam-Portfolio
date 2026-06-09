@@ -59,7 +59,9 @@ RUN curl -sL https://github.com/projectdiscovery/nuclei/releases/download/v3.3.8
 # 4. EXPLOTACIÓN Y FRAMEWORKS
 # =============================================================================
 RUN apt update && apt install -y --no-install-recommends \
-    metasploit-framework exploitdb \
+    metasploit-framework \
+    exploitdb \
+    util-linux \
     && apt clean && rm -rf /var/lib/apt/lists/*
 
 # =============================================================================
