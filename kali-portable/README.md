@@ -1,4 +1,4 @@
-⁸# 🔐 Kali Portable Full - Red Team Edition
+# 🔐 Kali Portable Full - Red Team Edition
 
 **Estación de pentesting completa en Docker con aceleración GPU**
 
@@ -7,8 +7,10 @@
 [![GPU](https://img.shields.io/badge/GPU-NVIDIA%20CUDA-green.svg)](https://developer.nvidia.com/cuda-zone)
 
 ---
+<div align="center">
+<img src="Images/Portada.jpeg" width="600">
+</div>
 
-![Kali Portable Full Banner](kali-portable/Images/Portada.jpeg)
 
 🚀 Instalación en 3 Comandos
 
@@ -52,7 +54,9 @@ Todos se descargan durante la instalación desde fuentes oficiales (Kali Linux, 
 ./run-kali.sh normal
 
 
-![Kali Portable Full Banner](kali-portable/Images/ru-kali-normal.jpeg)
+
+<img src="Images/ru-kali-normal.jpeg" width="400">
+
 
 
  Tiempo de instalación: ~30-45 minutos (depende de tu conexión a internet)
@@ -162,7 +166,9 @@ docker build --pull --no-cache -t kali-pentest-full .
 
 ./run-kali.sh normal
 
-![Kali Portable Full Banner](kali-portable/Images/ru-kali-normal.jpeg)
+
+<img src="Images/ru-kali-normal.jpeg" width="400">
+
 
 
 Este proyecto trabaja perfectamente con HackLabs
@@ -201,14 +207,18 @@ Paso 1.1: Iniciar el contenedor en modo WPA2
 ./run-kali.sh wpa2
     Nota: El modo wpa2 es obligatorio porque necesita acceso privilegiado al hardware USB.
 
-![Kali Portable Full Banner](kali-portable/Images/ru-kali.wpa2.jpeg)
+
+<img src="Images/ru-kali-wpa2.jpeg" width="400">
+
 
 Paso 1.2: Configurar modo monitor
 
  Dentro del contenedor
 setup-wifi.sh
 
-![Kali Portable Full Banner](kali-portable/Images/setupwifi.jpeg)
+
+<img src="Images/setupwifi.jpeg" width="400">
+
 
 El script automáticamente:
 
@@ -457,15 +467,26 @@ Este proyecto está bajo la licencia MIT - ver el archivo LICENSE
 ##  👤 Autor
 Diego Arriagada Zamora(V0rt3x_S0urc3)
 
+<div align="center">
+<img src="Images/Micaricatura.png" width="600">
+</div>
 
 
     GitHub: @V0rt3xS0urc3
     LinkedIn: Diego Arriagada
     
-<img src="img/Micaricatura.png" width="400">
+
     
 ## ⚠️ Disclaimer
 Este proyecto es para fines educativos y auditorías autorizadas. El uso indebido de estas herramientas es responsabilidad exclusiva del usuario. Respeta siempre las leyes y obtén autorización antes de realizar pruebas de penetración.
 
 ## 🔥 ¿Te gustó el proyecto? Dale una estrella ⭐ en GitHub!
 
+🔥 ¿Te gustó el proyecto?
+¡Dale una estrella ⭐ en GitHub!
+
+### 🎯 Pentester | Red Team | Hacker Ético
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-diego_arriagada_zamora-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&labelColor=101010)](https://www.linkedin.com/in/diegoarriagadazamora)
+[![Instagram](https://img.shields.io/badge/Instagram-@diego_arriagadadev-E4405F?style=for-the-badge&logo=instagram&logoColor=white&labelColor=101010)](https://instagram.com/diego_arriagadadev)
+[![GitHub](https://img.shields.io/badge/GitHub-V0rt3xS0urc3-181717?style=for-the-badge&logo=github&logoColor=white&labelColor=101010)](https://github.com/V0rt3xS0urc3)
