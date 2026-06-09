@@ -208,7 +208,7 @@ Paso 1.1: Iniciar el contenedor en modo WPA2
     Nota: El modo wpa2 es obligatorio porque necesita acceso privilegiado al hardware USB.
 
 
-<img src="/Images/ru-kali.wpa2.jpeg" width="400">
+<img src="Images/ru-kali.wpa2.jpeg" width="400">
 
 
 Paso 1.2: Configurar modo monitor
