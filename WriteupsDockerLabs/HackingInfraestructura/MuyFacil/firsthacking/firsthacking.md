@@ -85,7 +85,7 @@ Por una extrañ razón no se ha abierto una shell.
 
 <img src="img/NoSession.png" width="400">
 
-Buscando en la web me encuentro que puedo abrir una sesión con **netcat** con uns subshell **(...)** u **echo** con USER **root:)** y que la clave de este exploit es la carita feliz al final de root, la cual nos devuelve una **bidshell** en el puerto 6200 en segundo plano, que se pause 1 segundo con **sleep1** asi podemos detectar los carateres **:)** y abrir el puerto 6200, y poder poner el PASS **test**, comando completo seria **(echo "USER root:)"; sleep 1; echo "PASS test") | nc 172.17.0.2 21**, y posteriormente ejecutamos un netcat en modo verbose a **FirstHacking** y al puerto 6200 con el siguiente comando **nc -v 172.17.0.2 6200** y bingo!! obtenemos una sesión.
+Buscando en la web me encuentro que puedo abrir una sesión con **netcat** con un subshell **(...)** y **echo** con USER **root:)** y que la clave de este exploit es la carita feliz al final de root, la cual nos devuelve una **bindshell** en el puerto 6200 en segundo plano, que se pause 1 segundo con **sleep 1** asi podemos detectar los carateres **:)** y abrir el puerto 6200, y poder poner el PASS **test**, comando completo seria **(echo "USER root:)"; sleep 1; echo "PASS test") | nc 172.17.0.2 21**, y posteriormente ejecutamos un netcat en modo verbose a **FirstHacking** y al puerto 6200 con el siguiente comando **nc -v 172.17.0.2 6200** y bingo!! obtenemos una sesión.
 
 <img src="img/NcCon.png" width="400">
 
@@ -93,7 +93,7 @@ Ahora procedemos a verificar si logramos el paso final que es conseguir **root**
 
 <img src="img/Root.png" width="400">
 
-Ahora podriamos haberlo hechos menos complicado, pero como me gusta investigar opciones... Hice primero la dificil, algo que no sabia con **nc**, ahora procederemos a la version facil cuando **msf** falló, que es copiar el exploit que nios devolvió el **searchexploit vsftpd 2.3.4** y entre las 2 opciones una de ellas era un archivo **.py**, especificamente **49757.py** lo he copiado con **cp /usr/share/exploitdb/exploits/unix/remote/49757.py .** el punto al final es para que guarde en mi pwd actual, luego procederemos a ejecutar **python3 49757.py 172.17.0.2** y nos devuelve una shell, ingresamos **whoami** como nos pide la shell obtenida, y Bingo!! nuevamente hemos obtenido la flag **root**.
+Bingo!! hemos obtenido la flag **root** ... Ahora podriamos haberlo hechos menos complicado, pero como me gusta investigar opciones... Hice primero la dificil, algo que no sabia con **nc**, ahora procederemos a la version facil cuando **msf** falló, que es copiar el exploit que nos devolvió el **searchexploit vsftpd 2.3.4** y entre las 2 opciones una de ellas era un archivo **.py**, especificamente **49757.py** lo he copiado con **cp /usr/share/exploitdb/exploits/unix/remote/49757.py .** el punto al final es para que guarde en mi pwd actual, luego procederemos a ejecutar **python3 49757.py 172.17.0.2** y nos devuelve una shell, ingresamos **whoami** como nos pide la shell obtenida, y Bingo!! nuevamente hemos obtenido la flag **root** por segunda vez.
 
 <img src="img/Root2.png" width="400">
 
