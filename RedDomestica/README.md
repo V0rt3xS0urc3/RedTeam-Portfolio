@@ -2,7 +2,7 @@
 
 # 🏠 Red Doméstica Segmentada con Cisco 892FSP
 
-<img src="RedDomestica/img/banner.png" width="600">
+<img src="img/banner.png" width="600">
 
 **Diego Arriagada Zamora | V0rt3x_S0urc3**
 
@@ -198,7 +198,7 @@
 
     *Mejora de Cobertura: Actualizar los puntos de acceso 2.4GHz a modelos con WiFi 6 para una mayor velocidad y eficiencia.*
     
-    <img src="RedDomestica/img/diagrama.png" width="600">
+    <img src="img/diagrama.png" width="600">
     
    
    *⚠️ Disclaimer*
@@ -214,7 +214,7 @@
    *🔥 ¿Te gustó el proyecto?*
 *¡Dale una estrella ⭐ en GitHub!*
 
-<img src="RedDomestica/img/MiCaricatura.png" width="800">
+<img src="img/MiCaricatura.png" width="800">
 
 ### 🎯 Pentester | Red Team | Hacker Ético
 
