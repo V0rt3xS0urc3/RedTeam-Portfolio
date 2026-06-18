@@ -24,7 +24,10 @@
 
 **Infraestructura de red empresarial aplicada a un entorno doméstico**
 
-<img src="https://img.shields.io/badge/Cisco-892FSP-1BA0D7?style=for-the-badge&logo=cisco&logoColor=white"> <img src="https://img.shields.io/badge/OpenWrt-EDUP-00B5E2?style=for-the-badge&logo=openwrt&logoColor=white"> <img src="https://img.shields.io/badge/VLANs-6_Segmentadas-0052CC?style=for-the-badge"> <img src="https://img.shields.io/badge/VPN-WireGuard-0171CE?style=for-the-badge&logo=wireguard&logoColor=white">
+![Cisco](https://img.shields.io/badge/Cisco-892FSP-1BA0D7?style=for-the-badge&logo=cisco&logoColor=white)
+![OpenWrt](https://img.shields.io/badge/OpenWrt-EDUP-00B5E2?style=for-the-badge&logo=openwrt&logoColor=white)
+![VLANs](https://img.shields.io/badge/VLANs-6_Segmentadas-0052CC?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/QoS-Gaming_Priority-000?style=for-the-badge&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iI2ZmZmZmZiIgY2xhc3M9ImJpIGJpLWdhbWUtcGFkIiB2aWV3Qm94PSIwIDAgMTYgMTYiPjxwYXRoIGQ9Ik00IDBhMSAxIDAgMCAxIDEtMWg2YTEgMSAwIDAgMSAxIDF2NGgxLjVhMSAxIDAgMCAxIC44IDIuNUw4IDYuNSAxLjUgNS41QTEgMSAwIDAgMSAyIDRIM1oiLz48cGF0aCBkPSJNMi41IDYuNWwxLjUgMS41IDQgMCAxLjUgMS41IDEuNS0xLjVINGEyLjUgMi41IDAgMCAxIDAtNXoiLz48L3N2Zz4=)
 
 *Diseño, configuración e implementación de una red doméstica segmentada usando un* **Cisco 892FSP** *como núcleo, con* **6 VLANs** *para aislar tráfico de cámaras, gaming, multimedia, smartphones, invitados y administración. Incluye* **QoS** *para priorizar gaming,* **WireGuard** *para acceso remoto seguro, y puntos de acceso* **WiFi 6** *con OpenWrt.*
 
