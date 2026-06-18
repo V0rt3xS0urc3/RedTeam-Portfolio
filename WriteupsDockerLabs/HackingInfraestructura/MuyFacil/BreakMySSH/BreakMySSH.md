@@ -62,21 +62,68 @@
 >*Como estamos en un entorno controlado se usa modo agresivo. en entornnos reales será necesario utilizar el argumento **-sS** para no ser detectado por algun IDR,* **no se usará --min-rate.**
 
 
-*Hemos encontrado 1 puerto abierto:*
-**SSH (Puerto: 21):** *Puerto SSH OpenSSH 9.2p1.*
+*Análisis:*
+
+    *Servicio: OpenSSH 9.2p1*
+    *Sistema: Debian 12 (Bookworm)*
+    *Vulnerabilidades conocidas: No se encontraron CVEs críticos para esta versión*
 
 <img src="img/PingNmap.png" width="400">
 
-*Usaremos Hydra para encontrar el usuario y password de SSH* **hydra -L /usr/share/seclists/Usernames/top-usernames-shortlist.txt -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2 -t 4** *usando el top usernames de seclist y el diccionario rockyou, logramos encontrar el usuario: * **root** *con la password:* **estrella**.
+*🔓 Fase de Explotación*
+*Ataque de Fuerza Bruta con Hydra*
 
+*Dado que el servicio SSH está expuesto y no tenemos credenciales válidas, procedemos a realizar un ataque de fuerza bruta utilizando Hydra con el diccionario rockyou.txt:* **hydra -L /usr/share/seclists/Usernames/top-usernames-shortlist.txt -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2 -t 4** *usando el top usernames de seclist y el diccionario rockyou, logramos encontrar el usuario: * **root** *con la password:* **estrella**.
+
+*Resultado*
 <img src="img/hydra.png" width="400">
 
+*Acceso SSH*
+*Con las credenciales obtenidas, nos conectamos por SSH:* **ssh root@172.17.0.2**.
 
+*🔐 Escalada de Privilegios*
 
-*Luego entramos a ssh con las credenciales encontradas* **ssh root@172.17.0.2** *y contraseña* **estrella**, hacemos pwd y luego whoami, y verifdicamos qyue ya estamos dentro como root.
+*Nota: En esta máquina, ya obtuvimos acceso directamente como root mediante el ataque de fuerza bruta, por lo que no fue necesario realizar escalada de privilegios adicional.*
+
+*🏁 Captura de Flag*
+
+*Verificamos que tenemos acceso root y capturamos la flag:*
 
 <img src="img/root.png" width="400">
 
+*📚 Aprendizajes Clave*
+
+*Técnicas Aprendidas*
+
+    *Enumeración con Nmap:*
+        Escaneo rápido de puertos con --min-rate
+        Detección de versiones con -sV
+        Uso de scripts por defecto con -sC
+    *Ataque de Fuerza Bruta:*
+        Uso de Hydra para SSH
+        Optimización con -t 4 para evitar bloqueos
+        Selección de diccionario adecuado (rockyou.txt)
+    *Acceso SSH:*
+        Conexión remota con credenciales válidas
+        Verificación de privilegios con whoami e id
+
+*Reflexiones Profesionales*
+
+*⚠️ Nota sobre Entorno Controlado vs Real:*
+*Este laboratorio fue diseñado para fines educativos en un entorno controlado. En un escenario real de pentesting:*
+
+    Los servidores SSH modernos suelen tener protección contra fuerza bruta (fail2ban, limitación de intentos)*
+    *Las contraseñas de root rara vez están en diccionarios comunes*
+    *Se recomienda usar autenticación por claves SSH en lugar de contraseñas*
+    *Los administradores deben implementar políticas de contraseñas fuertes y autenticación multifactor*
+
+*Lección de Seguridad:*
+
+*La máquina demuestra los riesgos de:*
+
+    *Exponer SSH directamente a internet*
+    *Usar contraseñas débiles para cuentas privilegiadas*
+    *No implementar mecanismos de bloqueo tras intentos fallidos*
 
 ## 🧪 Post-Laboratorio
 *Una vez finalizada la máquina, presionamos lacombinación de teclas* **Control + C** *para eliminarla!!!.*
