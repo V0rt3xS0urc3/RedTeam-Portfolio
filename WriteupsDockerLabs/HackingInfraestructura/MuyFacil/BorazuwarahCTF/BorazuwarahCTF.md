@@ -100,7 +100,7 @@
 
 *Ahora procedemos a verificar si logramos el paso final que es conseguir* **root**, *iniciamos SSH con su usuario y pass, ejecutamos un* **whoami** *luego un **sudo -l** para ver si podemos abusar de sudoers, efectivamente tiene* **bash con permisos de sudo, ejecutamos un **sudo bash** *luego un* **whoami** *y ya estamos dentro como* **root**.
 
-<img src="img/Root.png" width="400">
+<img src="img/root.png" width="400">
 
 
 
