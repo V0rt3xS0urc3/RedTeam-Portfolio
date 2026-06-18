@@ -90,11 +90,11 @@
 
 *Volvemos a revisar la imagen, pero esta vez los metadatos con* **exiftool huevito.jpeg** *(Si!, le he cambiado el nombre a la imagen porque quise)... Yvemos que nos da un usuario pero sin pass a la vista.*
 
-<img src="img/exiftool" width="400">
+<img src="img/exiftool.png" width="400">
 
 *Ahora procederemos a usar* **hydra -l borazuwarah -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2 -t 64**, *buscaremos la clave al usuario* **borazuwarah** *al puerto 22 de ssh con diccionario rockyou, encontrando* **123456** *como password.*
 
-<img src="img/hydrabora" width="400">
+<img src="img/hydrabora.png" width="400">
 
 *También quise probar la velocidad de un* **script de nmap**, *primero creando un txt con el usuario borazuwarah,* **echo -e "borazuwarah">usuarios.txt**, *para luego correr el script* **nmap -p 22 --script ssh-brute --script-args userdb=usuarios.txt,passdb=top1000.txt 172.17.0.2** *con el mismo diccionario top1.000 que usamos con* **Hydra**, *y solo demoró 3.21 segundos y hydra demoró 6 segundos. En fin... Que divertido aprender con DockerLabs.*
 
