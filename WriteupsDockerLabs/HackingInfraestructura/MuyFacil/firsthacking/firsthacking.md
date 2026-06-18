@@ -97,6 +97,8 @@ Bingo!! hemos obtenido la flag **root** ... Ahora podriamos haberlo hechos menos
 
 <img src="img/Root2.png" width="400">
 
+<img src="img/diploma_FirstHacking.png" width="600">
+
 
 ## 🧪 Post-Laboratorio
 Una vez finalizada la máquina, presionamos lacombinación de teclas **Control + C** para eliminarla!!!.

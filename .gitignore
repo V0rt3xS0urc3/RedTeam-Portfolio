@@ -5,10 +5,13 @@
 *.vdi
 *.ova
 *.ovf
+*.zip
 
 # Capturas de red
 *.pcap
 *.pcapng
+*.restore
+hydra.restore
 
 # Archivos de contraseñas y hashes (¡muy importante para seguridad!)
 hashes.txt

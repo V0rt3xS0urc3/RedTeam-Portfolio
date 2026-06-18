@@ -203,6 +203,21 @@ RUN git clone https://github.com/epinna/tplmap.git /opt/tplmap && \
     echo "✅ tplmap y jwt_tool instalados desde GitHub"
 
 # =============================================================================
+# 11.5. ESTEGANOGRAFÍA Y ENUMERACIÓN SSH
+# =============================================================================
+# Steghide (esteganografía en imágenes/audio)
+RUN apt update && apt install -y --no-install-recommends \
+    steghide \
+    && apt clean && rm -rf /var/lib/apt/lists/*
+
+# Stegseek (cracker rápido para steghide)
+RUN wget -q https://github.com/RickdeJager/stegseek/releases/download/v0.6/stegseek_0.6-1.deb -O /tmp/stegseek.deb && \
+    dpkg -i /tmp/stegseek.deb || apt install -f -y && \
+    rm -f /tmp/stegseek.deb && \
+    apt clean && rm -rf /var/lib/apt/lists/*
+    
+    
+# =============================================================================
 # 12. REDES Y PROTOCOLOS
 # =============================================================================
 RUN apt update && apt install -y --no-install-recommends \

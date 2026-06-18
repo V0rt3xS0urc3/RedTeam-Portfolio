@@ -124,6 +124,8 @@ Volvemos a la consola para ejecutar el comando que nos dió GTFOBins opción A d
 
 <img src="img/SudoVimRoot.png" width="400">
 
+<img src="img/diploma_Trust.png" width="600">
+
 
 ## 🧪 Post-Laboratorio
 Una vez finalizada la máquina, presionamos lacombinación de teclas **Control + C** para eliminarla!!!.
