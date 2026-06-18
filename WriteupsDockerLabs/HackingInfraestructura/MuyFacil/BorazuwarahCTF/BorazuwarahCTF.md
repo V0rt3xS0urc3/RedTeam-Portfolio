@@ -1,6 +1,6 @@
 <div align="center">
 
-# FirstHacking From DockerLabs.es
+# BorazuwaraCTF From DockerLabs.es
 
 <img src="img/banner.png" width="600">
 
@@ -17,7 +17,7 @@
 >*Puede descargar la máquina a través del* **[enlace mega](https://mega.nz/file/gWNQlaZD#CgYMb_EEBL0jcypTg0xZZUaIqhO47ueX6pPU6utLy1U)**
 
 
-## 🔝 Despliegue Máquina FirstHacking
+## 🔝 Despliegue Máquina Borazuwarah
 
 *Al descargar la máquina, es necesario descomprimir.*
 
@@ -35,7 +35,7 @@
  
  <img src="img/chmod.png" width="400">
 
- *Una vez ejecutado, se utilizará el comando **./auto_deploy.sh firsthacking.tar** para lanzar la máquina vulnerable.*
+ *Una vez ejecutado, se utilizará el comando **./auto_deploy.sh borazuwarah.tar** para lanzar la máquina vulnerable.*
 
 <img src="img/despliegue.png" width="400">
 
