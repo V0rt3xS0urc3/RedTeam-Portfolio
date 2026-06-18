@@ -198,7 +198,8 @@
 
     *Mejora de Cobertura: Actualizar los puntos de acceso 2.4GHz a modelos con WiFi 6 para una mayor velocidad y eficiencia.*
     
-    <img src="img/diagrama.png" width="600">
+
+<img src="img/diagrama.png" width="600">
     
    
    *⚠️ Disclaimer*
