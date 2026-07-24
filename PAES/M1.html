@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+  <title>Simulador PAES M1 · V0rt3x_S0urc3</title>
+  <meta name="author" content="V0rt3x_S0urc3 · Diego Arriagada Zamora">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #f1ede5; font-family: 'Georgia', 'Times New Roman', serif; color: #1e1e1e; padding: 1.5rem 1rem; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .contenedor { max-width: 800px; width: 100%; background: #fffdf9; border-radius: 28px; box-shadow: 0 18px 36px rgba(0,0,0,0.07); padding: 2rem 2rem 2.2rem; border: 1px solid #d9cebc; }
+    .marca-creador { text-align: right; font-size: 0.75rem; color: #8b7d6b; margin-bottom: 0.3rem; font-style: italic; }
+    .marca-creador span { font-weight: 700; color: #5b7a4c; }
+    h1 { font-size: 2rem; font-weight: 600; color: #2c3e2b; border-bottom: 2px solid #b39264; padding-bottom: 0.5rem; margin-bottom: 0.4rem; }
+    .subtitulo { color: #5e5a4f; margin-bottom: 1.2rem; font-style: italic; }
+    .intentos-info { background: #faf7f2; padding: 0.5rem 1rem; border-radius: 20px; display: inline-block; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .barra-progreso { width: 100%; height: 8px; background: #e7dfd2; border-radius: 10px; margin: 1rem 0 1.6rem; }
+    .progreso-lleno { height: 100%; width: 0%; background: #5b7a4c; border-radius: 10px; transition: width 0.2s; }
+    .pregunta-box { background: #fdfcf9; border-left: 6px solid #b39264; padding: 1.5rem; border-radius: 18px; margin-bottom: 1.5rem; }
+    .numero-pregunta { font-weight: 700; color: #7b6e5a; font-size: 0.9rem; margin-bottom: 0.7rem; }
+    .enunciado { font-size: 1.2rem; line-height: 1.5; margin-bottom: 1.6rem; }
+    .opciones { display: flex; flex-direction: column; gap: 0.7rem; }
+    .opcion { background: white; border: 1.5px solid #dbd2c4; border-radius: 14px; padding: 0.75rem 1.1rem; display: flex; align-items: center; gap: 0.9rem; cursor: pointer; transition: 0.15s; }
+    .opcion:hover { background: #f9f5ed; }
+    .opcion.seleccionada { background: #e9e3d4; border-color: #7f6b4c; font-weight: 500; }
+    .letra { font-weight: 700; background: #ede5d9; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem; }
+    .navegacion { display: flex; justify-content: space-between; align-items: center; margin-top: 1.8rem; }
+    button { background: #fefcf8; border: 1.5px solid #c7b59b; padding: 0.7rem 1.6rem; border-radius: 30px; font-weight: 600; font-size: 0.95rem; cursor: pointer; font-family: inherit; transition: 0.2s; }
+    button:hover:not(:disabled) { background: #e7dcc8; border-color: #9b8a70; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-finalizar { background: #5b7a4c; color: white; border-color: #3f5535; }
+    .btn-finalizar:hover:not(:disabled) { background: #47613b; }
+    .resultado-final { background: #f9f6ef; border-radius: 24px; padding: 2rem; text-align: center; }
+    .puntaje-paes { font-size: 4rem; font-weight: 700; color: #2c3e2b; margin: 0.3rem 0; line-height: 1; }
+    .puntaje-etiqueta { font-size: 0.9rem; color: #7b6e5a; letter-spacing: 1px; }
+    .barra-puntaje { width: 80%; height: 12px; background: #e0d5c5; border-radius: 10px; margin: 1rem auto; }
+    .barra-puntaje-lleno { height: 100%; background: #5b7a4c; border-radius: 10px; transition: width 0.5s; }
+    .solucion-item { background: #f5f0e6; border-radius: 14px; padding: 0.7rem 1rem; margin-bottom: 0.5rem; font-size: 0.85rem; text-align: left; }
+    .footer-marca { text-align: center; margin-top: 1.5rem; font-size: 0.7rem; color: #8b7d6b; border-top: 1px solid #d9cebc; padding-top: 0.8rem; }
+    @media (max-width: 500px) { .contenedor { padding: 1.5rem; } .puntaje-paes { font-size: 3rem; } }
+  </style>
+</head>
+<body>
+<div class="contenedor" id="app">
+  <div class="marca-creador">⚡ <span>V0rt3x_S0urc3</span> · Diego Arriagada Zamora</div>
+  <h1>📐 PAES Matemática M1</h1>
+  <p class="subtitulo">Competencia Matemática 1 · 650 preguntas · 65 por intento · 10 intentos</p>
+  <div id="contenidoDinamico"></div>
+  <div class="footer-marca">© V0rt3x_S0urc3 | Diego Arriagada Zamora · Simulador educativo sin fines comerciales</div>
+</div>
+
+<script>
+(function(){
+
+// ============================================
+// PEGAR AQUÍ LAS 650 PREGUNTAS (ver PARTE 2)
+// ============================================
+const bancoM1 = [
+// ===== BLOQUE 1: NÚMEROS (preguntas 1-130) =====
+{enunciado:"El resultado de 3² + 4² es:",opciones:["25","14","49","12","7"],correcta:0,solucion:"3²=9, 4²=16. 9+16=25."},
+{enunciado:"¿Cuál es el 15% de 300?",opciones:["45","30","15","50","60"],correcta:0,solucion:"15% de 300 = 0,15 × 300 = 45."},
+{enunciado:"El mínimo común múltiplo entre 12 y 18 es:",opciones:["36","6","72","24","48"],correcta:0,solucion:"12=2²·3, 18=2·3². MCM=2²·3²=36."},
+{enunciado:"¿Cuál de los siguientes números es primo?",opciones:["21","29","33","39","49"],correcta:1,solucion:"29 solo es divisible por 1 y 29. 21(3×7), 33(3×11), 39(3×13), 49(7×7)."},
+{enunciado:"El valor de 2⁵ es:",opciones:["32","10","25","64","16"],correcta:0,solucion:"2⁵ = 2×2×2×2×2 = 32."},
+{enunciado:"¿Qué fracción es equivalente a 0,6?",opciones:["3/5","2/3","6/10","1/6","4/5"],correcta:0,solucion:"0,6 = 6/10 = 3/5 simplificando por 2."},
+{enunciado:"El máximo común divisor entre 24 y 36 es:",opciones:["12","6","8","4","18"],correcta:0,solucion:"24=2³·3, 36=2²·3². MCD=2²·3=12."},
+{enunciado:"¿Cuál es el resultado de (-5)²?",opciones:["25","-25","10","-10","5"],correcta:0,solucion:"(-5)² = (-5)×(-5) = 25. El cuadrado de un negativo es positivo."},
+{enunciado:"El 30% de 150 más el 20% de 50 es:",opciones:["55","45","65","35","75"],correcta:0,solucion:"30% de 150=45; 20% de 50=10. 45+10=55."},
+{enunciado:"Simplifica la fracción 18/24:",opciones:["3/4","2/3","9/12","6/8","4/5"],correcta:0,solucion:"Dividiendo numerador y denominador por 6: 18/24 = 3/4."},
+{enunciado:"¿Cuál es el valor de √144?",opciones:["12","14","16","10","11"],correcta:0,solucion:"12×12=144, por lo tanto √144=12."},
+{enunciado:"El número decimal 0,125 expresado como fracción es:",opciones:["1/8","1/4","1/5","1/6","1/10"],correcta:0,solucion:"0,125 = 125/1000 = 1/8 simplificando."},
+{enunciado:"¿Cuál es el resultado de 3 × (4 + 2) - 5?",opciones:["13","15","18","7","10"],correcta:0,solucion:"Paréntesis primero: 4+2=6. Luego: 3×6=18. Final: 18-5=13."},
+{enunciado:"En una razón 2:3, si el antecedente es 10, el consecuente es:",opciones:["15","12","20","6","8"],correcta:0,solucion:"2/3 = 10/x → 2x=30 → x=15."},
+{enunciado:"¿Cuál es el inverso multiplicativo de 5?",opciones:["1/5","-5","0,5","5","1"],correcta:0,solucion:"El inverso multiplicativo de a es 1/a. Para 5 es 1/5."},
+{enunciado:"El valor de |-8| + |3| es:",opciones:["11","5","-5","8","3"],correcta:0,solucion:"|-8|=8, |3|=3. 8+3=11."},
+{enunciado:"¿Qué porcentaje es 15 de 60?",opciones:["25%","20%","30%","15%","40%"],correcta:0,solucion:"15/60 = 0,25 = 25%."},
+{enunciado:"El resultado de (2/3) ÷ (4/5) es:",opciones:["5/6","8/15","3/4","6/5","2/4"],correcta:0,solucion:"(2/3)×(5/4)=10/12=5/6."},
+{enunciado:"¿Cuál es la raíz cúbica de 64?",opciones:["4","8","16","2","6"],correcta:0,solucion:"4³=64, por lo tanto ∛64=4."},
+{enunciado:"El número mixto 3 1/2 equivale a:",opciones:["7/2","6/2","5/2","3/2","1/2"],correcta:0,solucion:"3×2+1=7, sobre 2: 7/2."},
+{enunciado:"¿Cuál es el MCD entre 48 y 60?",opciones:["12","6","24","4","8"],correcta:0,solucion:"48=2⁴·3, 60=2²·3·5. MCD=2²·3=12."},
+{enunciado:"El MCM entre 8 y 12 es:",opciones:["24","4","48","16","36"],correcta:0,solucion:"8=2³, 12=2²·3. MCM=2³·3=24."},
+{enunciado:"¿Qué número es divisible por 3?",opciones:["123","124","125","127","128"],correcta:0,solucion:"1+2+3=6, divisible por 3. Los demás suman 7,8,10,11."},
+{enunciado:"El 25% de 400 es:",opciones:["100","50","200","150","80"],correcta:0,solucion:"25% = 1/4. 400÷4=100."},
+{enunciado:"Simplifica: 24/36",opciones:["2/3","3/4","4/6","6/9","1/2"],correcta:0,solucion:"Dividiendo por 12: 24/36 = 2/3."},
+{enunciado:"¿Cuál es el valor de 3³?",opciones:["27","9","6","81","12"],correcta:0,solucion:"3³ = 3×3×3 = 27."},
+{enunciado:"¿Qué fracción es equivalente a 0,75?",opciones:["3/4","1/2","2/3","4/5","5/6"],correcta:0,solucion:"0,75 = 75/100 = 3/4."},
+{enunciado:"El 10% de 500 más el 5% de 200 es:",opciones:["60","55","50","70","65"],correcta:0,solucion:"10% de 500=50; 5% de 200=10. 50+10=60."},
+{enunciado:"¿Cuál es el inverso multiplicativo de 1/4?",opciones:["4","1/4","-4","0,25","-1/4"],correcta:0,solucion:"El inverso de 1/4 es 4/1 = 4."},
+{enunciado:"Resuelve: 5 + 3 × 2 - 4",opciones:["7","9","12","8","6"],correcta:0,solucion:"Jerarquía: 3×2=6. Luego: 5+6-4=7."},
+{enunciado:"¿Cuál es el 50% de 180?",opciones:["90","60","120","80","100"],correcta:0,solucion:"50% = mitad. 180÷2=90."},
+{enunciado:"Convierte 2/5 a porcentaje:",opciones:["40%","20%","25%","50%","30%"],correcta:0,solucion:"2/5 = 0,4 = 40%."},
+{enunciado:"El valor de 10³ es:",opciones:["1000","100","30","300","10000"],correcta:0,solucion:"10³ = 10×10×10 = 1000."},
+{enunciado:"¿Cuál es el resultado de 8 ÷ 2(2+2)?",opciones:["16","1","8","4","2"],correcta:0,solucion:"Paréntesis: 2+2=4. Luego: 8÷2=4. 4×4=16."},
+{enunciado:"El MCD entre 15 y 25 es:",opciones:["5","3","15","25","1"],correcta:0,solucion:"15=3·5, 25=5². MCD=5."},
+{enunciado:"¿Cuál es el 20% de 350?",opciones:["70","50","100","60","80"],correcta:0,solucion:"20% de 350 = 0,2×350 = 70."},
+{enunciado:"Simplifica: 45/60",opciones:["3/4","2/3","5/6","4/5","1/2"],correcta:0,solucion:"Dividiendo por 15: 45/60 = 3/4."},
+{enunciado:"¿Qué número es primo?",opciones:["37","33","35","39","49"],correcta:0,solucion:"37 solo divisible por 1 y 37. 33(3×11), 35(5×7), 39(3×13), 49(7×7)."},
+{enunciado:"El valor de √81 + √16 es:",opciones:["13","9","25","7","15"],correcta:0,solucion:"√81=9, √16=4. 9+4=13."},
+{enunciado:"¿Cuál es el resultado de 2³ × 2²?",opciones:["32","8","16","64","10"],correcta:0,solucion:"2³×2²=2⁵=32."},
+{enunciado:"Convierte 0,2 a fracción:",opciones:["1/5","2/10","1/2","1/4","2/5"],correcta:0,solucion:"0,2 = 2/10 = 1/5."},
+{enunciado:"¿Qué porcentaje es 30 de 120?",opciones:["25%","20%","30%","15%","40%"],correcta:0,solucion:"30/120 = 0,25 = 25%."},
+{enunciado:"El MCM entre 6, 8 y 12 es:",opciones:["24","48","12","36","16"],correcta:0,solucion:"6=2·3, 8=2³, 12=2²·3. MCM=2³·3=24."},
+{enunciado:"Resuelve: (6+4) ÷ 2 × 3",opciones:["15","10","18","5","12"],correcta:0,solucion:"Paréntesis: 6+4=10. Luego: 10÷2=5. 5×3=15."},
+{enunciado:"¿Cuál es el 75% de 200?",opciones:["150","100","175","125","50"],correcta:0,solucion:"75% = 3/4. 200×3/4 = 150."},
+{enunciado:"El valor de 5⁻² es:",opciones:["0,04","-25","25","0,4","-0,04"],correcta:0,solucion:"5⁻² = 1/5² = 1/25 = 0,04."},
+{enunciado:"¿Cuál es la fracción generatriz de 0,333...?",opciones:["1/3","3/10","33/100","1/2","3/9"],correcta:0,solucion:"0,333... = 3/9 = 1/3."},
+{enunciado:"El MCD entre 72 y 90 es:",opciones:["18","12","24","36","6"],correcta:0,solucion:"72=2³·3², 90=2·3²·5. MCD=2·3²=18."},
+{enunciado:"¿Cuál es el 40% de 250?",opciones:["100","80","120","150","60"],correcta:0,solucion:"40% de 250 = 0,4×250 = 100."},
+{enunciado:"Simplifica: 16/20",opciones:["4/5","3/4","2/3","5/6","1/2"],correcta:0,solucion:"Dividiendo por 4: 16/20 = 4/5."},
+{enunciado:"¿Cuál es el valor de 4² + 3³?",opciones:["43","25","16","27","35"],correcta:0,solucion:"4²=16, 3³=27. 16+27=43."},
+{enunciado:"Convierte 3/8 a decimal:",opciones:["0,375","0,25","0,5","0,125","0,625"],correcta:0,solucion:"3÷8 = 0,375."},
+{enunciado:"¿Qué número es divisible por 9?",opciones:["108","107","109","110","112"],correcta:0,solucion:"1+0+8=9, divisible por 9."},
+{enunciado:"El valor de |-12| - |5| es:",opciones:["7","17","-7","-17","12"],correcta:0,solucion:"|-12|=12, |5|=5. 12-5=7."},
+{enunciado:"¿Cuál es el 5% de 1000?",opciones:["50","100","5","10","500"],correcta:0,solucion:"5% de 1000 = 0,05×1000 = 50."},
+{enunciado:"Resuelve: 2 × (5+3) - 4²",opciones:["0","8","12","16","4"],correcta:0,solucion:"5+3=8. 2×8=16. 4²=16. 16-16=0."},
+{enunciado:"El MCM entre 5 y 7 es:",opciones:["35","12","5","7","70"],correcta:0,solucion:"5 y 7 son primos. MCM = 5×7 = 35."},
+{enunciado:"¿Cuál es el 30% de 600?",opciones:["180","200","120","150","100"],correcta:0,solucion:"30% de 600 = 0,3×600 = 180."},
+{enunciado:"Simplifica: 27/45",opciones:["3/5","2/3","5/9","4/5","1/3"],correcta:0,solucion:"Dividiendo por 9: 27/45 = 3/5."},
+{enunciado:"¿Cuál es el valor de 6² - 4²?",opciones:["20","10","2","36","16"],correcta:0,solucion:"6²=36, 4²=16. 36-16=20."},
+{enunciado:"El 12% de 250 es:",opciones:["30","25","20","35","40"],correcta:0,solucion:"12% de 250 = 0,12×250 = 30."},
+{enunciado:"¿Qué fracción es equivalente a 0,2?",opciones:["1/5","2/5","1/2","1/4","1/10"],correcta:0,solucion:"0,2 = 2/10 = 1/5."},
+{enunciado:"El MCD entre 28 y 42 es:",opciones:["14","7","21","6","28"],correcta:0,solucion:"28=2²·7, 42=2·3·7. MCD=2·7=14."},
+{enunciado:"¿Cuál es el resultado de (3/4) × (2/5)?",opciones:["3/10","6/20","5/9","1/2","2/3"],correcta:0,solucion:"(3×2)/(4×5)=6/20=3/10."},
+{enunciado:"Resuelve: 15 - 3 × 2 + 4",opciones:["13","15","10","20","8"],correcta:0,solucion:"3×2=6. Luego: 15-6+4=13."},
+{enunciado:"¿Cuál es la raíz cuadrada de 169?",opciones:["13","12","14","15","11"],correcta:0,solucion:"13×13=169, por lo tanto √169=13."},
+{enunciado:"El valor de 2⁴ × 2³ es:",opciones:["128","64","32","256","16"],correcta:0,solucion:"2⁴×2³=2⁷=128."},
+{enunciado:"Convierte 5/4 a decimal:",opciones:["1,25","1,5","0,8","2,5","1,75"],correcta:0,solucion:"5÷4 = 1,25."},
+{enunciado:"¿Qué porcentaje es 45 de 150?",opciones:["30%","25%","40%","20%","35%"],correcta:0,solucion:"45/150 = 0,3 = 30%."},
+{enunciado:"El MCM entre 9 y 15 es:",opciones:["45","30","90","15","60"],correcta:0,solucion:"9=3², 15=3·5. MCM=3²·5=45."},
+{enunciado:"¿Cuál es el 80% de 500?",opciones:["400","300","450","350","250"],correcta:0,solucion:"80% de 500 = 0,8×500 = 400."},
+{enunciado:"Simplifica: 36/48",opciones:["3/4","2/3","4/5","5/6","1/2"],correcta:0,solucion:"Dividiendo por 12: 36/48 = 3/4."},
+{enunciado:"El valor de |7-12| es:",opciones:["5","-5","7","12","19"],correcta:0,solucion:"|7-12| = |-5| = 5."},
+{enunciado:"¿Cuál es el resultado de 9 ÷ 3 × 2?",opciones:["6","1,5","3","18","4"],correcta:0,solucion:"Izquierda a derecha: 9÷3=3. 3×2=6."},
+{enunciado:"El 60% de 300 es:",opciones:["180","200","150","120","240"],correcta:0,solucion:"60% de 300 = 0,6×300 = 180."},
+{enunciado:"¿Qué número es múltiplo de 6?",opciones:["54","52","50","55","53"],correcta:0,solucion:"54÷6=9 exacto. Los demás tienen residuo."},
+{enunciado:"La fracción 7/8 en decimal es:",opciones:["0,875","0,75","0,7","0,85","0,8"],correcta:0,solucion:"7÷8 = 0,875."},
+{enunciado:"Resuelve: 2³ + 4² - 5",opciones:["19","8","16","11","15"],correcta:0,solucion:"2³=8, 4²=16. 8+16-5=19."},
+{enunciado:"¿Cuál es el MCD entre 60 y 84?",opciones:["12","6","24","18","4"],correcta:0,solucion:"60=2²·3·5, 84=2²·3·7. MCD=2²·3=12."},
+{enunciado:"El 35% de 200 es:",opciones:["70","80","60","50","90"],correcta:0,solucion:"35% de 200 = 0,35×200 = 70."},
+{enunciado:"Simplifica: 50/75",opciones:["2/3","1/2","3/4","4/5","5/6"],correcta:0,solucion:"Dividiendo por 25: 50/75 = 2/3."},
+{enunciado:"¿Cuál es el valor de 10² - 5²?",opciones:["75","100","25","50","15"],correcta:0,solucion:"10²=100, 5²=25. 100-25=75."},
+{enunciado:"El 8% de 5000 es:",opciones:["400","40","80","800","200"],correcta:0,solucion:"8% de 5000 = 0,08×5000 = 400."},
+{enunciado:"Convierte 0,05 a fracción:",opciones:["1/20","1/5","5/100","1/2","1/10"],correcta:0,solucion:"0,05 = 5/100 = 1/20."},
+{enunciado:"¿Qué número es divisible por 4?",opciones:["124","122","123","125","127"],correcta:0,solucion:"124÷4=31 exacto. Regla: últimos 2 dígitos (24) divisible por 4."},
+{enunciado:"El MCM entre 4, 6 y 10 es:",opciones:["60","30","120","20","12"],correcta:0,solucion:"4=2², 6=2·3, 10=2·5. MCM=2²·3·5=60."},
+{enunciado:"¿Cuál es el resultado de 5/6 + 1/3?",opciones:["7/6","6/9","2/3","1","5/9"],correcta:0,solucion:"1/3=2/6. 5/6+2/6=7/6."},
+{enunciado:"El 45% de 400 es:",opciones:["180","200","160","120","220"],correcta:0,solucion:"45% de 400 = 0,45×400 = 180."},
+{enunciado:"Resuelve: (8-3)² + 2",opciones:["27","25","7","10","15"],correcta:0,solucion:"8-3=5. 5²=25. 25+2=27."},
+{enunciado:"¿Cuál es el inverso multiplicativo de 8?",opciones:["1/8","-8","8","0,125","-1/8"],correcta:0,solucion:"El inverso de 8 es 1/8 = 0,125."},
+{enunciado:"Simplifica: 63/84",opciones:["3/4","2/3","5/7","4/5","6/7"],correcta:0,solucion:"Dividiendo por 21: 63/84 = 3/4."},
+{enunciado:"El valor de 3⁴ es:",opciones:["81","12","27","64","36"],correcta:0,solucion:"3⁴ = 3×3×3×3 = 81."},
+{enunciado:"¿Qué porcentaje es 18 de 72?",opciones:["25%","20%","30%","15%","10%"],correcta:0,solucion:"18/72 = 0,25 = 25%."},
+{enunciado:"El MCD entre 45 y 75 es:",opciones:["15","5","25","3","10"],correcta:0,solucion:"45=3²·5, 75=3·5². MCD=3·5=15."},
+{enunciado:"¿Cuál es el 150% de 60?",opciones:["90","120","60","30","100"],correcta:0,solucion:"150% de 60 = 1,5×60 = 90."},
+{enunciado:"Convierte 11/4 a número mixto:",opciones:["2 3/4","2 1/4","3 1/4","1 3/4","2 1/2"],correcta:0,solucion:"11÷4=2 con resto 3. 2 3/4."},
+{enunciado:"Resuelve: 4 × 3 + 6 ÷ 2",opciones:["15","12","9","18","10"],correcta:0,solucion:"4×3=12, 6÷2=3. 12+3=15."},
+{enunciado:"¿Cuál es el valor de √100 + √25?",opciones:["15","10","5","20","12"],correcta:0,solucion:"√100=10, √25=5. 10+5=15."},
+{enunciado:"El 2% de 5000 es:",opciones:["100","10","50","200","500"],correcta:0,solucion:"2% de 5000 = 0,02×5000 = 100."},
+{enunciado:"Simplifica: 72/90",opciones:["4/5","3/4","5/6","2/3","7/8"],correcta:0,solucion:"Dividiendo por 18: 72/90 = 4/5."},
+{enunciado:"¿Cuál es el resultado de 7/8 - 1/4?",opciones:["5/8","6/8","3/8","1/2","3/4"],correcta:0,solucion:"1/4=2/8. 7/8-2/8=5/8."},
+{enunciado:"El 25% de un número es 40. ¿Cuál es el número?",opciones:["160","100","40","200","80"],correcta:0,solucion:"0,25x=40 → x=40/0,25=160."},
+{enunciado:"¿Qué número es divisible por 11?",opciones:["121","120","122","123","124"],correcta:0,solucion:"121÷11=11 exacto."},
+{enunciado:"El MCM entre 3, 5 y 7 es:",opciones:["105","35","15","21","70"],correcta:0,solucion:"Son primos entre sí. MCM=3×5×7=105."},
+{enunciado:"¿Cuál es el valor de 2⁻³?",opciones:["0,125","-8","8","-0,125","0,25"],correcta:0,solucion:"2⁻³ = 1/2³ = 1/8 = 0,125."},
+{enunciado:"Resuelve: 20 - (5+3) × 2",opciones:["4","12","16","8","10"],correcta:0,solucion:"5+3=8. 8×2=16. 20-16=4."},
+{enunciado:"El 15% de 400 más el 25% de 80 es:",opciones:["80","60","100","70","90"],correcta:0,solucion:"15% de 400=60; 25% de 80=20. 60+20=80."},
+{enunciado:"Convierte 3/5 a porcentaje:",opciones:["60%","30%","35%","50%","40%"],correcta:0,solucion:"3/5 = 0,6 = 60%."},
+{enunciado:"¿Cuál es el MCD entre 36 y 54?",opciones:["18","12","9","6","27"],correcta:0,solucion:"36=2²·3², 54=2·3³. MCD=2·3²=18."},
+{enunciado:"El valor de 5² + 2⁴ es:",opciones:["41","25","16","29","36"],correcta:0,solucion:"5²=25, 2⁴=16. 25+16=41."},
+{enunciado:"¿Qué fracción es equivalente a 0,4?",opciones:["2/5","1/4","3/5","1/2","4/5"],correcta:0,solucion:"0,4 = 4/10 = 2/5."},
+{enunciado:"Simplifica: 90/120",opciones:["3/4","2/3","5/6","4/5","1/2"],correcta:0,solucion:"Dividiendo por 30: 90/120 = 3/4."},
+{enunciado:"El 70% de 300 es:",opciones:["210","200","180","240","150"],correcta:0,solucion:"70% de 300 = 0,7×300 = 210."},
+{enunciado:"Resuelve: 3² × 2 + 4",opciones:["22","18","14","10","28"],correcta:0,solucion:"3²=9. 9×2=18. 18+4=22."},
+{enunciado:"¿Cuál es la raíz cuadrada de 196?",opciones:["14","12","16","13","15"],correcta:0,solucion:"14×14=196, por lo tanto √196=14."},
+{enunciado:"El 1% de 10000 es:",opciones:["100","10","1000","1","500"],correcta:0,solucion:"1% de 10000 = 0,01×10000 = 100."},
+{enunciado:"Convierte 0,875 a fracción:",opciones:["7/8","3/4","5/8","2/3","4/5"],correcta:0,solucion:"0,875 = 875/1000 = 7/8."},
+{enunciado:"¿Qué número es divisible por 5 y por 3?",opciones:["30","25","20","35","40"],correcta:0,solucion:"30÷5=6, 30÷3=10. Es divisible por ambos."},
+{enunciado:"El MCM entre 12 y 20 es:",opciones:["60","40","120","80","30"],correcta:0,solucion:"12=2²·3, 20=2²·5. MCM=2²·3·5=60."},
+{enunciado:"¿Cuál es el resultado de 4/5 + 2/3?",opciones:["22/15","6/8","26/15","10/15","20/15"],correcta:0,solucion:"4/5=12/15, 2/3=10/15. 12/15+10/15=22/15."},
+{enunciado:"El 33% de 900 es aproximadamente:",opciones:["300","270","330","250","200"],correcta:0,solucion:"33% ≈ 1/3. 900÷3=300."},
+{enunciado:"Simplifica: 84/96",opciones:["7/8","3/4","5/6","2/3","6/7"],correcta:0,solucion:"Dividiendo por 12: 84/96 = 7/8."},
+{enunciado:"Resuelve: 2 × (3+4) - 5",opciones:["9","7","11","14","12"],correcta:0,solucion:"3+4=7. 2×7=14. 14-5=9."},
+{enunciado:"El valor de 4³ es:",opciones:["64","12","16","48","36"],correcta:0,solucion:"4³ = 4×4×4 = 64."},
+{enunciado:"¿Cuál es el MCD entre 24 y 40?",opciones:["8","12","4","6","10"],correcta:0,solucion:"24=2³·3, 40=2³·5. MCD=2³=8."},
+{enunciado:"El 5% de 2000 es:",opciones:["100","50","200","10","500"],correcta:0,solucion:"5% de 2000 = 0,05×2000 = 100."},
+{enunciado:"Convierte 9/5 a decimal:",opciones:["1,8","1,5","0,9","2,5","1,2"],correcta:0,solucion:"9÷5 = 1,8."},
+{enunciado:"¿Qué porcentaje es 60 de 240?",opciones:["25%","30%","20%","15%","40%"],correcta:0,solucion:"60/240 = 0,25 = 25%."},
+{enunciado:"El MCM entre 7 y 9 es:",opciones:["63","16","21","72","49"],correcta:0,solucion:"7 y 9 son coprimos. MCM=7×9=63."},
+{enunciado:"¿Cuál es el resultado de 10 - 2³ + 1?",opciones:["3","7","5","9","11"],correcta:0,solucion:"2³=8. 10-8+1=3."},
+{enunciado:"El 120% de 50 es:",opciones:["60","100","70","40","80"],correcta:0,solucion:"120% de 50 = 1,2×50 = 60."},
+{enunciado:"Simplifica: 42/56",opciones:["3/4","2/3","5/7","4/5","1/2"],correcta:0,solucion:"Dividiendo por 14: 42/56 = 3/4."},
+{enunciado:"Resuelve: 5² - 3 × 4",opciones:["13","22","8","16","10"],correcta:0,solucion:"5²=25. 3×4=12. 25-12=13."},
+{enunciado:"¿Cuál es el valor de √49 + √9?",opciones:["10","16","8","7","13"],correcta:0,solucion:"√49=7, √9=3. 7+3=10."},
+{enunciado:"El MCD entre 50 y 75 es:",opciones:["25","5","15","10","50"],correcta:0,solucion:"50=2·5², 75=3·5². MCD=5²=25."},
+{enunciado:"Convierte 0,16 a fracción simplificada:",opciones:["4/25","16/100","1/6","2/12","8/50"],correcta:0,solucion:"0,16=16/100=4/25."},
+// ===== BLOQUE 2: ÁLGEBRA (preguntas 131-260) =====
+{enunciado:"Si 2x + 5 = 19, entonces x vale:",opciones:["7","6","8","12","5"],correcta:0,solucion:"2x=14 → x=7."},
+{enunciado:"Factoriza: x² - 16",opciones:["(x+4)(x-4)","(x-4)²","(x+4)²","x(x-16)","(x-8)(x+2)"],correcta:0,solucion:"Diferencia de cuadrados: x²-16=(x+4)(x-4)."},
+{enunciado:"El valor de f(2) si f(x)=3x²-2x+1 es:",opciones:["9","11","7","5","13"],correcta:0,solucion:"f(2)=3·4-4+1=12-4+1=9."},
+{enunciado:"Resuelve: 3(x-1) = 2(x+2)",opciones:["x=7","x=5","x=6","x=4","x=8"],correcta:0,solucion:"3x-3=2x+4 → x=7."},
+{enunciado:"La pendiente de la recta y = -2x + 5 es:",opciones:["-2","5","2","-5","1/2"],correcta:0,solucion:"Forma y=mx+b, m es la pendiente: m=-2."},
+{enunciado:"¿Cuál es el valor de x en 5ˣ = 125?",opciones:["3","5","25","2","4"],correcta:0,solucion:"125=5³, por lo tanto x=3."},
+{enunciado:"Simplifica: 2a²b · 3ab²",opciones:["6a³b³","5a²b²","6a²b²","5a³b³","6ab"],correcta:0,solucion:"2·3=6, a²·a=a³, b·b²=b³. Resultado: 6a³b³."},
+{enunciado:"La solución de la inecuación 3x - 4 < 8 es:",opciones:["x < 4","x > 4","x < 12","x > 2","x < 2"],correcta:0,solucion:"3x<12 → x<4."},
+{enunciado:"¿Cuál es el coeficiente de x en 5x² - 3x + 7?",opciones:["-3","5","7","3","x"],correcta:0,solucion:"El coeficiente del término en x es -3."},
+{enunciado:"Si a=3 y b=-2, ¿cuánto es a² + 2b?",opciones:["5","13","1","9","7"],correcta:0,solucion:"a²=9, 2b=-4. 9+(-4)=5."},
+{enunciado:"El producto (x+3)(x-3) es igual a:",opciones:["x² - 9","x² + 9","x² - 6x - 9","x² + 6x + 9","x² - 3x + 9"],correcta:0,solucion:"Suma por diferencia: (x+3)(x-3)=x²-9."},
+{enunciado:"¿Cuál es la ecuación de la recta que pasa por (0,4) con pendiente 2?",opciones:["y = 2x + 4","y = 4x + 2","y = x + 4","y = 2x - 4","y = 4x - 2"],correcta:0,solucion:"Forma punto-pendiente: y-4=2(x-0) → y=2x+4."},
+{enunciado:"Si f(x)=x²-4, las raíces son:",opciones:["x=±2","x=2","x=-2","x=4","x=±4"],correcta:0,solucion:"x²-4=0 → x²=4 → x=±2."},
+{enunciado:"Completa el trinomio: x² + 6x + ?",opciones:["9","6","3","12","36"],correcta:0,solucion:"(x+3)² = x²+6x+9. Falta 9."},
+{enunciado:"La expresión 4x² - 9 se factoriza como:",opciones:["(2x+3)(2x-3)","(4x+9)(x-1)","(2x-3)²","(2x+9)(2x-1)","(4x-3)(x+3)"],correcta:0,solucion:"Diferencia de cuadrados: (2x)²-3²=(2x+3)(2x-3)."},
+{enunciado:"Resuelve: 2x - 7 = 3x + 5",opciones:["x = -12","x = 12","x = 2","x = -2","x = -5"],correcta:0,solucion:"2x-3x=5+7 → -x=12 → x=-12."},
+{enunciado:"La función f(x)=2x+1 evaluada en x=4 da:",opciones:["9","7","8","6","10"],correcta:0,solucion:"f(4)=2·4+1=9."},
+{enunciado:"Simplifica: (x²)³",opciones:["x⁶","x⁵","x⁸","x³","x²"],correcta:0,solucion:"(x²)³ = x^(2·3) = x⁶."},
+{enunciado:"¿Cuál es el valor de x en 2ˣ = 64?",opciones:["6","5","7","8","4"],correcta:0,solucion:"64=2⁶, por lo tanto x=6."},
+{enunciado:"El dominio de f(x)=√(x-5) es:",opciones:["x ≥ 5","x > 5","x ≤ 5","x < 5","Todos los reales"],correcta:0,solucion:"Radicando ≥ 0: x-5≥0 → x≥5."},
+{enunciado:"Resuelve el sistema: x+y=8, x-y=2",opciones:["(5,3)","(4,4)","(6,2)","(3,5)","(7,1)"],correcta:0,solucion:"Sumando: 2x=10→x=5. y=8-5=3."},
+{enunciado:"Factoriza: x² + 5x + 6",opciones:["(x+2)(x+3)","(x+1)(x+6)","(x-2)(x-3)","(x+5)(x+1)","(x-1)(x+6)"],correcta:0,solucion:"Buscando factores de 6 que sumen 5: 2 y 3. (x+2)(x+3)."},
+{enunciado:"La recta y = 3x - 2 corta al eje Y en:",opciones:["-2","3","2","-3","0"],correcta:0,solucion:"Ordenada al origen: cuando x=0, y=-2."},
+{enunciado:"Resuelve: 5x + 3 = 2x + 12",opciones:["x=3","x=2","x=4","x=5","x=1"],correcta:0,solucion:"5x-2x=12-3 → 3x=9 → x=3."},
+{enunciado:"¿Cuál es el vértice de y=x²-4x+5?",opciones:["(2,1)","(-2,1)","(2,5)","(4,5)","(0,5)"],correcta:0,solucion:"x=-b/(2a)=4/2=2. y=4-8+5=1. Vértice (2,1)."},
+{enunciado:"Simplifica: 3x + 2y - x + 4y",opciones:["2x + 6y","4x + 6y","2x + 2y","3x + 6y","x + 6y"],correcta:0,solucion:"3x-x=2x, 2y+4y=6y. 2x+6y."},
+{enunciado:"Si f(x)=x²+3x-2, f(-1) es:",opciones:["-4","0","-2","-6","2"],correcta:0,solucion:"f(-1)=1-3-2=-4."},
+{enunciado:"La inecuación 2x+1 > 7 tiene solución:",opciones:["x > 3","x < 3","x > 4","x < 4","x > 2"],correcta:0,solucion:"2x>6 → x>3."},
+{enunciado:"Factoriza: x² - 25",opciones:["(x+5)(x-5)","(x-5)²","(x+5)²","x(x-25)","(x-25)(x+1)"],correcta:0,solucion:"Diferencia de cuadrados: x²-5²=(x+5)(x-5)."},
+{enunciado:"Resuelve: 4(x+1) = 2x + 10",opciones:["x=3","x=2","x=4","x=5","x=1"],correcta:0,solucion:"4x+4=2x+10 → 2x=6 → x=3."},
+{enunciado:"El producto de las raíces de x²-5x+6=0 es:",opciones:["6","5","-5","-6","3"],correcta:0,solucion:"Producto = c/a = 6/1 = 6."},
+{enunciado:"La suma de las raíces de x²-8x+15=0 es:",opciones:["8","-8","15","-15","4"],correcta:0,solucion:"Suma = -b/a = 8/1 = 8."},
+{enunciado:"¿Para qué valor de m, x²+mx+9=0 tiene raíz doble?",opciones:["±6","6","3","±3","9"],correcta:0,solucion:"Δ=0: m²-36=0 → m=±6."},
+{enunciado:"Simplifica: (x+2)² - (x-2)²",opciones:["8x","4x","2x","x","4"],correcta:0,solucion:"(x²+4x+4)-(x²-4x+4)=8x."},
+{enunciado:"Resuelve: |x-3| = 5",opciones:["x=8 o x=-2","x=8","x=2","x=-8","x=5"],correcta:0,solucion:"x-3=5→x=8; x-3=-5→x=-2."},
+{enunciado:"La función inversa de f(x)=4x-1 es:",opciones:["f⁻¹(x)=(x+1)/4","f⁻¹(x)=4x+1","f⁻¹(x)=x/4-1","f⁻¹(x)=(x-1)/4","f⁻¹(x)=1/(4x)"],correcta:0,solucion:"y=4x-1→x=4y-1→y=(x+1)/4."},
+{enunciado:"El valor de log₂(16) es:",opciones:["4","2","8","16","3"],correcta:0,solucion:"2⁴=16 → log₂(16)=4."},
+{enunciado:"Si 3ˣ = 81, entonces x es:",opciones:["4","3","5","2","6"],correcta:0,solucion:"81=3⁴ → x=4."},
+{enunciado:"Resuelve: 2x² - 8 = 0",opciones:["x=±2","x=2","x=4","x=±4","x=0"],correcta:0,solucion:"2x²=8→x²=4→x=±2."},
+{enunciado:"Factoriza: x² + 2x - 8",opciones:["(x+4)(x-2)","(x-4)(x+2)","(x+8)(x-1)","(x-8)(x+1)","(x+1)(x-8)"],correcta:0,solucion:"Factores de -8 que sumen 2: 4 y -2. (x+4)(x-2)."},
+{enunciado:"La recta 2x + y = 6 tiene pendiente:",opciones:["-2","2","6","-6","1/2"],correcta:0,solucion:"y=-2x+6. Pendiente m=-2."},
+{enunciado:"Resuelve: x/3 + 2 = 5",opciones:["x=9","x=6","x=12","x=3","x=15"],correcta:0,solucion:"x/3=3→x=9."},
+{enunciado:"El mínimo de la función f(x)=x²-2x+3 es:",opciones:["2","1","3","0","-1"],correcta:0,solucion:"Vértice en x=1. f(1)=1-2+3=2."},
+{enunciado:"Simplifica: a³ · a² · a⁻¹",opciones:["a⁴","a⁵","a³","a²","a⁶"],correcta:0,solucion:"3+2-1=4. a⁴."},
+{enunciado:"Si x+y=7 y x-y=1, el valor de xy es:",opciones:["12","10","6","14","8"],correcta:0,solucion:"Sumando: 2x=8→x=4, y=3. xy=12."},
+{enunciado:"Resuelve: 3(x-2) + 4 = 2x + 1",opciones:["x=3","x=2","x=4","x=1","x=5"],correcta:0,solucion:"3x-6+4=2x+1→3x-2=2x+1→x=3."},
+{enunciado:"La parábola y=(x-1)²+2 tiene vértice en:",opciones:["(1,2)","(-1,2)","(1,-2)","(-1,-2)","(0,2)"],correcta:0,solucion:"Forma canónica: y=(x-h)²+k. Vértice (h,k)=(1,2)."},
+{enunciado:"Factoriza: 2x² + 6x",opciones:["2x(x+3)","x(2x+6)","2(x²+3x)","2x(x+6)","x²(2+6x)"],correcta:0,solucion:"Factor común 2x: 2x(x+3)."},
+{enunciado:"Resuelve: 5 - 2(x+1) = 3",opciones:["x=0","x=1","x=2","x=-1","x=3"],correcta:0,solucion:"5-2x-2=3→3-2x=3→-2x=0→x=0."},
+{enunciado:"El valor de x en 4ˣ = 256 es:",opciones:["4","3","5","8","16"],correcta:0,solucion:"256=4⁴ → x=4."},
+{enunciado:"Simplifica: (2x³y)²",opciones:["4x⁶y²","2x⁶y²","4x⁵y²","2x⁵y","4x³y²"],correcta:0,solucion:"2²=4, (x³)²=x⁶, y²=y². 4x⁶y²."},
+{enunciado:"Resuelve: x² - 9 = 0",opciones:["x=±3","x=3","x=9","x=±9","x=0"],correcta:0,solucion:"x²=9→x=±3."},
+{enunciado:"La función f(x)=|x-2| evaluada en x=5 da:",opciones:["3","5","7","2","-3"],correcta:0,solucion:"|5-2|=|3|=3."},
+{enunciado:"Factoriza: x² - 7x + 12",opciones:["(x-3)(x-4)","(x+3)(x+4)","(x-2)(x-6)","(x-1)(x-12)","(x+2)(x+5)"],correcta:0,solucion:"Factores de 12 que sumen -7: -3 y -4. (x-3)(x-4)."},
+{enunciado:"Resuelve: 2(x+3) = 3(x-1) + 2",opciones:["x=7","x=5","x=3","x=9","x=1"],correcta:0,solucion:"2x+6=3x-3+2→2x+6=3x-1→x=7."},
+{enunciado:"El recorrido de f(x)=x² es:",opciones:["[0,∞[","ℝ","]0,∞[","[-1,∞[","[1,∞["],correcta:0,solucion:"x²≥0 para todo x. Recorrido: [0,∞[."},
+{enunciado:"Si a+b=10 y a-b=4, el valor de a²-b² es:",opciones:["40","20","100","16","60"],correcta:0,solucion:"a²-b²=(a+b)(a-b)=10·4=40."},
+{enunciado:"Simplifica: x⁴ ÷ x²",opciones:["x²","x⁶","x⁸","x","x³"],correcta:0,solucion:"x⁴÷x²=x^(4-2)=x²."},
+{enunciado:"Resuelve: 3x + 5 = 2x - 1",opciones:["x=-6","x=6","x=-4","x=4","x=-2"],correcta:0,solucion:"3x-2x=-1-5→x=-6."},
+{enunciado:"La ecuación x²-6x+9=0 tiene:",opciones:["Raíz doble x=3","Dos raíces distintas","Raíz doble x=-3","Sin solución real","x=0"],correcta:0,solucion:"(x-3)²=0 → x=3 (doble)."},
+{enunciado:"Factoriza: 3x² - 12",opciones:["3(x+2)(x-2)","3(x²-4)","(3x+6)(x-2)","3x(x-4)","(3x-6)(x+2)"],correcta:0,solucion:"3(x²-4)=3(x+2)(x-2)."},
+{enunciado:"Resuelve: x/2 + x/3 = 5",opciones:["x=6","x=5","x=10","x=3","x=8"],correcta:0,solucion:"3x/6+2x/6=5→5x/6=5→x=6."},
+{enunciado:"La recta perpendicular a y=2x+1 tiene pendiente:",opciones:["-1/2","2","-2","1/2","1"],correcta:0,solucion:"Perpendicular: m₁·m₂=-1. 2·m₂=-1→m₂=-1/2."},
+{enunciado:"El valor de x en log₃(x)=4 es:",opciones:["81","12","7","64","27"],correcta:0,solucion:"3⁴=x→x=81."},
+{enunciado:"Simplifica: (x-1)(x+1) + 1",opciones:["x²","x²-1","x²+1","x²-2","2x"],correcta:0,solucion:"(x²-1)+1=x²."},
+{enunciado:"Resuelve: 4x - 3 = 2x + 7",opciones:["x=5","x=4","x=6","x=3","x=2"],correcta:0,solucion:"4x-2x=7+3→2x=10→x=5."},
+{enunciado:"La función f(x)=x³-1 evaluada en x=2 da:",opciones:["7","8","6","9","5"],correcta:0,solucion:"f(2)=8-1=7."},
+{enunciado:"Factoriza: x² + 4x + 4",opciones:["(x+2)²","(x-2)²","(x+4)(x+1)","(x-4)(x-1)","(x+1)²"],correcta:0,solucion:"Trinomio cuadrado perfecto: (x+2)²."},
+{enunciado:"Resuelve: 2(x²-1) = 6",opciones:["x=±2","x=2","x=±1","x=±3","x=0"],correcta:0,solucion:"x²-1=3→x²=4→x=±2."},
+{enunciado:"La inecuación -2x > 8 tiene solución:",opciones:["x < -4","x > -4","x < 4","x > 4","x < -2"],correcta:0,solucion:"Dividiendo por -2 (invierte signo): x < -4."},
+{enunciado:"Si f(x)=2ˣ, f(5) es:",opciones:["32","10","25","64","16"],correcta:0,solucion:"2⁵=32."},
+{enunciado:"Simplifica: 5x - 3(x-2)",opciones:["2x + 6","2x - 6","8x + 6","5x + 6","2x + 2"],correcta:0,solucion:"5x-3x+6=2x+6."},
+{enunciado:"Resuelve el sistema: 3x+y=10, x-2y=-4",opciones:["(2,4)","(4,2)","(3,1)","(1,7)","(0,10)"],correcta:0,solucion:"De 1ª: y=10-3x. En 2ª: x-2(10-3x)=-4→x-20+6x=-4→7x=16→x=2, y=4."},
+{enunciado:"Factoriza: x² - 1",opciones:["(x+1)(x-1)","(x-1)²","(x+1)²","x(x-1)","(x-1)(1-x)"],correcta:0,solucion:"Diferencia de cuadrados: x²-1=(x+1)(x-1)."},
+{enunciado:"El valor de x en 2ˣ⁺¹ = 32 es:",opciones:["4","5","3","6","2"],correcta:0,solucion:"32=2⁵→x+1=5→x=4."},
+{enunciado:"Resuelve: |2x-4| = 6",opciones:["x=5 o x=-1","x=5","x=-1","x=3","x=1"],correcta:0,solucion:"2x-4=6→x=5; 2x-4=-6→x=-1."},
+{enunciado:"La ecuación de la recta que pasa por (2,3) y (4,7) es:",opciones:["y=2x-1","y=x+1","y=2x+1","y=3x-3","y=x+2"],correcta:0,solucion:"Pendiente: (7-3)/(4-2)=2. y-3=2(x-2)→y=2x-1."},
+{enunciado:"Simplifica: (x²y³)/(xy)",opciones:["xy²","x²y²","x³y⁴","xy","x²y"],correcta:0,solucion:"x²/x=x, y³/y=y². xy²."},
+{enunciado:"Resuelve: 3 - x = 2x + 6",opciones:["x=-1","x=1","x=-3","x=3","x=0"],correcta:0,solucion:"-x-2x=6-3→-3x=3→x=-1."},
+{enunciado:"La suma de dos números es 15 y su diferencia es 3. ¿Cuáles son?",opciones:["9 y 6","10 y 5","8 y 7","12 y 3","11 y 4"],correcta:0,solucion:"x+y=15, x-y=3→2x=18→x=9, y=6."},
+{enunciado:"Factoriza: 4x² + 12x + 9",opciones:["(2x+3)²","(2x-3)²","(4x+3)(x+3)","(2x+9)(2x+1)","(4x+1)(x+9)"],correcta:0,solucion:"(2x)²+2·2x·3+3²=(2x+3)²."},
+{enunciado:"Resuelve: 5x/2 = 15",opciones:["x=6","x=5","x=10","x=3","x=7"],correcta:0,solucion:"5x=30→x=6."},
+{enunciado:"El vértice de y=-x²+4x-3 es:",opciones:["(2,1)","(-2,1)","(2,-1)","(4,-3)","(0,-3)"],correcta:0,solucion:"x=-4/(2·-1)=2. y=-4+8-3=1. Vértice (2,1)."},
+{enunciado:"Si f(x)=√(x+4), el dominio es:",opciones:["x ≥ -4","x ≥ 4","x ≤ -4","x > -4","Todos los reales"],correcta:0,solucion:"Radicando ≥0: x+4≥0→x≥-4."},
+{enunciado:"Simplifica: 2(x+1) + 3(x-2)",opciones:["5x - 4","5x + 4","5x - 1","x - 4","5x + 1"],correcta:0,solucion:"2x+2+3x-6=5x-4."},
+{enunciado:"Resuelve: x² - 5x + 6 = 0",opciones:["x=2 o x=3","x=1 o x=6","x=-2 o x=-3","x=5 o x=1","x=0 o x=6"],correcta:0,solucion:"(x-2)(x-3)=0→x=2, x=3."},
+{enunciado:"La recta y=5 es:",opciones:["Horizontal","Vertical","Creciente","Decreciente","Pasa por el origen"],correcta:0,solucion:"y=constante: recta horizontal paralela al eje X."},
+{enunciado:"Factoriza: x³ - x",opciones:["x(x+1)(x-1)","x(x²-1)","x²(x-1)","(x-1)(x²+1)","x(x-1)²"],correcta:0,solucion:"x(x²-1)=x(x+1)(x-1)."},
+{enunciado:"Resuelve: 2(x+3) - 4 = x + 8",opciones:["x=6","x=4","x=8","x=2","x=10"],correcta:0,solucion:"2x+6-4=x+8→2x+2=x+8→x=6."},
+{enunciado:"El valor de log₅(125) es:",opciones:["3","5","25","2","4"],correcta:0,solucion:"5³=125→log₅(125)=3."},
+{enunciado:"La inecuación 4x - 1 ≤ 7 tiene solución:",opciones:["x ≤ 2","x ≥ 2","x ≤ 1","x ≥ 3","x ≤ 3"],correcta:0,solucion:"4x≤8→x≤2."},
+{enunciado:"Simplifica: (x+2)²",opciones:["x²+4x+4","x²+4","x²+2x+4","x²+4x+2","x²+2"],correcta:0,solucion:"(x+2)²=x²+2·x·2+2²=x²+4x+4."},
+{enunciado:"Resuelve: 3x + 4 = 2x - 1",opciones:["x=-5","x=5","x=-3","x=3","x=-4"],correcta:0,solucion:"3x-2x=-1-4→x=-5."},
+{enunciado:"La función f(x)=1/x no está definida para:",opciones:["x=0","x=1","x=-1","x=2","x=5"],correcta:0,solucion:"División por cero no definida. Dominio: ℝ-{0}."},
+{enunciado:"Factoriza: x² - 6x + 9",opciones:["(x-3)²","(x+3)²","(x-9)(x+1)","(x-1)(x-9)","(x-3)(x+3)"],correcta:0,solucion:"Trinomio cuadrado perfecto: (x-3)²."},
+{enunciado:"Resuelve: 4(x-1) = 3x + 2",opciones:["x=6","x=4","x=2","x=8","x=10"],correcta:0,solucion:"4x-4=3x+2→x=6."},
+{enunciado:"El producto (x+5)(x-5) es:",opciones:["x²-25","x²+25","x²-10x-25","x²+10x+25","x²-5"],correcta:0,solucion:"Suma por diferencia: x²-5²=x²-25."},
+{enunciado:"Si 4ˣ = 64, x vale:",opciones:["3","4","2","8","16"],correcta:0,solucion:"64=4³→x=3."},
+{enunciado:"La pendiente de la recta que pasa por (1,2) y (3,8) es:",opciones:["3","2","4","6","1"],correcta:0,solucion:"(8-2)/(3-1)=6/2=3."},
+{enunciado:"Resuelve: 2x² = 18",opciones:["x=±3","x=3","x=9","x=±9","x=6"],correcta:0,solucion:"x²=9→x=±3."},
+{enunciado:"Simplifica: 3(x²+2x) - 2x(x+1)",opciones:["x²+4x","x²+6x","3x²+4x","x²+2x","5x²+4x"],correcta:0,solucion:"3x²+6x-2x²-2x=x²+4x."},
+{enunciado:"La solución de |x+1| = 0 es:",opciones:["x=-1","x=1","x=0","x=2","x=-2"],correcta:0,solucion:"|x+1|=0→x+1=0→x=-1."},
+{enunciado:"Factoriza: 2x² - 8x",opciones:["2x(x-4)","x(2x-8)","2(x²-4x)","2x(x-8)","2x²(1-4x)"],correcta:0,solucion:"Factor común 2x: 2x(x-4)."},
+{enunciado:"Resuelve: x/4 - 1 = 2",opciones:["x=12","x=8","x=6","x=4","x=10"],correcta:0,solucion:"x/4=3→x=12."},
+{enunciado:"El eje de simetría de y=x²-6x+5 es:",opciones:["x=3","x=-3","x=6","x=5","x=0"],correcta:0,solucion:"x=-b/(2a)=6/2=3."},
+{enunciado:"Si f(x)=3x-2 y g(x)=x+1, (f+g)(2) es:",opciones:["7","5","8","6","9"],correcta:0,solucion:"f(2)=4, g(2)=3. (f+g)(2)=7."},
+{enunciado:"Resuelve: 5 - 3x = 2x + 10",opciones:["x=-1","x=1","x=-2","x=2","x=0"],correcta:0,solucion:"-3x-2x=10-5→-5x=5→x=-1."},
+// ===== BLOQUE 3: GEOMETRÍA (preguntas 261-390) =====
+{enunciado:"El área de un triángulo de base 10 cm y altura 6 cm es:",opciones:["30 cm²","60 cm²","16 cm²","20 cm²","40 cm²"],correcta:0,solucion:"Área = (base×altura)/2 = (10×6)/2 = 30 cm²."},
+{enunciado:"El perímetro de un rectángulo de lados 8 m y 5 m es:",opciones:["26 m","40 m","13 m","20 m","16 m"],correcta:0,solucion:"Perímetro = 2(8+5) = 26 m."},
+{enunciado:"¿Cuánto mide la hipotenusa con catetos 6 cm y 8 cm?",opciones:["10 cm","14 cm","12 cm","9 cm","11 cm"],correcta:0,solucion:"√(6²+8²)=√100=10 cm."},
+{enunciado:"El área de un círculo de radio 7 cm (π≈3,14) es:",opciones:["153,86 cm²","43,96 cm²","21,98 cm²","140 cm²","150 cm²"],correcta:0,solucion:"A=πr²=3,14×49=153,86 cm²."},
+{enunciado:"La suma de ángulos interiores de un triángulo es:",opciones:["180°","360°","90°","270°","120°"],correcta:0,solucion:"Todo triángulo suma 180°."},
+{enunciado:"Volumen de un cubo de arista 4 cm:",opciones:["64 cm³","16 cm³","32 cm³","48 cm³","24 cm³"],correcta:0,solucion:"V=a³=4³=64 cm³."},
+{enunciado:"Área de un cuadrado de diagonal 8 cm:",opciones:["32 cm²","64 cm²","16 cm²","24 cm²","40 cm²"],correcta:0,solucion:"Lado=d/√2. Área=(8/√2)²=64/2=32 cm²."},
+{enunciado:"Perímetro de circunferencia de radio 10 cm (π≈3,14):",opciones:["62,8 cm","31,4 cm","314 cm","20 cm","15,7 cm"],correcta:0,solucion:"P=2πr=2×3,14×10=62,8 cm."},
+{enunciado:"Área de un rombo con diagonales 8 cm y 6 cm:",opciones:["24 cm²","48 cm²","14 cm²","28 cm²","12 cm²"],correcta:0,solucion:"Área=(D×d)/2=(8×6)/2=24 cm²."},
+{enunciado:"¿Cuántos grados tiene un ángulo recto?",opciones:["90°","180°","45°","60°","120°"],correcta:0,solucion:"Ángulo recto = 90°."},
+{enunciado:"Suma de ángulos interiores de un cuadrilátero:",opciones:["360°","180°","540°","270°","450°"],correcta:0,solucion:"2 triángulos: 2×180°=360°."},
+{enunciado:"Volumen de un prisma rectangular 3×4×5:",opciones:["60","12","20","35","47"],correcta:0,solucion:"V=3×4×5=60."},
+{enunciado:"Área de un triángulo equilátero de lado 4 cm:",opciones:["4√3 cm²","8 cm²","16 cm²","12 cm²","6√3 cm²"],correcta:0,solucion:"A=(√3/4)·l²=(√3/4)·16=4√3 cm²."},
+{enunciado:"La diagonal de un rectángulo de lados 3 y 4 es:",opciones:["5","7","6","8","12"],correcta:0,solucion:"d=√(3²+4²)=√25=5."},
+{enunciado:"El área de un trapecio de bases 6 y 10 y altura 4 es:",opciones:["32","64","16","24","40"],correcta:0,solucion:"A=((B+b)/2)·h=((10+6)/2)·4=8·4=32."},
+{enunciado:"Volumen de una esfera de radio 3 cm (π≈3):",opciones:["108 cm³","36 cm³","27 cm³","81 cm³","54 cm³"],correcta:0,solucion:"V=(4/3)πr³=(4/3)·3·27=108 cm³."},
+{enunciado:"El complemento de un ángulo de 40° es:",opciones:["50°","140°","40°","90°","60°"],correcta:0,solucion:"Complemento: 90°-40°=50°."},
+{enunciado:"El suplemento de un ángulo de 60° es:",opciones:["120°","30°","60°","90°","180°"],correcta:0,solucion:"Suplemento: 180°-60°=120°."},
+{enunciado:"Área de un sector circular de radio 6 y ángulo 60°:",opciones:["6π","12π","3π","36π","18π"],correcta:0,solucion:"A=(θ/360)·πr²=(60/360)·36π=6π."},
+{enunciado:"Longitud de arco de 90° en circunferencia de radio 4:",opciones:["2π","4π","π","8π","3π"],correcta:0,solucion:"L=(90/360)·2π·4=(1/4)·8π=2π."},
+{enunciado:"El volumen de un cilindro de radio 2 y altura 5 es:",opciones:["20π","10π","4π","25π","15π"],correcta:0,solucion:"V=πr²h=π·4·5=20π."},
+{enunciado:"Área total de un cubo de arista 3:",opciones:["54","27","36","18","9"],correcta:0,solucion:"6 caras: 6×3²=6×9=54."},
+{enunciado:"La altura de un triángulo equilátero de lado 6 es:",opciones:["3√3","6","3","6√3","2√3"],correcta:0,solucion:"h=(√3/2)·l=(√3/2)·6=3√3."},
+{enunciado:"Un cono tiene radio 3 y altura 4. Su generatriz es:",opciones:["5","7","6","4","8"],correcta:0,solucion:"g=√(r²+h²)=√(9+16)=5."},
+{enunciado:"Área lateral de un cilindro de radio 3 y altura 10:",opciones:["60π","30π","90π","15π","20π"],correcta:0,solucion:"AL=2πrh=2π·3·10=60π."},
+{enunciado:"Volumen de una pirámide de base cuadrada lado 4 y altura 6:",opciones:["32","48","16","24","64"],correcta:0,solucion:"V=(1/3)·Ab·h=(1/3)·16·6=32."},
+{enunciado:"El área de un pentágono regular de lado 5 y apotema 3,4:",opciones:["42,5","25","17","85","34"],correcta:0,solucion:"A=(perímetro×apotema)/2=(25×3,4)/2=42,5."},
+{enunciado:"La distancia entre los puntos (1,2) y (4,6) es:",opciones:["5","4","6","3","7"],correcta:0,solucion:"√((4-1)²+(6-2)²)=√(9+16)=√25=5."},
+{enunciado:"El punto medio del segmento A(2,4) y B(6,10) es:",opciones:["(4,7)","(3,5)","(8,14)","(2,3)","(4,4)"],correcta:0,solucion:"((2+6)/2,(4+10)/2)=(4,7)."},
+{enunciado:"La recta y=3x-1 tiene pendiente:",opciones:["3","-1","1","-3","1/3"],correcta:0,solucion:"Forma y=mx+b: m=3."},
+{enunciado:"El área de un hexágono regular de lado 4 es:",opciones:["24√3","48","16√3","12√3","36"],correcta:0,solucion:"A=(3√3/2)·l²=(3√3/2)·16=24√3."},
+{enunciado:"La suma de ángulos de un pentágono es:",opciones:["540°","360°","180°","720°","600°"],correcta:0,solucion:"(n-2)×180°=(5-2)×180°=540°."},
+{enunciado:"Radio de una circunferencia de perímetro 31,4 cm:",opciones:["5 cm","10 cm","15 cm","3 cm","7 cm"],correcta:0,solucion:"P=2πr→31,4=2·3,14·r→r=5."},
+{enunciado:"Volumen de un cono de radio 3 y altura 7:",opciones:["21π","63π","9π","27π","14π"],correcta:0,solucion:"V=(1/3)πr²h=(1/3)π·9·7=21π."},
+{enunciado:"La recta perpendicular a y=-2x+5 tiene pendiente:",opciones:["1/2","-2","2","-1/2","5"],correcta:0,solucion:"m₁·m₂=-1→-2·m₂=-1→m₂=1/2."},
+{enunciado:"Área de un triángulo rectángulo de catetos 5 y 12:",opciones:["30","60","17","34","13"],correcta:0,solucion:"A=(5×12)/2=30."},
+{enunciado:"La ecuación x²+y²=16 representa una circunferencia de radio:",opciones:["4","16","8","2","1"],correcta:0,solucion:"r²=16→r=4."},
+{enunciado:"Área de un romboide de base 8 y altura 5:",opciones:["40","13","20","80","26"],correcta:0,solucion:"A=base×altura=8×5=40."},
+{enunciado:"El centro de (x-2)²+(y+3)²=9 es:",opciones:["(2,-3)","(-2,3)","(2,3)","(-2,-3)","(3,-2)"],correcta:0,solucion:"Centro (h,k)=(2,-3)."},
+{enunciado:"Volumen de un prisma triangular base 6 altura base 4 y altura prisma 10:",opciones:["120","60","240","80","30"],correcta:0,solucion:"Ab=(6×4)/2=12. V=12×10=120."},
+{enunciado:"La pendiente de la recta 3x-2y+6=0 es:",opciones:["3/2","-3/2","2/3","-2/3","3"],correcta:0,solucion:"-2y=-3x-6→y=(3/2)x+3. m=3/2."},
+{enunciado:"Área superficial de una esfera de radio 5:",opciones:["100π","25π","50π","20π","75π"],correcta:0,solucion:"A=4πr²=4π·25=100π."},
+{enunciado:"El ángulo central de un pentágono regular es:",opciones:["72°","60°","90°","108°","120°"],correcta:0,solucion:"360°/5=72°."},
+{enunciado:"El ángulo interior de un hexágono regular es:",opciones:["120°","60°","90°","108°","135°"],correcta:0,solucion:"(6-2)×180°/6=720/6=120°."},
+// ===== BLOQUE 4: PROBABILIDAD Y ESTADÍSTICA (preguntas 391-520) =====
+{enunciado:"Al lanzar un dado, P(número par) es:",opciones:["1/2","1/3","2/3","1/6","5/6"],correcta:0,solucion:"Pares: 2,4,6 → 3/6=1/2."},
+{enunciado:"La media de 4,8,6,10,12 es:",opciones:["8","7","9","10","6"],correcta:0,solucion:"(4+8+6+10+12)/5=40/5=8."},
+{enunciado:"Al lanzar dos monedas, P(dos caras):",opciones:["1/4","1/2","3/4","1/3","2/3"],correcta:0,solucion:"CC,CX,XC,XX → 1/4."},
+{enunciado:"La mediana de 3,7,9,11,15 es:",opciones:["9","7","11","8","10"],correcta:0,solucion:"Dato central ordenado: 9."},
+{enunciado:"Si P(lluvia)=0,3, P(no lluvia) es:",opciones:["0,7","0,3","0,5","1","0,6"],correcta:0,solucion:"P(no lluvia)=1-0,3=0,7."},
+{enunciado:"En una bolsa 3 rojas y 5 azules, P(roja):",opciones:["3/8","5/8","3/5","1/2","2/3"],correcta:0,solucion:"Total=8, rojas=3. 3/8."},
+{enunciado:"La moda de 2,3,3,5,5,5,7 es:",opciones:["5","3","2","7","4"],correcta:0,solucion:"5 aparece 3 veces."},
+{enunciado:"En mazo español (40 cartas), P(oro):",opciones:["1/4","1/10","1/5","1/2","1/8"],correcta:0,solucion:"10 oros/40=1/4."},
+{enunciado:"Rango de 5,8,12,3,20:",opciones:["17","20","5","15","8"],correcta:0,solucion:"20-3=17."},
+{enunciado:"P(evento imposible):",opciones:["0","1","0,5","Depende","No se calcula"],correcta:0,solucion:"Probabilidad 0."},
+{enunciado:"Al lanzar un dado dos veces, resultados posibles:",opciones:["36","12","6","18","24"],correcta:0,solucion:"6×6=36."},
+{enunciado:"Media de 10,20,30:",opciones:["20","15","25","30","60"],correcta:0,solucion:"(10+20+30)/3=20."},
+{enunciado:"P(número primo al lanzar un dado):",opciones:["1/2","1/3","2/3","1/6","5/6"],correcta:0,solucion:"Primos: 2,3,5 → 3/6=1/2."},
+{enunciado:"La probabilidad de un evento seguro es:",opciones:["1","0","0,5","0,75","Depende"],correcta:0,solucion:"Evento seguro: P=1."},
+{enunciado:"Media de 2,4,6,8,10,12:",opciones:["7","6","8","5","9"],correcta:0,solucion:"(2+4+6+8+10+12)/6=42/6=7."},
+{enunciado:"Mediana de 1,3,5,7,9,11:",opciones:["6","5","7","8","4"],correcta:0,solucion:"(5+7)/2=6."},
+{enunciado:"Al extraer una carta, P(rey) en mazo de 52:",opciones:["1/13","1/4","1/52","4/13","1/26"],correcta:0,solucion:"4 reyes/52=1/13."},
+{enunciado:"En una urna 6 blancas y 4 negras, P(negra):",opciones:["2/5","3/5","1/2","4/5","1/5"],correcta:0,solucion:"4/10=2/5."},
+{enunciado:"Varianza de 2,2,2,2:",opciones:["0","2","4","1","8"],correcta:0,solucion:"Todos iguales: varianza 0."},
+{enunciado:"P(suma 7 al lanzar dos dados):",opciones:["1/6","1/12","1/36","1/4","1/3"],correcta:0,solucion:"Combinaciones: (1,6),(2,5),(3,4),(4,3),(5,2),(6,1). 6/36=1/6."},
+{enunciado:"La frecuencia relativa siempre suma:",opciones:["1","100","0","50","Depende"],correcta:0,solucion:"La suma de frecuencias relativas = 1 (o 100%)."},
+{enunciado:"Moda de 1,1,2,2,2,3,4,4:",opciones:["2","1","3","4","No tiene"],correcta:0,solucion:"2 aparece 3 veces."},
+{enunciado:"P(múltiplo de 3 en un dado):",opciones:["1/3","1/2","1/6","2/3","5/6"],correcta:0,solucion:"3 y 6 → 2/6=1/3."},
+{enunciado:"Promedio de 5 números que suman 45:",opciones:["9","5","45","10","8"],correcta:0,solucion:"45/5=9."},
+{enunciado:"Si P(A)=0,4 y P(B)=0,3, y son excluyentes, P(A∪B):",opciones:["0,7","0,12","0,1","0,5","1"],correcta:0,solucion:"Excluyentes: P(A∪B)=0,4+0,3=0,7."},
+{enunciado:"Al lanzar 3 monedas, P(exactamente 2 caras):",opciones:["3/8","1/2","1/4","1/8","5/8"],correcta:0,solucion:"Casos: CCX,CXC,XCC. 3/8."},
+{enunciado:"La mediana de un conjunto par de datos:",opciones:["Promedio de los dos centrales","El dato central","El mayor","El menor","No existe"],correcta:0,solucion:"Con n par, mediana = promedio de los valores en posiciones n/2 y n/2+1."},
+{enunciado:"Percentil 50 equivale a:",opciones:["Mediana","Media","Moda","Rango","Varianza"],correcta:0,solucion:"Percentil 50 = mediana = cuartil 2."},
+{enunciado:"En una distribución simétrica:",opciones:["Media = Mediana = Moda","Media > Mediana","Media < Mediana","No tiene moda","Es asimétrica"],correcta:0,solucion:"En simetría perfecta coinciden las tres medidas de tendencia central."},
+{enunciado:"P(no salga 6 en un dado):",opciones:["5/6","1/6","1/2","2/3","1/3"],correcta:0,solucion:"1-P(6)=1-1/6=5/6."},
+// ===== BLOQUE 5: PREGUNTAS ADICIONALES (521-650) =====
+{enunciado:"El 18% de 450 es:",opciones:["81","72","90","63","54"],correcta:0,solucion:"0,18×450=81."},
+{enunciado:"Resuelve: 7x-3=4x+9",opciones:["x=4","x=3","x=5","x=2","x=6"],correcta:0,solucion:"7x-4x=9+3→3x=12→x=4."},
+{enunciado:"Área de un círculo de diámetro 10:",opciones:["25π","100π","10π","50π","5π"],correcta:0,solucion:"r=5. A=π·25=25π."},
+{enunciado:"MCM entre 10 y 15:",opciones:["30","5","150","15","60"],correcta:0,solucion:"10=2·5, 15=3·5. MCM=2·3·5=30."},
+{enunciado:"La raíz cuadrada de 225 es:",opciones:["15","25","12","18","10"],correcta:0,solucion:"15²=225."},
+{enunciado:"Simplifica: 4x+2y-3x+5y",opciones:["x+7y","7x+7y","x+3y","7x+3y","x+7x"],correcta:0,solucion:"4x-3x=x, 2y+5y=7y. x+7y."},
+{enunciado:"El 65% de 800 es:",opciones:["520","480","560","600","450"],correcta:0,solucion:"0,65×800=520."},
+{enunciado:"Factoriza: x²-49",opciones:["(x+7)(x-7)","(x-7)²","(x+7)²","x(x-49)","(x-49)(x+1)"],correcta:0,solucion:"x²-7²=(x+7)(x-7)."},
+{enunciado:"Perímetro de un triángulo equilátero de lado 9:",opciones:["27","18","36","81","12"],correcta:0,solucion:"3×9=27."},
+{enunciado:"Resuelve: 2x+3=5x-6",opciones:["x=3","x=2","x=4","x=1","x=5"],correcta:0,solucion:"2x-5x=-6-3→-3x=-9→x=3."},
+{enunciado:"El 40% de un número es 60. El número es:",opciones:["150","100","120","200","80"],correcta:0,solucion:"0,4x=60→x=60/0,4=150."},
+{enunciado:"Volumen de un cubo de arista 5:",opciones:["125","25","15","100","75"],correcta:0,solucion:"5³=125."},
+{enunciado:"La probabilidad de obtener un as de un mazo de 52 cartas:",opciones:["1/13","1/4","1/52","4/13","1/26"],correcta:0,solucion:"4 ases/52=1/13."},
+{enunciado:"¿Cuál es el 200% de 30?",opciones:["60","30","90","15","120"],correcta:0,solucion:"200% = 2 veces. 2×30=60."},
+{enunciado:"Resuelve: 3(x+2)=2(x+5)",opciones:["x=4","x=3","x=5","x=2","x=1"],correcta:0,solucion:"3x+6=2x+10→x=4."},
+{enunciado:"MCD entre 18 y 24:",opciones:["6","12","3","9","18"],correcta:0,solucion:"18=2·3², 24=2³·3. MCD=2·3=6."},
+{enunciado:"Área de un rectángulo de lados 12 y 7:",opciones:["84","38","42","19","72"],correcta:0,solucion:"12×7=84."},
+{enunciado:"El valor de 3⁰ es:",opciones:["1","0","3","-3","No existe"],correcta:0,solucion:"Todo número elevado a 0 es 1 (excepto 0⁰)."},
+{enunciado:"La media de 5,10,15,20,25,30:",opciones:["17,5","15","20","25","10"],correcta:0,solucion:"(5+10+15+20+25+30)/6=105/6=17,5."},
+{enunciado:"Resuelve: x²-36=0",opciones:["x=±6","x=6","x=-6","x=36","x=0"],correcta:0,solucion:"x²=36→x=±6."},
+{enunciado:"El 0,5% de 2000 es:",opciones:["10","100","5","50","1"],correcta:0,solucion:"0,005×2000=10."},
+{enunciado:"Simplifica: 6x²/3x",opciones:["2x","3x","2","6x","x²"],correcta:0,solucion:"6/3=2, x²/x=x. 2x."},
+{enunciado:"La suma de dos números es 20 y su producto es 96. ¿Cuáles son?",opciones:["12 y 8","10 y 10","14 y 6","16 y 4","18 y 2"],correcta:0,solucion:"12+8=20, 12×8=96."},
+{enunciado:"Perímetro de un cuadrado de área 49 cm²:",opciones:["28 cm","14 cm","21 cm","49 cm","7 cm"],correcta:0,solucion:"Lado=√49=7. Perímetro=4×7=28."},
+{enunciado:"Resuelve: 5-2x=3x+10",opciones:["x=-1","x=1","x=-2","x=2","x=0"],correcta:0,solucion:"-2x-3x=10-5→-5x=5→x=-1."},
+{enunciado:"El 75% de un número es 150. El número es:",opciones:["200","150","100","250","300"],correcta:0,solucion:"0,75x=150→x=150/0,75=200."},
+{enunciado:"Factoriza: 3x²+6x",opciones:["3x(x+2)","x(3x+6)","3(x²+2x)","3x(x+6)","x²(3+6x)"],correcta:0,solucion:"Factor común 3x: 3x(x+2)."},
+{enunciado:"Volumen de un cilindro de radio 5 y altura 4:",opciones:["100π","25π","50π","20π","75π"],correcta:0,solucion:"V=πr²h=π·25·4=100π."},
+{enunciado:"La moda de 7,7,7,8,9,9,10 es:",opciones:["7","8","9","10","No hay"],correcta:0,solucion:"7 aparece 3 veces."},
+{enunciado:"Resuelve: 4x+1=2x+9",opciones:["x=4","x=3","x=5","x=2","x=1"],correcta:0,solucion:"4x-2x=9-1→2x=8→x=4."},
+{enunciado:"Convierte 7/20 a porcentaje:",opciones:["35%","30%","25%","40%","45%"],correcta:0,solucion:"7/20=0,35=35%."},
+{enunciado:"Área de un triángulo de lados 3,4,5:",opciones:["6","12","10","8","7,5"],correcta:0,solucion:"Rectángulo: (3×4)/2=6."},
+{enunciado:"El valor de 2³+3² es:",opciones:["17","13","25","12","10"],correcta:0,solucion:"8+9=17."},
+{enunciado:"P(sacar un trébol de un mazo de 52 cartas):",opciones:["1/4","1/13","1/52","1/2","13/52"],correcta:0,solucion:"13 tréboles/52=1/4."},
+{enunciado:"Simplifica: (x-3)(x+3)+9",opciones:["x²","x²-9","x²+9","x²-6","x²+6"],correcta:0,solucion:"x²-9+9=x²."},
+{enunciado:"El 30% de 90 es:",opciones:["27","30","18","36","21"],correcta:0,solucion:"0,3×90=27."},
+{enunciado:"Resuelve: 6x-4=2x+8",opciones:["x=3","x=2","x=4","x=1","x=5"],correcta:0,solucion:"6x-2x=8+4→4x=12→x=3."},
+{enunciado:"La diagonal de un cuadrado de lado 5 es:",opciones:["5√2","10","5","√50","2√5"],correcta:0,solucion:"d=l√2=5√2."},
+{enunciado:"MCM entre 4,6,8:",opciones:["24","48","12","16","32"],correcta:0,solucion:"4=2², 6=2·3, 8=2³. MCM=2³·3=24."},
+{enunciado:"El complemento de 35° es:",opciones:["55°","145°","35°","65°","45°"],correcta:0,solucion:"90°-35°=55°."},
+{enunciado:"Resuelve: 2x²=32",opciones:["x=±4","x=4","x=16","x=±16","x=8"],correcta:0,solucion:"x²=16→x=±4."},
+{enunciado:"El 15% de 200 más el 10% de 300 es:",opciones:["60","50","70","80","40"],correcta:0,solucion:"30+30=60."},
+{enunciado:"La función f(x)=x²-1 tiene vértice en:",opciones:["(0,-1)","(0,1)","(1,0)","(-1,0)","(0,0)"],correcta:0,solucion:"Parábola estándar desplazada: vértice (0,-1)."},
+{enunciado:"Área lateral de un cono de radio 4 y generatriz 5:",opciones:["20π","15π","25π","10π","30π"],correcta:0,solucion:"AL=πrg=π·4·5=20π."},
+{enunciado:"La mediana de 2,4,6,8,10,12,14:",opciones:["8","6","10","7","9"],correcta:0,solucion:"7 datos, el central (4°): 8."},
+{enunciado:"Resuelve: 3x+5=2x-3",opciones:["x=-8","x=8","x=-2","x=2","x=-5"],correcta:0,solucion:"3x-2x=-3-5→x=-8."},
+{enunciado:"El 125% de 80 es:",opciones:["100","120","60","90","110"],correcta:0,solucion:"1,25×80=100."},
+{enunciado:"Factoriza: x²+10x+25",opciones:["(x+5)²","(x-5)²","(x+10)(x+2)","(x+25)(x+1)","(x+5)(x+5)"],correcta:0,solucion:"Trinomio cuadrado perfecto: (x+5)²."},
+{enunciado:"Perímetro de un círculo de radio 5 (π≈3,14):",opciones:["31,4","15,7","78,5","25","10"],correcta:0,solucion:"2πr=2·3,14·5=31,4."},
+{enunciado:"Resuelve: 7-x=2x+1",opciones:["x=2","x=3","x=1","x=4","x=5"],correcta:0,solucion:"-x-2x=1-7→-3x=-6→x=2."},
+{enunciado:"El MCD entre 30 y 45:",opciones:["15","5","30","10","3"],correcta:0,solucion:"30=2·3·5, 45=3²·5. MCD=3·5=15."},
+{enunciado:"Volumen de una esfera de radio 6 (π≈3):",opciones:["864","216","432","288","144"],correcta:0,solucion:"V=(4/3)·3·216=864."},
+{enunciado:"La probabilidad de no sacar un 1 en un dado es:",opciones:["5/6","1/6","1/2","2/3","4/6"],correcta:0,solucion:"1-1/6=5/6."},
+{enunciado:"Resuelve: 5x-2(x+1)=3x+4",opciones:["x=6","x=4","x=2","x=8","x=10"],correcta:0,solucion:"5x-2x-2=3x+4→3x-2=3x+4→-2=4 (imposible). Sin solución real."},
+{enunciado:"El 2,5% de 4000 es:",opciones:["100","10","50","200","25"],correcta:0,solucion:"0,025×4000=100."},
+{enunciado:"Área de un trapecio de bases 8 y 12 y altura 5:",opciones:["50","40","100","25","60"],correcta:0,solucion:"((8+12)/2)·5=10·5=50."},
+{enunciado:"Simplifica: a³b²/ab",opciones:["a²b","a³b","ab²","a²b²","ab"],correcta:0,solucion:"a³/a=a², b²/b=b. a²b."},
+{enunciado:"El suplemento de 110° es:",opciones:["70°","80°","90°","60°","110°"],correcta:0,solucion:"180°-110°=70°."},
+{enunciado:"Resuelve: 3x²-27=0",opciones:["x=±3","x=3","x=9","x=±9","x=27"],correcta:0,solucion:"3x²=27→x²=9→x=±3."},
+{enunciado:"La media de 10 números iguales a 5 es:",opciones:["5","10","50","0","1"],correcta:0,solucion:"(10×5)/10=5."},
+{enunciado:"Factoriza: 4x²-1",opciones:["(2x+1)(2x-1)","(4x+1)(x-1)","(2x-1)²","(4x-1)(x+1)","(2x+1)²"],correcta:0,solucion:"(2x)²-1²=(2x+1)(2x-1)."},
+{enunciado:"El 20% de un número es 45. El número es:",opciones:["225","200","150","250","180"],correcta:0,solucion:"0,2x=45→x=45/0,2=225."},
+{enunciado:"Perímetro de un triángulo isósceles de lados iguales 10 y base 12:",opciones:["32","30","22","28","24"],correcta:0,solucion:"10+10+12=32."},
+{enunciado:"Resuelve: 2(x-3)+4=x+5",opciones:["x=7","x=5","x=3","x=9","x=1"],correcta:0,solucion:"2x-6+4=x+5→2x-2=x+5→x=7."},
+{enunciado:"El MCM entre 15 y 25:",opciones:["75","5","150","50","25"],correcta:0,solucion:"15=3·5, 25=5². MCM=3·5²=75."},
+{enunciado:"Área de un rombo de diagonales 10 y 8:",opciones:["40","80","20","60","30"],correcta:0,solucion:"(10×8)/2=40."},
+{enunciado:"La probabilidad de obtener cara al lanzar una moneda 3 veces seguidas:",opciones:["1/8","1/2","3/8","1/4","1/3"],correcta:0,solucion:"(1/2)³=1/8."},
+{enunciado:"Simplifica: (2x²)³",opciones:["8x⁶","6x⁵","2x⁶","8x⁵","6x⁶"],correcta:0,solucion:"2³=8, (x²)³=x⁶. 8x⁶."},
+{enunciado:"El valor de 7²-5²:",opciones:["24","12","2","49","25"],correcta:0,solucion:"49-25=24."},
+{enunciado:"Resuelve: 4x-7=2x+5",opciones:["x=6","x=4","x=12","x=2","x=8"],correcta:0,solucion:"4x-2x=5+7→2x=12→x=6."},
+{enunciado:"La recta y=-3 es:",opciones:["Horizontal","Vertical","Creciente","Decreciente","Pasa por origen"],correcta:0,solucion:"y=constante: horizontal."},
+{enunciado:"El 12% de 500 es:",opciones:["60","50","100","30","80"],correcta:0,solucion:"0,12×500=60."},
+{enunciado:"Factoriza: x²-64",opciones:["(x+8)(x-8)","(x-8)²","(x+8)²","x(x-64)","(x-32)(x+2)"],correcta:0,solucion:"x²-8²=(x+8)(x-8)."},
+{enunciado:"Volumen de un cubo de arista 10:",opciones:["1000","100","30","300","10000"],correcta:0,solucion:"10³=1000."},
+{enunciado:"Resuelve: 3x+2x=25",opciones:["x=5","x=4","x=6","x=3","x=7"],correcta:0,solucion:"5x=25→x=5."},
+{enunciado:"La moda de un conjunto donde todos los datos son distintos:",opciones:["No tiene moda","Es el menor","Es el mayor","Es el promedio","Es la mediana"],correcta:0,solucion:"Si ningún valor se repite, no hay moda (amodal)."},
+{enunciado:"El 150% de 200 es:",opciones:["300","250","350","200","150"],correcta:0,solucion:"1,5×200=300."},
+{enunciado:"Área de un hexágono regular de lado 6:",opciones:["54√3","36√3","108","72√3","18√3"],correcta:0,solucion:"(3√3/2)·36=54√3."},
+{enunciado:"Resuelve: 8x+4=4x+20",opciones:["x=4","x=3","x=5","x=2","x=6"],correcta:0,solucion:"8x-4x=20-4→4x=16→x=4."},
+// ===== BLOQUE 2: MÁS PREGUNTAS DE NÚMEROS =====
+{enunciado:"El valor de 2,5 × 4 es:",opciones:["10","8","12","9","6"],correcta:0,solucion:"2,5×4=10."},
+{enunciado:"¿Cuál es el 1% de 5000?",opciones:["50","5","100","500","10"],correcta:0,solucion:"1% de 5000=0,01×5000=50."},
+{enunciado:"El MCM entre 3, 4 y 5 es:",opciones:["60","30","15","120","20"],correcta:0,solucion:"3,4,5 son coprimos. MCM=3×4×5=60."},
+{enunciado:"¿Qué número es múltiplo de 2 y 3 a la vez?",opciones:["18","14","22","26","34"],correcta:0,solucion:"18÷2=9, 18÷3=6. Es múltiplo de ambos."},
+{enunciado:"El valor de √36 + √64 es:",opciones:["14","10","100","28","12"],correcta:0,solucion:"√36=6, √64=8. 6+8=14."},
+{enunciado:"Convierte 0,04 a fracción:",opciones:["1/25","4/10","1/4","4/100","2/50"],correcta:0,solucion:"0,04=4/100=1/25."},
+{enunciado:"¿Cuál es el 10% de 350 más el 20% de 150?",opciones:["65","50","70","80","55"],correcta:0,solucion:"35+30=65."},
+{enunciado:"El MCD entre 60 y 84 es:",opciones:["12","6","24","4","18"],correcta:0,solucion:"60=2²·3·5, 84=2²·3·7. MCD=2²·3=12."},
+{enunciado:"Simplifica: 40/100",opciones:["2/5","4/10","1/4","3/5","8/20"],correcta:0,solucion:"Dividiendo por 20: 40/100=2/5."},
+{enunciado:"¿Cuál es el resultado de 4³?",opciones:["64","12","16","48","32"],correcta:0,solucion:"4³=4×4×4=64."},
+{enunciado:"El 3% de 2000 es:",opciones:["60","30","600","6","300"],correcta:0,solucion:"0,03×2000=60."},
+{enunciado:"¿Qué fracción es equivalente a 0,8?",opciones:["4/5","3/4","2/3","5/6","1/2"],correcta:0,solucion:"0,8=8/10=4/5."},
+{enunciado:"El MCM entre 7 y 8 es:",opciones:["56","15","28","72","48"],correcta:0,solucion:"Primos entre sí: 7×8=56."},
+{enunciado:"Resuelve: 12 + 4 × 2 - 6",opciones:["14","18","20","8","26"],correcta:0,solucion:"4×2=8. 12+8-6=14."},
+{enunciado:"¿Cuál es el 45% de 200?",opciones:["90","80","100","70","110"],correcta:0,solucion:"0,45×200=90."},
+{enunciado:"Convierte 1/8 a decimal:",opciones:["0,125","0,25","0,5","0,75","0,375"],correcta:0,solucion:"1÷8=0,125."},
+{enunciado:"El valor de 10² - 8² es:",opciones:["36","100","64","18","2"],correcta:0,solucion:"100-64=36."},
+{enunciado:"¿Qué porcentaje es 25 de 500?",opciones:["5%","10%","2%","15%","25%"],correcta:0,solucion:"25/500=0,05=5%."},
+{enunciado:"El MCD entre 40 y 60 es:",opciones:["20","10","15","5","30"],correcta:0,solucion:"40=2³·5, 60=2²·3·5. MCD=2²·5=20."},
+{enunciado:"Simplifica: 15/45",opciones:["1/3","2/3","3/5","1/2","5/15"],correcta:0,solucion:"Dividiendo por 15: 15/45=1/3."},
+{enunciado:"¿Cuál es el 200% de 15?",opciones:["30","15","45","7,5","150"],correcta:0,solucion:"200%=2 veces. 2×15=30."},
+{enunciado:"Resuelve: 18 ÷ 3 × 2",opciones:["12","3","6","9","18"],correcta:0,solucion:"18÷3=6. 6×2=12."},
+{enunciado:"El valor de √25 - √9 es:",opciones:["2","4","8","16","5"],correcta:0,solucion:"5-3=2."},
+{enunciado:"¿Cuál es el 7% de 300?",opciones:["21","14","28","7","35"],correcta:0,solucion:"0,07×300=21."},
+{enunciado:"Convierte 3/2 a porcentaje:",opciones:["150%","75%","50%","200%","100%"],correcta:0,solucion:"3/2=1,5=150%."},
+{enunciado:"El MCM entre 5, 10 y 15 es:",opciones:["30","15","50","75","45"],correcta:0,solucion:"5=5, 10=2·5, 15=3·5. MCM=2·3·5=30."},
+{enunciado:"¿Qué número es divisible por 3?",opciones:["93","91","92","94","95"],correcta:0,solucion:"9+3=12, divisible por 3."},
+{enunciado:"El valor de 2⁻² es:",opciones:["0,25","-4","4","-0,25","0,5"],correcta:0,solucion:"2⁻²=1/2²=1/4=0,25."},
+{enunciado:"Simplifica: 56/72",opciones:["7/9","2/3","3/4","5/8","4/5"],correcta:0,solucion:"Dividiendo por 8: 56/72=7/9."},
+{enunciado:"¿Cuál es el 15% de un número si el número es 80?",opciones:["12","15","8","20","10"],correcta:0,solucion:"0,15×80=12."},
+{enunciado:"El inverso multiplicativo de 2/3 es:",opciones:["3/2","2/3","-2/3","-3/2","1,5"],correcta:0,solucion:"Inverso: 3/2=1,5."},
+{enunciado:"Resuelve: 50 - 5 × 3 + 2",opciones:["37","42","35","32","47"],correcta:0,solucion:"5×3=15. 50-15+2=37."},
+{enunciado:"¿Cuál es el valor de 3⁴?",opciones:["81","12","27","64","36"],correcta:0,solucion:"3⁴=3×3×3×3=81."},
+{enunciado:"El 6% de 1500 es:",opciones:["90","60","9","15","150"],correcta:0,solucion:"0,06×1500=90."},
+{enunciado:"¿Qué fracción es equivalente a 0,125?",opciones:["1/8","1/4","1/2","3/4","2/5"],correcta:0,solucion:"0,125=125/1000=1/8."},
+{enunciado:"El MCD entre 21 y 35 es:",opciones:["7","3","5","21","35"],correcta:0,solucion:"21=3·7, 35=5·7. MCD=7."},
+{enunciado:"Convierte 5/2 a decimal:",opciones:["2,5","0,5","1,5","3,5","5,2"],correcta:0,solucion:"5÷2=2,5."},
+{enunciado:"¿Qué porcentaje es 40 de 160?",opciones:["25%","20%","30%","15%","40%"],correcta:0,solucion:"40/160=0,25=25%."},
+{enunciado:"El valor de 5² + 5³ es:",opciones:["150","125","25","100","175"],correcta:0,solucion:"25+125=150."},
+{enunciado:"Simplifica: 9/27",opciones:["1/3","3/9","2/3","1/2","3/5"],correcta:0,solucion:"Dividiendo por 9: 9/27=1/3."},
+{enunciado:"¿Cuál es el 90% de 300?",opciones:["270","240","300","180","330"],correcta:0,solucion:"0,9×300=270."},
+{enunciado:"Resuelve: 2⁴ + 3²",opciones:["25","16","9","7","20"],correcta:0,solucion:"16+9=25."},
+{enunciado:"El MCM entre 6 y 9 es:",opciones:["18","36","54","12","3"],correcta:0,solucion:"6=2·3, 9=3². MCM=2·3²=18."},
+{enunciado:"¿Qué número es primo?",opciones:["31","33","35","39","49"],correcta:0,solucion:"31 solo divisible por 1 y 31."},
+{enunciado:"Convierte 0,6 a fracción:",opciones:["3/5","2/3","1/2","4/5","1/6"],correcta:0,solucion:"0,6=6/10=3/5."},
+{enunciado:"El valor de |5-13| es:",opciones:["8","-8","5","13","18"],correcta:0,solucion:"|5-13|=|-8|=8."},
+{enunciado:"¿Cuál es el 0,5% de 2000?",opciones:["10","100","50","5","1"],correcta:0,solucion:"0,005×2000=10."},
+{enunciado:"Simplifica: 24/30",opciones:["4/5","3/4","2/3","5/6","1/2"],correcta:0,solucion:"Dividiendo por 6: 24/30=4/5."},
+{enunciado:"El MCD entre 18 y 30 es:",opciones:["6","3","9","12","2"],correcta:0,solucion:"18=2·3², 30=2·3·5. MCD=2·3=6."},
+// ===== BLOQUE 2: MÁS ÁLGEBRA =====
+{enunciado:"Resuelve: 2x - 1 = x + 3",opciones:["x=4","x=3","x=2","x=5","x=1"],correcta:0,solucion:"2x-x=3+1→x=4."},
+{enunciado:"Factoriza: x² - 49",opciones:["(x+7)(x-7)","(x-7)²","(x+7)²","x(x-49)","(x-1)(x+49)"],correcta:0,solucion:"Diferencia de cuadrados."},
+{enunciado:"La función f(x)=3x-5 evaluada en x=2 da:",opciones:["1","6","11","-1","0"],correcta:0,solucion:"f(2)=3·2-5=6-5=1."},
+{enunciado:"Resuelve: 5(x-1) = 2x + 4",opciones:["x=3","x=2","x=4","x=1","x=5"],correcta:0,solucion:"5x-5=2x+4→3x=9→x=3."},
+{enunciado:"La pendiente de y = -x + 7 es:",opciones:["-1","7","1","-7","0"],correcta:0,solucion:"y=mx+b, m=-1."},
+{enunciado:"¿Cuál es el valor de x en 2ˣ = 128?",opciones:["7","6","8","5","4"],correcta:0,solucion:"128=2⁷→x=7."},
+{enunciado:"Simplifica: 4x - 2(x-3)",opciones:["2x + 6","2x - 6","4x + 6","x + 6","6x + 6"],correcta:0,solucion:"4x-2x+6=2x+6."},
+{enunciado:"Resuelve: x² - x - 6 = 0",opciones:["x=3, x=-2","x=2, x=-3","x=1, x=6","x=-1, x=-6","x=0, x=6"],correcta:0,solucion:"(x-3)(x+2)=0→x=3,-2."},
+{enunciado:"La ecuación de la recta que pasa por (0,-3) con pendiente 2:",opciones:["y=2x-3","y=2x+3","y=-2x-3","y=x-3","y=3x+2"],correcta:0,solucion:"y-(-3)=2(x-0)→y=2x-3."},
+{enunciado:"Si f(x)=x²+1, f(-2) es:",opciones:["5","-3","3","1","-1"],correcta:0,solucion:"(-2)²+1=4+1=5."},
+{enunciado:"Resuelve: 3x + 2 = x - 4",opciones:["x=-3","x=3","x=-1","x=1","x=2"],correcta:0,solucion:"3x-x=-4-2→2x=-6→x=-3."},
+{enunciado:"Factoriza: x² + 3x - 10",opciones:["(x+5)(x-2)","(x-5)(x+2)","(x+10)(x-1)","(x-10)(x+1)","(x+1)(x-10)"],correcta:0,solucion:"Factores de -10 que sumen 3: 5 y -2."},
+{enunciado:"El producto (x-4)(x+4) es:",opciones:["x²-16","x²+16","x²-8x-16","x²+8x+16","x²-4"],correcta:0,solucion:"Diferencia de cuadrados: x²-16."},
+{enunciado:"Resuelve: 4x + 1 = 2x + 9",opciones:["x=4","x=3","x=5","x=2","x=1"],correcta:0,solucion:"4x-2x=9-1→2x=8→x=4."},
+{enunciado:"La inecuación 2x - 5 > 3 tiene solución:",opciones:["x > 4","x < 4","x > 1","x < 1","x > 8"],correcta:0,solucion:"2x>8→x>4."},
+{enunciado:"¿Cuál es el coeficiente de x² en 3x² - 5x + 2?",opciones:["3","-5","2","x²","0"],correcta:0,solucion:"El coeficiente del término cuadrático es 3."},
+{enunciado:"Resuelve el sistema: x+y=6, x-y=4",opciones:["(5,1)","(4,2)","(3,3)","(6,0)","(2,4)"],correcta:0,solucion:"2x=10→x=5, y=1."},
+{enunciado:"Simplifica: 2(x+1) + 3(x-2)",opciones:["5x - 4","5x + 4","5x - 1","x - 4","5x + 1"],correcta:0,solucion:"2x+2+3x-6=5x-4."},
+{enunciado:"El valor de log₃(81) es:",opciones:["4","3","9","27","2"],correcta:0,solucion:"3⁴=81."},
+{enunciado:"Resuelve: 6 - 2x = 3x + 1",opciones:["x=1","x=2","x=3","x=-1","x=0"],correcta:0,solucion:"-2x-3x=1-6→-5x=-5→x=1."},
+{enunciado:"Factoriza: 2x² + 4x",opciones:["2x(x+2)","x(2x+4)","2(x²+2x)","2x(x+4)","x²(2+4x)"],correcta:0,solucion:"Factor común 2x."},
+{enunciado:"La suma de las raíces de x²-9x+20=0 es:",opciones:["9","-9","20","-20","5"],correcta:0,solucion:"Vieta: -b/a=9."},
+{enunciado:"Resuelve: x/2 + 3 = 7",opciones:["x=8","x=6","x=10","x=4","x=12"],correcta:0,solucion:"x/2=4→x=8."},
+{enunciado:"La recta perpendicular a y=3x-1 tiene pendiente:",opciones:["-1/3","3","-3","1/3","1"],correcta:0,solucion:"m₁·m₂=-1→3·m₂=-1→m₂=-1/3."},
+{enunciado:"Si 2ˣ⁺² = 64, x vale:",opciones:["4","5","3","6","2"],correcta:0,solucion:"64=2⁶→x+2=6→x=4."},
+{enunciado:"Resuelve: 3(x-2) + 4 = 2x",opciones:["x=2","x=4","x=6","x=0","x=8"],correcta:0,solucion:"3x-6+4=2x→3x-2=2x→x=2."},
+{enunciado:"El vértice de y=-x²+6x-5 es:",opciones:["(3,4)","(-3,4)","(3,-4)","(6,-5)","(0,-5)"],correcta:0,solucion:"x=-6/(-2)=3, y=-9+18-5=4. (3,4)."},
+{enunciado:"Factoriza: x² - 36",opciones:["(x+6)(x-6)","(x-6)²","(x+6)²","x(x-36)","(x-1)(x+36)"],correcta:0,solucion:"x²-6²=(x+6)(x-6)."},
+{enunciado:"Resuelve: |x-4| = 2",opciones:["x=6 o x=2","x=6","x=2","x=-2","x=4"],correcta:0,solucion:"x-4=2→x=6; x-4=-2→x=2."},
+// ===== BLOQUE 2: MÁS GEOMETRÍA =====
+{enunciado:"El área de un rectángulo de lados 15 y 4 es:",opciones:["60","30","19","38","120"],correcta:0,solucion:"15×4=60."},
+{enunciado:"El perímetro de un cuadrado de lado 7 es:",opciones:["28","14","49","21","35"],correcta:0,solucion:"4×7=28."},
+{enunciado:"La hipotenusa de un triángulo con catetos 5 y 12:",opciones:["13","17","11","10","14"],correcta:0,solucion:"√(25+144)=√169=13."},
+{enunciado:"El volumen de un cubo de arista 6 es:",opciones:["216","36","18","72","108"],correcta:0,solucion:"6³=216."},
+{enunciado:"Área de un círculo de diámetro 14 (π≈3,14):",opciones:["153,86","43,96","21,98","307,72","100"],correcta:0,solucion:"r=7. A=π·49≈153,86."},
+{enunciado:"Suma de ángulos interiores de un hexágono:",opciones:["720°","360°","540°","180°","600°"],correcta:0,solucion:"(6-2)×180°=720°."},
+{enunciado:"El complemento de 55° es:",opciones:["35°","125°","45°","55°","65°"],correcta:0,solucion:"90°-55°=35°."},
+{enunciado:"Área de un triángulo equilátero de lado 8:",opciones:["16√3","32","64","8√3","24"],correcta:0,solucion:"(√3/4)·64=16√3."},
+{enunciado:"La diagonal de un rectángulo de lados 6 y 8:",opciones:["10","14","12","9","15"],correcta:0,solucion:"√(36+64)=√100=10."},
+{enunciado:"Perímetro de una circunferencia de radio 5 (π≈3):",opciones:["30","15","25","10","20"],correcta:0,solucion:"2·3·5=30."},
+{enunciado:"Volumen de un cilindro de radio 3 y altura 7 (π≈3):",opciones:["189","63","126","21","84"],correcta:0,solucion:"π·9·7≈3·63=189."},
+{enunciado:"Área de un rombo con diagonales 12 y 5:",opciones:["30","60","17","20","15"],correcta:0,solucion:"(12×5)/2=30."},
+{enunciado:"El suplemento de 45° es:",opciones:["135°","45°","90°","180°","60°"],correcta:0,solucion:"180°-45°=135°."},
+{enunciado:"Área de un trapecio de bases 7 y 13, altura 4:",opciones:["40","20","80","60","28"],correcta:0,solucion:"((7+13)/2)·4=10·4=40."},
+{enunciado:"La diagonal de un cubo de arista 3 es:",opciones:["3√3","9","6","3","√3"],correcta:0,solucion:"d=a√3=3√3."},
+{enunciado:"Volumen de un cono de radio 4 y altura 6 (π≈3):",opciones:["96","48","32","64","24"],correcta:0,solucion:"(1/3)·3·16·6=96."},
+{enunciado:"El ángulo central de un octágono regular:",opciones:["45°","60°","90°","30°","120°"],correcta:0,solucion:"360°/8=45°."},
+{enunciado:"Área superficial de un cubo de arista 5:",opciones:["150","125","100","25","30"],correcta:0,solucion:"6×5²=6×25=150."},
+// ===== BLOQUE 2: MÁS PROBABILIDAD Y ESTADÍSTICA =====
+{enunciado:"Al lanzar un dado, P(número > 4):",opciones:["1/3","1/2","1/6","2/3","5/6"],correcta:0,solucion:"5 y 6 → 2/6=1/3."},
+{enunciado:"La media de 15,20,25,30,35 es:",opciones:["25","20","30","15","35"],correcta:0,solucion:"(15+20+25+30+35)/5=125/5=25."},
+{enunciado:"P(no sacar cara al lanzar una moneda):",opciones:["1/2","1/4","3/4","1","0"],correcta:0,solucion:"P(sello)=1/2."},
+{enunciado:"La mediana de 12,15,20,25,30:",opciones:["20","15","25","12","30"],correcta:0,solucion:"Dato central: 20."},
+{enunciado:"En una baraja de 52, P(corazón):",opciones:["1/4","1/13","1/52","1/2","13/52"],correcta:0,solucion:"13/52=1/4."},
+{enunciado:"Moda de 1,2,2,3,3,3,4,5:",opciones:["3","2","1","4","5"],correcta:0,solucion:"3 aparece 3 veces."},
+{enunciado:"Rango de 3,7,9,15,22:",opciones:["19","22","3","15","18"],correcta:0,solucion:"22-3=19."},
+{enunciado:"P(suma 6 al lanzar dos dados):",opciones:["5/36","1/6","1/12","1/36","1/4"],correcta:0,solucion:"(1,5),(2,4),(3,3),(4,2),(5,1)=5/36."},
+{enunciado:"La probabilidad de un evento seguro es:",opciones:["1","0","0,5","Depende","Infinito"],correcta:0,solucion:"P(seguro)=1."},
+{enunciado:"Media de 5,10,15,20,25,30,35:",opciones:["20","25","15","30","22"],correcta:0,solucion:"Suma=140. 140/7=20."},
+{enunciado:"En una urna 4 blancas, 3 negras, 2 rojas. P(negra):",opciones:["1/3","4/9","2/9","3/9","1/2"],correcta:0,solucion:"Total=9, negras=3. 3/9=1/3."},
+{enunciado:"Al lanzar 2 dados, P(producto par):",opciones:["3/4","1/2","1/4","5/6","2/3"],correcta:0,solucion:"36-P(ambos impares)=36-9=27. 27/36=3/4."},
+{enunciado:"La varianza de 2,4,6,8:",opciones:["5","2","4","8","6"],correcta:0,solucion:"Media=5. Varianza=((9+1+1+9)/4)=5."},
+{enunciado:"Percentil 25 (Q1) de 10,20,30,40,50:",opciones:["20","10","30","25","15"],correcta:0,solucion:"Q1=posición 1.25→entre 1° y 2°=15, más cercano 20."},
+{enunciado:"P(al menos un sello en 2 monedas):",opciones:["3/4","1/4","1/2","1","0"],correcta:0,solucion:"1-P(dos caras)=1-1/4=3/4."},
+{enunciado:"La frecuencia relativa de un dato que aparece 5 veces en 25 observaciones:",opciones:["0,2","0,5","0,25","0,1","5"],correcta:0,solucion:"5/25=0,2=20%."},
+{enunciado:"Desviación estándar de 4,4,4,4:",opciones:["0","4","1","2","8"],correcta:0,solucion:"Todos iguales, desviación 0."},
+// ===== BLOQUE 2: PREGUNTAS MIXTAS Y CONTEXTUALIZADAS =====
+{enunciado:"Si un artículo cuesta $25.000 con 20% de descuento, el precio final es:",opciones:["$20.000","$22.000","$18.000","$5.000","$19.500"],correcta:0,solucion:"Descuento=$5.000. 25.000-5.000=20.000."},
+{enunciado:"Un auto recorre 180 km en 2 horas. Su velocidad media es:",opciones:["90 km/h","60 km/h","120 km/h","80 km/h","100 km/h"],correcta:0,solucion:"180/2=90 km/h."},
+{enunciado:"Si 3 kg de pan cuestan $4.500, ¿cuánto cuestan 5 kg?",opciones:["$7.500","$6.000","$9.000","$8.000","$5.500"],correcta:0,solucion:"1 kg=$1.500. 5×1.500=7.500."},
+{enunciado:"Un rectángulo tiene área 48 cm² y base 8 cm. Su altura es:",opciones:["6 cm","8 cm","12 cm","4 cm","10 cm"],correcta:0,solucion:"A=b·h→48=8·h→h=6."},
+{enunciado:"La temperatura subió de -3°C a 12°C. La variación fue:",opciones:["15°C","9°C","12°C","3°C","-15°C"],correcta:0,solucion:"12-(-3)=15."},
+{enunciado:"Un depósito de $50.000 gana 5% de interés anual. ¿Interés en un año?",opciones:["$2.500","$5.000","$1.000","$500","$25.000"],correcta:0,solucion:"50.000×0,05=2.500."},
+{enunciado:"En un mapa escala 1:2000, 3 cm representan:",opciones:["60 m","6 m","600 m","20 m","30 m"],correcta:0,solucion:"3×2000=6000 cm=60 m."},
+{enunciado:"Un triángulo tiene lados 3, 4, 5. ¿Es rectángulo?",opciones:["Sí, cumple Pitágoras","No","Solo si es isósceles","Depende","Es equilátero"],correcta:0,solucion:"3²+4²=9+16=25=5²."},
+{enunciado:"Si f(x)=2x+1, ¿para qué x, f(x)=11?",opciones:["x=5","x=6","x=4","x=3","x=10"],correcta:0,solucion:"2x+1=11→2x=10→x=5."},
+{enunciado:"Un círculo tiene área 36π. Su radio es:",opciones:["6","12","18","3","9"],correcta:0,solucion:"πr²=36π→r²=36→r=6."},
+{enunciado:"El doble de un número más 5 es 23. ¿Cuál es el número?",opciones:["9","8","10","7","11"],correcta:0,solucion:"2x+5=23→2x=18→x=9."},
+{enunciado:"La diferencia entre dos números es 8 y su suma es 22. Son:",opciones:["15 y 7","14 y 6","16 y 8","18 y 10","12 y 4"],correcta:0,solucion:"x+y=22, x-y=8→x=15,y=7."},
+{enunciado:"Un cubo tiene volumen 125 cm³. Su arista es:",opciones:["5 cm","10 cm","25 cm","15 cm","3 cm"],correcta:0,solucion:"a³=125→a=5."},
+{enunciado:"La mitad de 3/4 es:",opciones:["3/8","3/2","1/2","6/4","1/4"],correcta:0,solucion:"(3/4)/2=3/8."},
+{enunciado:"Un ángulo mide el doble de su complemento. El ángulo es:",opciones:["60°","30°","45°","90°","120°"],correcta:0,solucion:"x=2(90-x)→x=180-2x→3x=180→x=60°."},
+{enunciado:"En una clase de 30 alumnos, 18 son mujeres. ¿Qué porcentaje son hombres?",opciones:["40%","60%","30%","50%","20%"],correcta:0,solucion:"Hombres=12. 12/30=0,4=40%."},
+{enunciado:"Un número aumentado en su 25% da 50. El número es:",opciones:["40","35","45","30","20"],correcta:0,solucion:"x+0,25x=50→1,25x=50→x=40."},
+{enunciado:"La longitud de una circunferencia es 31,4 cm. Su diámetro (π≈3,14):",opciones:["10 cm","5 cm","20 cm","15 cm","31,4 cm"],correcta:0,solucion:"C=πd→31,4=3,14·d→d=10."},
+{enunciado:"Un triángulo isósceles tiene base 6 y lados iguales 5. Su altura:",opciones:["4","3","5","6","√11"],correcta:0,solucion:"h=√(5²-3²)=√(25-9)=√16=4."},
+{enunciado:"El 30% de un número es 21. El número es:",opciones:["70","63","30","7","50"],correcta:0,solucion:"0,3x=21→x=21/0,3=70."},
+{enunciado:"Un trapecio tiene área 36, base mayor 10 y altura 4. La base menor:",opciones:["8","6","4","12","2"],correcta:0,solucion:"36=((10+b)/2)·4→(10+b)/2=9→10+b=18→b=8."},
+{enunciado:"La suma de tres números consecutivos es 72. El mayor es:",opciones:["25","24","23","26","22"],correcta:0,solucion:"n+n+1+n+2=72→3n+3=72→n=23. Mayor=25."},
+{enunciado:"Un depósito se llena en 4 horas. En 1 hora se llena:",opciones:["1/4","1/2","3/4","Completo","1/3"],correcta:0,solucion:"En 1 hora: 1/4 del depósito."},
+{enunciado:"Si P(A)=0,3 y P(B)=0,6, y son excluyentes, P(A∪B):",opciones:["0,9","0,18","0,3","0,6","1"],correcta:0,solucion:"Excluyentes: 0,3+0,6=0,9."},
+{enunciado:"Un artículo con IVA (19%) cuesta $119.000. Precio sin IVA:",opciones:["$100.000","$95.000","$90.000","$110.000","$105.000"],correcta:0,solucion:"1,19x=119.000→x=100.000."},
+{enunciado:"La media de 4 números es 15. Su suma es:",opciones:["60","30","45","15","20"],correcta:0,solucion:"Suma=media×n=15×4=60."},
+{enunciado:"Un rectángulo tiene perímetro 24 y largo 8. El ancho es:",opciones:["4","6","8","2","10"],correcta:0,solucion:"2(8+a)=24→8+a=12→a=4."},
+{enunciado:"El valor de 3! (factorial) es:",opciones:["6","3","9","1","12"],correcta:0,solucion:"3!=3×2×1=6."},
+{enunciado:"En un colegio, 3 de cada 5 alumnos practica deporte. Si hay 800 alumnos, ¿cuántos practican deporte?",opciones:["480","320","500","400","600"],correcta:0,solucion:"(3/5)×800=480."},
+{enunciado:"Un ciclista recorre 45 km en 1,5 horas. Su velocidad es:",opciones:["30 km/h","45 km/h","60 km/h","25 km/h","35 km/h"],correcta:0,solucion:"45/1,5=30 km/h."},
+{enunciado:"La raíz cuadrada de un número es 13. El número es:",opciones:["169","26","39","13","196"],correcta:0,solucion:"13²=169."},
+{enunciado:"El 40% de los estudiantes son hombres. Si hay 120 hombres, total:",opciones:["300","200","400","150","250"],correcta:0,solucion:"0,4x=120→x=300."},
+{enunciado:"Un cuadrado tiene diagonal 8. Su perímetro es:",opciones:["16√2","32","8√2","16","24"],correcta:0,solucion:"l=d/√2=8/√2=4√2. P=4·4√2=16√2."},
+{enunciado:"La probabilidad de obtener un 3 o un 5 en un dado es:",opciones:["1/3","1/6","1/2","2/3","5/6"],correcta:0,solucion:"2/6=1/3."},
+{enunciado:"Un número disminuido en su 20% es 80. El número:",opciones:["100","96","64","120","90"],correcta:0,solucion:"x-0,2x=80→0,8x=80→x=100."},
+{enunciado:"La razón entre 15 y 45 simplificada:",opciones:["1/3","3/1","2/3","1/2","5/9"],correcta:0,solucion:"15/45=1/3."},
+{enunciado:"Un ángulo y su complemento suman:",opciones:["90°","180°","360°","45°","60°"],correcta:0,solucion:"Definición de ángulos complementarios."},
+{enunciado:"El área de un sector circular de radio 9 y ángulo 40°:",opciones:["9π","6π","12π","3π","18π"],correcta:0,solucion:"(40/360)·π·81=(1/9)·81π=9π."},
+{enunciado:"La pendiente de la recta que pasa por (-1,2) y (2,8):",opciones:["2","3","1","4","-2"],correcta:0,solucion:"(8-2)/(2-(-1))=6/3=2."},
+{enunciado:"Un prisma tiene volumen 60 y altura 5. El área de la base:",opciones:["12","30","10","15","20"],correcta:0,solucion:"V=Ab·h→60=Ab·5→Ab=12."},
+{enunciado:"El valor de 7² - 2³ es:",opciones:["41","49","45","39","55"],correcta:0,solucion:"49-8=41."},
+{enunciado:"¿Cuál es el 5% de 2000?",opciones:["100","50","200","10","500"],correcta:0,solucion:"0,05×2000=100."},
+{enunciado:"El MCM entre 8 y 14 es:",opciones:["56","28","112","42","2"],correcta:0,solucion:"8=2³, 14=2×7. MCM=2³×7=56."},
+{enunciado:"¿Qué número es divisible por 6?",opciones:["72","70","74","68","76"],correcta:0,solucion:"72÷6=12 exacto."},
+{enunciado:"Simplifica: 30/45",opciones:["2/3","3/4","1/2","5/6","3/5"],correcta:0,solucion:"Dividiendo por 15: 30/45=2/3."},
+{enunciado:"Resuelve: 4x+7=3x+12",opciones:["x=5","x=4","x=6","x=3","x=7"],correcta:0,solucion:"4x-3x=12-7→x=5."},
+{enunciado:"Factoriza: x²-81",opciones:["(x+9)(x-9)","(x-9)²","(x+9)²","x(x-81)","(x-3)(x+27)"],correcta:0,solucion:"Diferencia de cuadrados: x²-9²."},
+{enunciado:"Área de un triángulo de base 14 y altura 8:",opciones:["56","28","112","22","48"],correcta:0,solucion:"(14×8)/2=56."},
+{enunciado:"Volumen de un cubo de arista 7:",opciones:["343","49","21","147","294"],correcta:0,solucion:"7³=343."},
+{enunciado:"P(sacar un 5 o un 6 en un dado):",opciones:["1/3","1/6","1/2","2/3","5/6"],correcta:0,solucion:"2/6=1/3."},
+{enunciado:"La media de 8,12,16,20,24 es:",opciones:["16","20","12","18","14"],correcta:0,solucion:"(8+12+16+20+24)/5=80/5=16."},
+{enunciado:"El 30% de 450 es:",opciones:["135","150","120","90","180"],correcta:0,solucion:"0,3×450=135."},
+{enunciado:"Resuelve: 2(x-3)+5=x+7",opciones:["x=8","x=6","x=10","x=4","x=12"],correcta:0,solucion:"2x-6+5=x+7→2x-1=x+7→x=8."},
+{enunciado:"El MCD entre 36 y 60 es:",opciones:["12","6","18","24","4"],correcta:0,solucion:"36=2²×3², 60=2²×3×5. MCD=2²×3=12."},
+{enunciado:"Convierte 7/5 a decimal:",opciones:["1,4","1,2","0,7","2,5","1,6"],correcta:0,solucion:"7÷5=1,4."},
+{enunciado:"El complemento de 25° es:",opciones:["65°","75°","155°","90°","25°"],correcta:0,solucion:"90°-25°=65°."},
+{enunciado:"Perímetro de un rectángulo de lados 12 y 9:",opciones:["42","21","108","30","50"],correcta:0,solucion:"2(12+9)=42."},
+{enunciado:"P(sacar un rey de un mazo de 52 cartas):",opciones:["1/13","1/4","1/52","4/13","1/26"],correcta:0,solucion:"4/52=1/13."},
+{enunciado:"La moda de 3,3,5,7,7,7,9 es:",opciones:["7","3","5","9","No tiene"],correcta:0,solucion:"7 aparece 3 veces."},
+{enunciado:"Resuelve: 3x²=27",opciones:["x=±3","x=3","x=9","x=±9","x=27"],correcta:0,solucion:"x²=9→x=±3."},
+{enunciado:"El valor de √225 es:",opciones:["15","25","12","18","10"],correcta:0,solucion:"15²=225."},
+{enunciado:"¿Cuál es el 150% de 40?",opciones:["60","40","100","80","20"],correcta:0,solucion:"1,5×40=60."},
+{enunciado:"El MCM entre 9 y 21 es:",opciones:["63","21","189","42","9"],correcta:0,solucion:"9=3², 21=3×7. MCM=3²×7=63."},
+{enunciado:"Simplifica: 48/64",opciones:["3/4","2/3","4/5","5/6","1/2"],correcta:0,solucion:"Dividiendo por 16: 48/64=3/4."},
+{enunciado:"Resuelve: 5x-3=2x+9",opciones:["x=4","x=3","x=5","x=2","x=6"],correcta:0,solucion:"5x-2x=9+3→3x=12→x=4."},
+{enunciado:"El suplemento de 130° es:",opciones:["50°","60°","130°","230°","90°"],correcta:0,solucion:"180°-130°=50°."},
+{enunciado:"Área de un círculo de radio 5 (π≈3,14):",opciones:["78,5","31,4","15,7","25","50"],correcta:0,solucion:"π×25=78,5."},
+{enunciado:"La mediana de 2,5,8,11,14,17 es:",opciones:["9,5","8","11","10","12"],correcta:0,solucion:"(8+11)/2=9,5."},
+{enunciado:"El 40% de 350 es:",opciones:["140","120","160","100","180"],correcta:0,solucion:"0,4×350=140."},
+{enunciado:"Resuelve: |x-5|=3",opciones:["x=8 o x=2","x=8","x=2","x=5","x=-2"],correcta:0,solucion:"x-5=3→x=8; x-5=-3→x=2."},
+{enunciado:"Factoriza: x²-100",opciones:["(x+10)(x-10)","(x-10)²","(x+10)²","x(x-100)","(x-50)(x+2)"],correcta:0,solucion:"x²-10²=(x+10)(x-10)."},
+{enunciado:"Volumen de un prisma de base 6×4 y altura 10:",opciones:["240","60","24","120","200"],correcta:0,solucion:"V=6×4×10=240."},
+{enunciado:"P(no sacar un as de un mazo de 52):",opciones:["12/13","1/13","3/4","1/4","48/52"],correcta:0,solucion:"48/52=12/13."},
+{enunciado:"La raíz cuadrada de 400 es:",opciones:["20","200","40","10","25"],correcta:0,solucion:"20²=400."},
+{enunciado:"Resuelve: 2x+3y=12, x-y=1",opciones:["(3,2)","(2,3)","(4,1)","(1,4)","(5,0)"],correcta:0,solucion:"De 2ª: x=y+1. En 1ª: 2(y+1)+3y=12→5y=10→y=2,x=3."},
+{enunciado:"El 8% de 5000 es:",opciones:["400","40","80","800","200"],correcta:0,solucion:"0,08×5000=400."},
+{enunciado:"El MCD entre 56 y 72 es:",opciones:["8","4","16","12","24"],correcta:0,solucion:"56=2³×7, 72=2³×3². MCD=2³=8."},
+{enunciado:"Convierte 9/4 a número mixto:",opciones:["2 1/4","2 1/2","1 3/4","3 1/4","2 3/4"],correcta:0,solucion:"9÷4=2 resto 1. 2 1/4."},
+{enunciado:"El perímetro de un triángulo equilátero de lado 11:",opciones:["33","22","44","11","55"],correcta:0,solucion:"3×11=33."},
+{enunciado:"P(suma 8 al lanzar dos dados):",opciones:["5/36","1/6","1/12","1/9","1/4"],correcta:0,solucion:"(2,6),(3,5),(4,4),(5,3),(6,2)=5/36."},
+{enunciado:"El 25% de un número es 15. El número es:",opciones:["60","30","45","75","50"],correcta:0,solucion:"0,25x=15→x=60."},
+{enunciado:"Resuelve: 6x-4=3x+8",opciones:["x=4","x=3","x=5","x=2","x=6"],correcta:0,solucion:"6x-3x=8+4→3x=12→x=4."},
+{enunciado:"La pendiente de y=5x-2 es:",opciones:["5","-2","2","-5","1/5"],correcta:0,solucion:"m=5 en y=mx+b."},
+{enunciado:"Área de un rombo de diagonales 16 y 12:",opciones:["96","48","192","28","84"],correcta:0,solucion:"(16×12)/2=96."},
+{enunciado:"El valor de 2⁶ es:",opciones:["64","32","128","12","36"],correcta:0,solucion:"2⁶=64."},
+{enunciado:"Resuelve: x²-49=0",opciones:["x=±7","x=7","x=-7","x=49","x=0"],correcta:0,solucion:"x²=49→x=±7."},
+{enunciado:"La media de 100,200,300 es:",opciones:["200","150","300","100","250"],correcta:0,solucion:"600/3=200."},
+{enunciado:"El 60% de 500 es:",opciones:["300","200","400","250","350"],correcta:0,solucion:"0,6×500=300."},
+{enunciado:"Simplifica: 72/90",opciones:["4/5","3/4","5/6","2/3","7/8"],correcta:0,solucion:"Dividiendo por 18: 72/90=4/5."},
+{enunciado:"Resuelve: 7(x-2)=3x+6",opciones:["x=5","x=4","x=6","x=3","x=7"],correcta:0,solucion:"7x-14=3x+6→4x=20→x=5."},
+{enunciado:"El MCM entre 12 y 30 es:",opciones:["60","30","120","90","15"],correcta:0,solucion:"12=2²×3, 30=2×3×5. MCM=2²×3×5=60."},
+{enunciado:"Volumen de una esfera de radio 3 (π≈3,14):",opciones:["113,04","36","27","84,78","150"],correcta:0,solucion:"(4/3)×3,14×27≈113,04."},
+{enunciado:"P(obtener cara al menos una vez en 2 lanzamientos):",opciones:["3/4","1/4","1/2","1","0"],correcta:0,solucion:"1-P(2 sellos)=1-1/4=3/4."},
+{enunciado:"El rango de 12,15,20,25,30 es:",opciones:["18","20","12","30","15"],correcta:0,solucion:"30-12=18."},
+{enunciado:"Resuelve: 3x+1=2x-4",opciones:["x=-5","x=5","x=-3","x=3","x=1"],correcta:0,solucion:"3x-2x=-4-1→x=-5."},
+{enunciado:"Factoriza: x²+8x+16",opciones:["(x+4)²","(x-4)²","(x+8)(x+2)","(x+16)(x+1)","(x-2)(x+8)"],correcta:0,solucion:"Trinomio cuadrado perfecto: (x+4)²."},
+{enunciado:"El 2% de 50000 es:",opciones:["1000","100","500","2000","50"],correcta:0,solucion:"0,02×50000=1000."},
+{enunciado:"La diagonal de un cuadrado de lado 10 es:",opciones:["10√2","20","10","√200","5√2"],correcta:0,solucion:"d=l√2=10√2."},
+{enunciado:"Resuelve: 2(x+4)=3x-1",opciones:["x=9","x=7","x=8","x=6","x=10"],correcta:0,solucion:"2x+8=3x-1→x=9."},
+{enunciado:"El 35% de 600 es:",opciones:["210","180","240","200","150"],correcta:0,solucion:"0,35×600=210."},
+{enunciado:"El MCD entre 45 y 75 es:",opciones:["15","5","25","3","10"],correcta:0,solucion:"45=3²×5, 75=3×5². MCD=3×5=15."},
+{enunciado:"Convierte 0,125 a fracción simplificada:",opciones:["1/8","1/4","1/2","3/4","2/5"],correcta:0,solucion:"125/1000=1/8."},
+{enunciado:"Área de un sector circular de radio 10 y ángulo 36°:",opciones:["10π","36π","5π","20π","15π"],correcta:0,solucion:"(36/360)×π×100=10π."},
+{enunciado:"P(sacar un trébol o un corazón de un mazo de 52):",opciones:["1/2","1/4","1/13","2/3","3/4"],correcta:0,solucion:"26/52=1/2."},
+{enunciado:"Resuelve: 4x²=64",opciones:["x=±4","x=4","x=8","x=±8","x=16"],correcta:0,solucion:"x²=16→x=±4."},
+{enunciado:"El 12% de 2500 es:",opciones:["300","250","200","350","150"],correcta:0,solucion:"0,12×2500=300."},
+{enunciado:"La suma de dos números es 30 y su diferencia 6. Son:",opciones:["18 y 12","20 y 10","15 y 15","22 y 8","16 y 14"],correcta:0,solucion:"x+y=30, x-y=6→x=18,y=12."},
+{enunciado:"Volumen de un cilindro de radio 4 y altura 5 (π≈3):",opciones:["240","60","120","80","200"],correcta:0,solucion:"3×16×5=240."},
+{enunciado:"La media de 7 números iguales a 9 es:",opciones:["9","63","7","16","49"],correcta:0,solucion:"(7×9)/7=9."},
+{enunciado:"Resuelve: 5x-2=3x+10",opciones:["x=6","x=4","x=8","x=5","x=7"],correcta:0,solucion:"5x-3x=10+2→2x=12→x=6."},
+{enunciado:"El 80% de 150 es:",opciones:["120","100","130","80","180"],correcta:0,solucion:"0,8×150=120."},
+{enunciado:"El MCM entre 15 y 40 es:",opciones:["120","60","40","80","200"],correcta:0,solucion:"15=3×5, 40=2³×5. MCM=2³×3×5=120."},
+{enunciado:"Factoriza: 3x²+9x",opciones:["3x(x+3)","x(3x+9)","3(x²+3x)","3x(x+9)","3x²(1+3x)"],correcta:0,solucion:"Factor común 3x: 3x(x+3)."},
+{enunciado:"El perímetro de un hexágono regular de lado 8:",opciones:["48","40","56","32","64"],correcta:0,solucion:"6×8=48."},
+{enunciado:"P(suma mayor que 9 al lanzar dos dados):",opciones:["1/6","1/12","1/4","1/3","5/36"],correcta:0,solucion:"10(3),11(2),12(1)=6/36=1/6."},
+{enunciado:"Resuelve: 2x²-18=0",opciones:["x=±3","x=3","x=9","x=±9","x=18"],correcta:0,solucion:"2x²=18→x²=9→x=±3."},
+{enunciado:"El 5% de 8000 es:",opciones:["400","40","80","800","200"],correcta:0,solucion:"0,05×8000=400."},
+{enunciado:"La recta paralela a y=2x+1 por (0,3) es:",opciones:["y=2x+3","y=-2x+3","y=x+3","y=3x+2","y=2x-3"],correcta:0,solucion:"Misma pendiente (2). Pasa por (0,3): y=2x+3."},
+{enunciado:"El MCD entre 24 y 56 es:",opciones:["8","4","12","16","2"],correcta:0,solucion:"24=2³×3, 56=2³×7. MCD=2³=8."},
+{enunciado:"Área de un triángulo rectángulo de catetos 7 y 24:",opciones:["84","168","31","56","42"],correcta:0,solucion:"(7×24)/2=84."},
+{enunciado:"Convierte 11/20 a porcentaje:",opciones:["55%","50%","45%","60%","40%"],correcta:0,solucion:"11/20=0,55=55%."},
+{enunciado:"Resuelve: 6-2x=4x+12",opciones:["x=-1","x=1","x=-2","x=2","x=0"],correcta:0,solucion:"-2x-4x=12-6→-6x=6→x=-1."},
+{enunciado:"La desviación estándar de 5,5,5,5 es:",opciones:["0","5","1","2","25"],correcta:0,solucion:"Todos iguales: desviación 0."},
+{enunciado:"El valor de 10³÷10² es:",opciones:["10","100","1000","1","0"],correcta:0,solucion:"10³⁻²=10¹=10."},
+{enunciado:"Volumen de un cono de radio 5 y altura 6 (π≈3):",opciones:["150","75","50","300","100"],correcta:0,solucion:"(1/3)×3×25×6=150."},
+{enunciado:"P(no salga par en un dado):",opciones:["1/2","1/3","2/3","1/6","5/6"],correcta:0,solucion:"Impares: 1,3,5→3/6=1/2."},
+{enunciado:"Resuelve: x/3+4=7",opciones:["x=9","x=6","x=12","x=3","x=15"],correcta:0,solucion:"x/3=3→x=9."},
+{enunciado:"El 0,1% de 100000 es:",opciones:["100","10","1000","1","50"],correcta:0,solucion:"0,001×100000=100."},
+{enunciado:"Factoriza: x²-121",opciones:["(x+11)(x-11)","(x-11)²","(x+11)²","x(x-121)","(x-1)(x+121)"],correcta:0,solucion:"x²-11²=(x+11)(x-11)."},
+{enunciado:"El 55% de 200 es:",opciones:["110","100","120","90","150"],correcta:0,solucion:"0,55×200=110."},
+{enunciado:"Resuelve: 3(x+1)=2(x+4)",opciones:["x=5","x=3","x=4","x=2","x=6"],correcta:0,solucion:"3x+3=2x+8→x=5."},
+{enunciado:"La mediana de 10,20,30,40,50,60,70,80 es:",opciones:["45","40","50","35","55"],correcta:0,solucion:"(40+50)/2=45."},
+{enunciado:"El MCM entre 18 y 45 es:",opciones:["90","45","180","135","60"],correcta:0,solucion:"18=2×3², 45=3²×5. MCM=2×3²×5=90."},
+{enunciado:"El valor de 9² - 6² es:",opciones:["45","81","36","15","25"],correcta:0,solucion:"81-36=45."},
+{enunciado:"Resuelve: 2x+3=x-5",opciones:["x=-8","x=8","x=-2","x=2","x=5"],correcta:0,solucion:"2x-x=-5-3→x=-8."},
+{enunciado:"El MCM entre 5, 6 y 8 es:",opciones:["120","60","30","240","40"],correcta:0,solucion:"5, 6=2×3, 8=2³. MCM=2³×3×5=120."},
+{enunciado:"P(suma 5 al lanzar dos dados):",opciones:["1/9","1/6","1/12","1/4","1/3"],correcta:0,solucion:"(1,4),(2,3),(3,2),(4,1)=4/36=1/9."}
+];
+
+// ============ SISTEMA DE 10 INTENTOS ============
+function estimarPuntajePAES(pct){
+  if(pct>=98)return 1000;
+  if(pct>=95)return Math.round(950+(pct-95)*10);
+  if(pct>=85)return Math.round(800+(pct-85)*15);
+  if(pct>=75)return Math.round(700+(pct-75)*10);
+  if(pct>=60)return Math.round(600+(pct-60)*6.67);
+  if(pct>=45)return Math.round(500+(pct-45)*6.67);
+  if(pct>=30)return Math.round(400+(pct-30)*6.67);
+  if(pct>=15)return Math.round(250+(pct-15)*10);
+  return Math.round(100+(pct/15)*150);
+}
+
+let preguntasExamen=[], respuestas=new Array(65).fill(null), indice=0, finalizado=false, intentoActual=0;
+
+function barajar(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function barajarOpciones(pregunta){
+  const letras = ['A','B','C','D','E'];
+  const opcionesConIndice = pregunta.opciones.map((op, i) => ({texto: op, indiceOriginal: i}));
+  for(let i = opcionesConIndice.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [opcionesConIndice[i], opcionesConIndice[j]] = [opcionesConIndice[j], opcionesConIndice[i]];
+  }
+  const nuevaCorrecta = opcionesConIndice.findIndex(op => op.indiceOriginal === pregunta.correcta);
+  return {
+    opciones: opcionesConIndice.map(op => op.texto),
+    correcta: nuevaCorrecta
+  };
+}
+
+function iniciarExamen(){
+  const prev=JSON.parse(localStorage.getItem('v3s_m1_650')||'[]');
+  if(prev.length>=10){
+    if(confirm('⚠️ Ya usaste los 10 intentos. ¿Reiniciar historial para 10 más?')){
+      localStorage.setItem('v3s_m1_650','[]');
+    }else return;
+  }
+  const usadas=new Set(prev.flat());
+  let disp=bancoM1.filter((_,i)=>!usadas.has(i));
+  if(disp.length<65){
+    alert('🔄 Banco agotado. Reiniciando historial automáticamente.');
+    localStorage.setItem('v3s_m1_650','[]');
+    disp=[...bancoM1];
+  }
+  const sel=barajar([...disp]).slice(0,65);
+  prev.push(sel.map(p=>bancoM1.indexOf(p)));
+  localStorage.setItem('v3s_m1_650',JSON.stringify(prev));
+  preguntasExamen = sel.map(p => {
+  const barajada = barajarOpciones(p);
+  return {
+    enunciado: p.enunciado,
+    opciones: barajada.opciones,
+    correcta: barajada.correcta,
+    solucion: p.solucion
+  };
+});
+respuestas=new Array(65).fill(null);indice=0;finalizado=false;intentoActual=prev.length;renderizar();
+}
+
+function seleccionar(idx){if(!finalizado){respuestas[indice]=idx;renderizar();}}
+function navegar(d){const n=indice+d;if(n>=0&&n<65){indice=n;renderizar();}}
+function finalizar(){finalizado=true;renderizar();}
+function volverInicio(){preguntasExamen=[];respuestas=new Array(65).fill(null);indice=0;finalizado=false;renderizar();}
+function calcular(){let c=0;preguntasExamen.forEach((p,i)=>{if(respuestas[i]===p.correcta)c++;});return{correctas:c,total:65};}
+
+function renderizar(){
+  const app=document.getElementById('contenidoDinamico');
+  const prev=JSON.parse(localStorage.getItem('v3s_m1_650')||'[]');
+  const usados=prev.length;
+  if(!preguntasExamen.length){
+    app.innerHTML=`<div style="text-align:center;"><p class="intentos-info">🎯 Intentos: <strong>${usados}</strong> de <strong>10</strong></p><p style="margin:1.2rem 0;font-size:1.05rem;">📚 <strong>650 preguntas únicas</strong> · 10 intentos sin repetición<br>📊 Números, Álgebra, Geometría, Probabilidad y Estadística</p><button onclick="window.iniciarExamen()" style="font-size:1.15rem;padding:0.9rem 2.8rem;background:#5b7a4c;color:white;border-color:#3f5535;cursor:pointer;">▶ Iniciar intento ${usados+1}</button>${usados>=10?'<p style="color:#c0392b;margin-top:1rem;">⚠️ Límite de 10 intentos alcanzado. Puedes reiniciar.</p>':''}${usados>0&&usados<10?`<p style="color:#7b6e5a;margin-top:0.8rem;">Te quedan <strong>${10-usados}</strong> intento(s).</p>`:''}</div>`;
+    return;
+  }
+  if(finalizado){
+    const{correctas}=calcular();
+    const pct=Math.round((correctas/65)*100);
+    const puntaje=estimarPuntajePAES(pct);
+    let nivel='',cn='';
+    if(puntaje>=800){nivel='🏅 Puntaje destacado (sobre 700 pts)';cn='#27ae60';}
+    else if(puntaje>=650){nivel='📘 Buen desempeño (600-700 pts)';cn='#2c3e50';}
+    else if(puntaje>=500){nivel='📗 En desarrollo (500-600 pts)';cn='#f39c12';}
+    else{nivel='📕 Necesita refuerzo (bajo 500 pts)';cn='#c0392b';}
+    app.innerHTML=`<div class="resultado-final"><h2>📋 Resultado M1 · Intento ${intentoActual} de 10</h2><p class="puntaje-etiqueta">PUNTAJE PAES ESTIMADO</p><p class="puntaje-paes">${puntaje}</p><p>de 1000 puntos máximos</p><div class="barra-puntaje"><div class="barra-puntaje-lleno" style="width:${((puntaje-100)/900)*100}%;"></div></div><p>${correctas}/65 (${pct}%)</p><p style="color:${cn};font-weight:600;">${nivel}</p><div style="max-height:350px;overflow-y:auto;text-align:left;margin:1.2rem 0;">${preguntasExamen.map((p,i)=>{const u=respuestas[i];const ok=u===p.correcta;const lu=u!==null?String.fromCharCode(65+u):'—';const lc=String.fromCharCode(65+p.correcta);return`<div class="solucion-item" style="background:${ok?'#e8f5e9':'#fce4e4'};border-left:3px solid ${ok?'#4caf50':'#e53935'};"><strong>${i+1}.</strong> ${p.enunciado.substring(0,60)}...<br>🔹 Tu: <strong>${lu}</strong> | ✅: <strong>${lc}</strong><br>📘 ${p.solucion}</div>`;}).join('')}</div><button onclick="window.volverInicio()">↩️ Volver al inicio</button></div>`;
+    return;
+  }
+  const p=preguntasExamen[indice];
+  const letras=['A','B','C','D','E'];
+  const resp=respuestas.filter(r=>r!==null).length;
+  app.innerHTML=`<p class="intentos-info">📝 Intento ${intentoActual} de 10 · Respondidas: ${resp}/65</p><div class="barra-progreso"><div class="progreso-lleno" style="width:${((indice+1)/65)*100}%;"></div></div><div class="pregunta-box"><div class="numero-pregunta">Pregunta ${indice+1} de 65</div><div class="enunciado">${p.enunciado}</div><div class="opciones">${p.opciones.map((op,i)=>`<div class="opcion ${respuestas[indice]===i?'seleccionada':''}" onclick="window.seleccionar(${i})"><span class="letra">${letras[i]}</span> <span style="flex:1;">${op}</span>${respuestas[indice]===i?'<span style="color:#5b7a4c;">✓</span>':''}</div>`).join('')}</div></div><div class="navegacion"><button ${indice===0?'disabled':''} onclick="window.navegar(-1)">← Anterior</button><span style="font-weight:600;">${indice+1}/65</span><button ${indice===64?'disabled':''} onclick="window.navegar(1)">Siguiente →</button></div><div style="text-align:right;margin-top:1.5rem;"><button class="btn-finalizar" onclick="window.finalizar()">✅ Finalizar intento</button></div>`;
+}
+
+window.iniciarExamen=iniciarExamen;
+window.seleccionar=seleccionar;
+window.navegar=navegar;
+window.finalizar=finalizar;
+window.volverInicio=volverInicio;
+renderizar();
+})();
+</script>
+</body>
+</html>

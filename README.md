@@ -60,6 +60,31 @@
 
 ---
 
+### 🏠 [Practicas Comandos Devops](./DevopsLabs)
+
+**Desarrollado por:**
+
+- 🧑‍💻 **V0rt3x_S0urc3** - [GitHub](https://github.com/V0rt3xS0urc3)
+- 🤖 **Qwen Studio IA** - [Chat](https://chat.qwen.ai)
+- 🤖 **DeepSeek IA** - [Chat](https://chat.deepseek.com)
+
+---
+
+### 🏠 [Practicas Prueba Universitaria PAES(Chile)](./PAES)
+
+✅ 650 preguntas aleatorias para 10 practicas con 65 preguntas M1
+✅ 650 preguntas aleatorias para 10 practicas con 65 preguntas M2
+✅ 650 preguntas aleatorias para 10 practicas con 65 preguntas Comprensión Lectora
+✅ 650 preguntas aleatorias para 10 practicas con 65 preguntas Biología
+
+**Desarrollado por:**
+
+- 🧑‍💻 **V0rt3x_S0urc3** - [GitHub](https://github.com/V0rt3xS0urc3)
+- 🤖 **Qwen Studio IA** - [Chat](https://chat.qwen.ai)
+- 🤖 **DeepSeek IA** - [Chat](https://chat.deepseek.com)
+
+---
+
 ### 🎯 [WriteUps DockerLabs](./WriteupsDockerLabs)
 
 **Soluciones detalladas de máquinas vulnerables de DockerLabs.es**

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+  <title>Calculadora Postulación Medicina · V0rt3x_S0urc3</title>
+  <meta name="author" content="V0rt3x_S0urc3 · Diego Arriagada Zamora">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #f5f0e8; font-family: 'Georgia', 'Times New Roman', serif; color: #1e1e1e; padding: 1.5rem 1rem; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .contenedor { max-width: 750px; width: 100%; background: #fffdf9; border-radius: 28px; box-shadow: 0 18px 36px rgba(0,0,0,0.07); padding: 2rem 2rem 2.2rem; border: 1px solid #d9cebc; }
+    .marca-creador { text-align: right; font-size: 0.75rem; color: #8b7d6b; margin-bottom: 0.3rem; font-style: italic; }
+    .marca-creador span { font-weight: 700; color: #2c5a4c; }
+    h1 { font-size: 1.8rem; color: #2c3e2b; border-bottom: 2px solid #b39264; padding-bottom: 0.5rem; margin-bottom: 0.8rem; text-align: center; }
+    .subtitulo { text-align: center; color: #5e5a4f; margin-bottom: 1.5rem; font-style: italic; }
+    .seccion { background: #faf7f2; border-radius: 18px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #e0d5c5; }
+    .seccion h3 { color: #4a3728; margin-bottom: 1rem; font-size: 1.1rem; border-bottom: 1px solid #d9cebc; padding-bottom: 0.4rem; }
+    .fila { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; gap: 1rem; flex-wrap: wrap; }
+    .fila label { font-weight: 600; color: #3a3028; min-width: 160px; }
+    .fila input, .fila select { padding: 0.6rem 0.8rem; border: 1.5px solid #c7b59b; border-radius: 10px; font-size: 1rem; font-family: inherit; width: 150px; text-align: center; background: white; }
+    .fila input:focus, .fila select:focus { outline: none; border-color: #5b7a4c; box-shadow: 0 0 0 2px rgba(91,122,76,0.2); }
+    .btn-calcular { display: block; width: 100%; padding: 1rem; background: #2c5a4c; color: white; border: none; border-radius: 14px; font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: inherit; margin: 1.5rem 0; transition: 0.2s; }
+    .btn-calcular:hover { background: #1e4538; }
+    .resultado { background: #f9f6ef; border-radius: 20px; padding: 1.5rem; margin-top: 1rem; border: 1px solid #d9cebc; }
+    .resultado h3 { text-align: center; color: #2c3e2b; margin-bottom: 1rem; }
+    .uni-resultado { background: white; border-radius: 14px; padding: 1.2rem; margin-bottom: 1rem; border: 2px solid #e0d5c5; text-align: center; }
+    .uni-resultado h4 { color: #4a3728; margin-bottom: 0.5rem; }
+    .puntaje-final { font-size: 2.5rem; font-weight: 700; color: #2c5a4c; }
+    .califica { font-size: 1.3rem; font-weight: 700; margin-top: 0.5rem; padding: 0.5rem 1rem; border-radius: 20px; display: inline-block; }
+    .si-califica { background: #d4edda; color: #155724; }
+    .no-califica { background: #f8d7da; color: #721c24; }
+    .detalle { font-size: 0.85rem; color: #5e5a4f; margin-top: 0.8rem; text-align: left; line-height: 1.6; }
+    .footer-marca { text-align: center; margin-top: 1.5rem; font-size: 0.7rem; color: #8b7d6b; border-top: 1px solid #d9cebc; padding-top: 0.8rem; }
+    .info-nem { background: #e8f0e8; border-radius: 12px; padding: 0.8rem 1rem; margin: 0.8rem 0; font-size: 0.85rem; color: #3a5a3a; }
+    @media (max-width: 500px) { .contenedor { padding: 1.5rem; } .fila { flex-direction: column; align-items: flex-start; } .fila input, .fila select { width: 100%; } }
+  </style>
+</head>
+<body>
+<div class="contenedor">
+  <div class="marca-creador">⚡ <span>V0rt3x_S0urc3</span> · Diego Arriagada Zamora</div>
+  <h1>🧬 Calculadora de Postulación</h1>
+  <p class="subtitulo">Medicina · UCM y Universidad Autónoma de Chile (Talca)</p>
+
+  <div class="seccion">
+    <h3>📊 Puntajes PAES (100 a 1000 puntos)</h3>
+    <div class="fila">
+      <label>📐 M1 Matemática:</label>
+      <input type="number" id="m1" min="100" max="1000" value="700" step="1">
+    </div>
+    <div class="fila">
+      <label>📊 M2 Matemática:</label>
+      <input type="number" id="m2" min="100" max="1000" value="680" step="1">
+    </div>
+    <div class="fila">
+      <label>📖 Comprensión Lectora:</label>
+      <input type="number" id="lectura" min="100" max="1000" value="700" step="1">
+    </div>
+    <div class="fila">
+      <label>🧬 Ciencias (Biología):</label>
+      <input type="number" id="ciencias" min="100" max="1000" value="720" step="1">
+    </div>
+  </div>
+
+  <div class="seccion">
+    <h3>📚 Notas de Enseñanza Media (NEM)</h3>
+    <div class="info-nem">
+      📌 El NEM se expresa en la misma escala PAES (100 a 1000 puntos).<br>
+      Se calcula a partir del promedio de notas de 1° a 4° medio.
+    </div>
+    <div class="fila">
+      <label>🏫 NEM (puntaje):</label>
+      <input type="number" id="nem" min="100" max="1000" value="650" step="1">
+    </div>
+    <div class="fila">
+      <label>📋 Ranking de notas:</label>
+      <input type="number" id="ranking" min="100" max="1000" value="680" step="1">
+    </div>
+  </div>
+
+  <button class="btn-calcular" onclick="calcular()">🔍 Calcular puntaje ponderado</button>
+
+  <div id="resultadoContainer"></div>
+
+  <div class="footer-marca">© V0rt3x_S0urc3 | Diego Arriagada Zamora · Calculadora educativa sin fines comerciales</div>
+</div>
+
+<script>
+function calcular(){
+  const m1 = parseInt(document.getElementById('m1').value) || 0;
+  const m2 = parseInt(document.getElementById('m2').value) || 0;
+  const lectura = parseInt(document.getElementById('lectura').value) || 0;
+  const ciencias = parseInt(document.getElementById('ciencias').value) || 0;
+  const nem = parseInt(document.getElementById('nem').value) || 0;
+  const ranking = parseInt(document.getElementById('ranking').value) || 0;
+
+  // Ponderaciones UCM (aproximadas según datos oficiales)
+  // M1: 15%, M2: 15%, Lectura: 20%, Ciencias: 25%, NEM: 15%, Ranking: 10%
+  const ponderadoUCM = (m1 * 0.15) + (m2 * 0.15) + (lectura * 0.20) + (ciencias * 0.25) + (nem * 0.15) + (ranking * 0.10);
+  
+  // Ponderaciones Universidad Autónoma (aproximadas)
+  // M1: 20%, M2: 10%, Lectura: 20%, Ciencias: 20%, NEM: 20%, Ranking: 10%
+  const ponderadoUA = (m1 * 0.20) + (m2 * 0.10) + (lectura * 0.20) + (ciencias * 0.20) + (nem * 0.20) + (ranking * 0.10);
+
+  // Puntajes de corte estimados 2024-2025
+  const corteUCM = 720;
+  const corteUA = 660;
+
+  const calificaUCM = ponderadoUCM >= corteUCM;
+  const calificaUA = ponderadoUA >= corteUA;
+
+  // Determinar nivel de cada prueba
+  function nivelPrueba(p, nombre){
+    if(p >= 800) return `<span style="color:#27ae60;">🏅 ${nombre}: Sobresaliente</span>`;
+    if(p >= 700) return `<span style="color:#2c3e50;">📘 ${nombre}: Bueno</span>`;
+    if(p >= 600) return `<span style="color:#f39c12;">📗 ${nombre}: Suficiente</span>`;
+    if(p >= 500) return `<span style="color:#e67e22;">📙 ${nombre}: Regular</span>`;
+    return `<span style="color:#c0392b;">📕 ${nombre}: Insuficiente</span>`;
+  }
+
+  const container = document.getElementById('resultadoContainer');
+  container.innerHTML = `
+    <div class="resultado">
+      <h3>📋 Resultados del cálculo</h3>
+
+      <div style="background:white;border-radius:14px;padding:1rem;margin-bottom:1rem;text-align:left;line-height:2;">
+        <strong>Resumen de puntajes:</strong><br>
+        ${nivelPrueba(m1, 'M1')}<br>
+        ${nivelPrueba(m2, 'M2')}<br>
+        ${nivelPrueba(lectura, 'Lectura')}<br>
+        ${nivelPrueba(ciencias, 'Ciencias')}<br>
+        ${nivelPrueba(nem, 'NEM')}<br>
+        ${nivelPrueba(ranking, 'Ranking')}
+      </div>
+
+      <div class="uni-resultado" style="border-color:${calificaUCM ? '#4caf50' : '#e53935'};">
+        <h4>🏥 Universidad Católica del Maule (UCM)</h4>
+        <p style="font-size:0.9rem;color:#5e5a4f;">Ponderaciones: M1 15% · M2 15% · Lectura 20% · Ciencias 25% · NEM 15% · Ranking 10%</p>
+        <div class="puntaje-final">${ponderadoUCM.toFixed(1)}</div>
+        <p style="font-size:0.9rem;">Puntaje de corte estimado: <strong>${corteUCM}</strong> puntos</p>
+        <div class="califica ${calificaUCM ? 'si-califica' : 'no-califica'}">
+          ${calificaUCM ? '✅ CALIFICA para Medicina UCM' : '❌ NO califica para Medicina UCM'}
+        </div>
+        ${!calificaUCM ? `<p style="margin-top:0.5rem;font-size:0.9rem;">Necesitas ${(corteUCM - ponderadoUCM).toFixed(1)} puntos más para alcanzar el corte.</p>` : ''}
+        <div class="detalle">
+          <strong>Desglose del puntaje ponderado:</strong><br>
+          M1: ${m1} × 15% = ${(m1*0.15).toFixed(1)}<br>
+          M2: ${m2} × 15% = ${(m2*0.15).toFixed(1)}<br>
+          Lectura: ${lectura} × 20% = ${(lectura*0.20).toFixed(1)}<br>
+          Ciencias: ${ciencias} × 25% = ${(ciencias*0.25).toFixed(1)}<br>
+          NEM: ${nem} × 15% = ${(nem*0.15).toFixed(1)}<br>
+          Ranking: ${ranking} × 10% = ${(ranking*0.10).toFixed(1)}
+        </div>
+      </div>
+
+      <div class="uni-resultado" style="border-color:${calificaUA ? '#4caf50' : '#e53935'};">
+        <h4>🏥 Universidad Autónoma de Chile (Talca)</h4>
+        <p style="font-size:0.9rem;color:#5e5a4f;">Ponderaciones: M1 20% · M2 10% · Lectura 20% · Ciencias 20% · NEM 20% · Ranking 10%</p>
+        <div class="puntaje-final">${ponderadoUA.toFixed(1)}</div>
+        <p style="font-size:0.9rem;">Puntaje de corte estimado: <strong>${corteUA}</strong> puntos</p>
+        <div class="califica ${calificaUA ? 'si-califica' : 'no-califica'}">
+          ${calificaUA ? '✅ CALIFICA para Medicina Autónoma' : '❌ NO califica para Medicina Autónoma'}
+        </div>
+        ${!calificaUA ? `<p style="margin-top:0.5rem;font-size:0.9rem;">Necesitas ${(corteUA - ponderadoUA).toFixed(1)} puntos más para alcanzar el corte.</p>` : ''}
+        <div class="detalle">
+          <strong>Desglose del puntaje ponderado:</strong><br>
+          M1: ${m1} × 20% = ${(m1*0.20).toFixed(1)}<br>
+          M2: ${m2} × 10% = ${(m2*0.10).toFixed(1)}<br>
+          Lectura: ${lectura} × 20% = ${(lectura*0.20).toFixed(1)}<br>
+          Ciencias: ${ciencias} × 20% = ${(ciencias*0.20).toFixed(1)}<br>
+          NEM: ${nem} × 20% = ${(nem*0.20).toFixed(1)}<br>
+          Ranking: ${ranking} × 10% = ${(ranking*0.10).toFixed(1)}
+        </div>
+      </div>
+
+      <div class="info-nem" style="margin-top:1rem;">
+        <strong>📌 Sobre el NEM y Ranking:</strong><br>
+        • El NEM convierte tu promedio de notas de 1° a 4° medio a escala PAES (100-1000 pts)<br>
+        • El Ranking compara tu rendimiento con el de tu generación en tu colegio<br>
+        • Ambos son calculados oficialmente por el DEMRE al momento de la postulación
+      </div>
+    </div>
+  `;
+
+  // Scroll al resultado
+  container.scrollIntoView({behavior:'smooth'});
+}
+
+// Calcular automáticamente al cargar
+window.addEventListener('DOMContentLoaded', calcular);
+</script>
+</body>
+</html>

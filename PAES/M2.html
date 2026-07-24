@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+  <title>Simulador PAES M2 · V0rt3x_S0urc3</title>
+  <meta name="author" content="V0rt3x_S0urc3 · Diego Arriagada Zamora">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #eef2f5; font-family: 'Georgia', 'Times New Roman', serif; color: #1a1a2e; padding: 1.5rem 1rem; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .contenedor { max-width: 800px; width: 100%; background: #fff; border-radius: 28px; box-shadow: 0 18px 36px rgba(0,0,0,0.09); padding: 2rem 2rem 2.2rem; border: 1px solid #c5d0d9; }
+    .marca-creador { text-align: right; font-size: 0.75rem; color: #6b7d8e; margin-bottom: 0.3rem; font-style: italic; }
+    .marca-creador span { font-weight: 700; color: #1a3c5e; }
+    h1 { font-size: 2rem; color: #1a3c5e; border-bottom: 2px solid #3a7ca5; padding-bottom: 0.5rem; margin-bottom: 0.4rem; }
+    .subtitulo { color: #4a5568; margin-bottom: 1.2rem; font-style: italic; }
+    .intentos-info { background: #edf2f7; padding: 0.5rem 1rem; border-radius: 20px; display: inline-block; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .barra-progreso { width: 100%; height: 8px; background: #dce3ea; border-radius: 10px; margin: 1rem 0 1.6rem; }
+    .progreso-lleno { height: 100%; width: 0%; background: #3a7ca5; border-radius: 10px; transition: width 0.2s; }
+    .pregunta-box { background: #f8fafc; border-left: 6px solid #3a7ca5; padding: 1.5rem; border-radius: 18px; margin-bottom: 1.5rem; }
+    .numero-pregunta { font-weight: 700; color: #4a6a8a; font-size: 0.9rem; margin-bottom: 0.7rem; }
+    .enunciado { font-size: 1.2rem; line-height: 1.5; margin-bottom: 1.6rem; }
+    .opciones { display: flex; flex-direction: column; gap: 0.7rem; }
+    .opcion { background: white; border: 1.5px solid #c5d0d9; border-radius: 14px; padding: 0.75rem 1.1rem; display: flex; align-items: center; gap: 0.9rem; cursor: pointer; transition: 0.15s; }
+    .opcion:hover { background: #edf2f7; }
+    .opcion.seleccionada { background: #dce8f2; border-color: #3a7ca5; font-weight: 500; }
+    .letra { font-weight: 700; background: #dce8f2; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #1a3c5e; }
+    .navegacion { display: flex; justify-content: space-between; align-items: center; margin-top: 1.8rem; }
+    button { background: #f8fafc; border: 1.5px solid #b0c4d8; padding: 0.7rem 1.6rem; border-radius: 30px; font-weight: 600; cursor: pointer; font-family: inherit; color: #1a3c5e; }
+    button:hover:not(:disabled) { background: #dce8f2; border-color: #3a7ca5; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-finalizar { background: #1a3c5e; color: white; border-color: #0f2a40; }
+    .btn-finalizar:hover:not(:disabled) { background: #15304d; }
+    .resultado-final { background: #f0f4f8; border-radius: 24px; padding: 2rem; text-align: center; }
+    .puntaje-paes { font-size: 4rem; font-weight: 700; color: #1a3c5e; margin: 0.3rem 0; line-height: 1; }
+    .puntaje-etiqueta { font-size: 0.9rem; color: #6b7d8e; letter-spacing: 1px; }
+    .barra-puntaje { width: 80%; height: 12px; background: #d0dce5; border-radius: 10px; margin: 1rem auto; }
+    .barra-puntaje-lleno { height: 100%; background: #3a7ca5; border-radius: 10px; transition: width 0.5s; }
+    .solucion-item { background: #e8eef3; border-radius: 14px; padding: 0.7rem 1rem; margin-bottom: 0.5rem; font-size: 0.85rem; text-align: left; }
+    .footer-marca { text-align: center; margin-top: 1.5rem; font-size: 0.7rem; color: #6b7d8e; border-top: 1px solid #c5d0d9; padding-top: 0.8rem; }
+    @media (max-width: 500px) { .contenedor { padding: 1.5rem; } .puntaje-paes { font-size: 3rem; } }
+  </style>
+</head>
+<body>
+<div class="contenedor" id="app">
+  <div class="marca-creador">⚡ <span>V0rt3x_S0urc3</span> · Diego Arriagada Zamora</div>
+  <h1>📊 PAES Matemática M2</h1>
+  <p class="subtitulo">Competencia Matemática 2 · 650 preguntas · 65 por intento · 10 intentos</p>
+  <div id="contenidoDinamico"></div>
+  <div class="footer-marca">© V0rt3x_S0urc3 | Diego Arriagada Zamora · Simulador educativo sin fines comerciales</div>
+</div>
+
+<script>
+(function(){
+
+// ============================================
+// PEGAR AQUÍ LAS 650 PREGUNTAS DE M2
+// ============================================
+const bancoM2 = [
+
+  // ===== BLOQUE 1: ÁLGEBRA AVANZADA Y FUNCIONES (1-130) =====
+{enunciado:"Si f(x)=2x³-5x²+3x-7, f(2) es:",opciones:["-1","3","5","-3","7"],correcta:0,solucion:"f(2)=2(8)-5(4)+6-7=16-20+6-7=-1."},
+{enunciado:"El dominio de f(x)=√(x-4) es:",opciones:["x ≥ 4","x > 4","x ≤ 4","x < 4","Todos ℝ"],correcta:0,solucion:"Radicando ≥0: x-4≥0→x≥4."},
+{enunciado:"La inversa de f(x)=3x-2 es:",opciones:["f⁻¹(x)=(x+2)/3","f⁻¹(x)=3x+2","f⁻¹(x)=(x-2)/3","f⁻¹(x)=x/3+2","f⁻¹(x)=3/(x+2)"],correcta:0,solucion:"y=3x-2→x=3y-2→y=(x+2)/3."},
+{enunciado:"Vértice de y=x²-6x+11:",opciones:["(3,2)","(-3,2)","(3,-2)","(6,11)","(0,11)"],correcta:0,solucion:"x=-b/(2a)=3, y(3)=9-18+11=2. (3,2)."},
+{enunciado:"Suma de raíces de x²-7x+12=0:",opciones:["7","-7","12","-12","3"],correcta:0,solucion:"Vieta: -b/a=7/1=7."},
+{enunciado:"Producto de raíces de 2x²-8x+6=0:",opciones:["3","4","6","-3","8"],correcta:0,solucion:"c/a=6/2=3."},
+{enunciado:"k para raíz doble en x²+kx+16=0:",opciones:["±8","8","4","±4","16"],correcta:0,solucion:"Δ=0: k²-64=0→k=±8."},
+{enunciado:"log₂(32):",opciones:["5","6","4","3","16"],correcta:0,solucion:"2⁵=32→log₂32=5."},
+{enunciado:"Si log(x)=3, x vale:",opciones:["1000","300","30","3","100"],correcta:0,solucion:"10³=1000."},
+{enunciado:"Asíntota horizontal de f(x)=(2x+3)/(x-1):",opciones:["y=2","y=3","y=1","y=0","y=-1"],correcta:0,solucion:"Grados iguales: 2/1=2."},
+{enunciado:"Recorrido de f(x)=x²+1:",opciones:["[1,∞[","ℝ","[0,∞[","]1,∞[","[-1,∞["],correcta:0,solucion:"x²≥0→x²+1≥1. [1,∞[."},
+{enunciado:"Si f(x)=√(x+2), f(7) es:",opciones:["3","√7","9","√9","5"],correcta:0,solucion:"f(7)=√(7+2)=√9=3."},
+{enunciado:"(f∘g)(x) si f(x)=x² y g(x)=x+1:",opciones:["(x+1)²","x²+1","x²+2x","x+1²","2x+1"],correcta:0,solucion:"f(g(x))=f(x+1)=(x+1)²."},
+{enunciado:"Valor de x en 3ˣ⁺¹=81:",opciones:["3","4","2","5","1"],correcta:0,solucion:"81=3⁴→x+1=4→x=3."},
+{enunciado:"Concavidad hacia arriba si:",opciones:["a>0","a<0","b>0","c>0","Δ>0"],correcta:0,solucion:"a>0: parábola abre hacia arriba."},
+{enunciado:"Eje de simetría de y=2x²-8x+5:",opciones:["x=2","x=-2","x=4","x=-4","x=8"],correcta:0,solucion:"x=-b/(2a)=8/4=2."},
+{enunciado:"Raíces de x²-5x+6=0:",opciones:["x=2, x=3","x=1, x=6","x=-2, x=-3","x=5, x=1","x=0, x=6"],correcta:0,solucion:"(x-2)(x-3)=0→x=2,3."},
+{enunciado:"Si f(x)=2ˣ, f⁻¹(8) es:",opciones:["3","2","4","8","1"],correcta:0,solucion:"2ˣ=8→2ˣ=2³→x=3."},
+{enunciado:"Dominio de f(x)=ln(x-1):",opciones:["x>1","x≥1","x<1","x≤1","Todos ℝ"],correcta:0,solucion:"Argumento>0: x-1>0→x>1."},
+{enunciado:"g(x)=|x-2| evaluada en x=-1:",opciones:["3","1","-3","-1","2"],correcta:0,solucion:"|-1-2|=|-3|=3."},
+{enunciado:"Sistema: 2x+y=7, x-y=2:",opciones:["(3,1)","(2,3)","(1,5)","(4,-1)","(3,2)"],correcta:0,solucion:"Sumando:3x=9→x=3,y=1."},
+{enunciado:"Sistema 3x-2y=4, 6x-4y=8:",opciones:["Infinitas soluciones","Única","Ninguna","Dos","No se sabe"],correcta:0,solucion:"2ª=2×(1ª). Coincidentes."},
+{enunciado:"Si x+y=10, xy=21, x²+y²:",opciones:["58","100","42","79","121"],correcta:0,solucion:"(x+y)²=x²+2xy+y²→100=x²+y²+42→58."},
+{enunciado:"Valor de a en f(x)=ax²+bx+c si vértice (2,3) y pasa por (0,-1):",opciones:["a=-1","a=1","a=2","a=-2","a=0"],correcta:0,solucion:"f(0)=-1→c=-1. Vértice: -b/(2a)=2, f(2)=4a+2b-1=3. Resolviendo: a=-1."},
+{enunciado:"log₃(81):",opciones:["4","3","9","27","2"],correcta:0,solucion:"3⁴=81."},
+{enunciado:"Ecuación logarítmica: log₂(x)=5:",opciones:["x=32","x=10","x=25","x=64","x=16"],correcta:0,solucion:"2⁵=32."},
+{enunciado:"Sistema x+y=5, x-y=1:",opciones:["(3,2)","(2,3)","(4,1)","(1,4)","(5,0)"],correcta:0,solucion:"2x=6→x=3,y=2."},
+{enunciado:"Factorizar x³-8:",opciones:["(x-2)(x²+2x+4)","(x-2)³","(x+2)(x²-2x+4)","(x-2)(x²-2x+4)","x(x²-8)"],correcta:0,solucion:"Diferencia de cubos: a³-b³=(a-b)(a²+ab+b²)."},
+// ===== BLOQUE 2: CÁLCULO - DERIVADAS (131-260) =====
+{enunciado:"Derivada de f(x)=4x³-2x²+x-5:",opciones:["12x²-4x+1","12x²-2x+1","4x²-4x+1","12x²-4x","12x²-4x-5"],correcta:0,solucion:"f'(x)=12x²-4x+1."},
+{enunciado:"Derivada de f(x)=ln(x²):",opciones:["2/x","1/x²","2x","1/x","x/2"],correcta:0,solucion:"ln(x²)=2ln(x)→2/x."},
+{enunciado:"Derivada de f(x)=e²ˣ:",opciones:["2e²ˣ","e²ˣ","2eˣ","eˣ","4e²ˣ"],correcta:0,solucion:"Regla cadena: e²ˣ·2=2e²ˣ."},
+{enunciado:"Pendiente tangente a f(x)=x² en x=3:",opciones:["6","9","3","12","18"],correcta:0,solucion:"f'(x)=2x. f'(3)=6."},
+{enunciado:"Punto crítico de f(x)=x³-3x²:",opciones:["x=0, x=2","x=0, x=3","x=1, x=2","x=0","x=2"],correcta:0,solucion:"f'(x)=3x²-6x=3x(x-2)=0→x=0,2."},
+{enunciado:"Derivada de f(x)=sen(3x):",opciones:["3cos(3x)","cos(3x)","3sen(3x)","-3cos(3x)","3cos(x)"],correcta:0,solucion:"cos(3x)·3=3cos(3x)."},
+{enunciado:"f''(x) de f(x)=x⁴-2x³:",opciones:["12x²-12x","12x²-6x","4x³-6x²","12x²-12","24x-12"],correcta:0,solucion:"f'(x)=4x³-6x², f''(x)=12x²-12x."},
+{enunciado:"Derivada de f(x)=cos(x²):",opciones:["-2x·sen(x²)","2x·sen(x²)","-sen(x²)","-2x·cos(x²)","sen(x²)"],correcta:0,solucion:"-sen(x²)·2x=-2x·sen(x²)."},
+{enunciado:"Si f'(a)=0 y f''(a)<0, hay:",opciones:["Máximo local","Mínimo local","Inflexión","Asíntota","Nada"],correcta:0,solucion:"f''<0→cóncava hacia abajo→máximo."},
+{enunciado:"Derivada de f(x)=1/x:",opciones:["-1/x²","1/x²","-x","x⁻²","ln(x)"],correcta:0,solucion:"x⁻¹→-x⁻²=-1/x²."},
+{enunciado:"Derivada de f(x)=tan(x):",opciones:["sec²(x)","-sec²(x)","cot(x)","sen(x)","cos(x)"],correcta:0,solucion:"d/dx(tan x)=sec²x."},
+{enunciado:"Derivada de f(x)=x·eˣ:",opciones:["eˣ(x+1)","eˣ","xeˣ","eˣ+1","x+eˣ"],correcta:0,solucion:"Regla producto: 1·eˣ+x·eˣ=eˣ(1+x)."},
+{enunciado:"Derivada de f(x)=√x:",opciones:["1/(2√x)","1/√x","2√x","√x/2","1/x"],correcta:0,solucion:"x^(1/2)→(1/2)x^(-1/2)=1/(2√x)."},
+{enunciado:"Máximo de f(x)=-x²+4x-3:",opciones:["1 en x=2","3 en x=0","4 en x=1","2 en x=3","0 en x=2"],correcta:0,solucion:"Vértice: x=2, f(2)=-4+8-3=1."},
+{enunciado:"Mínimo de f(x)=x²-4x+7:",opciones:["3 en x=2","7 en x=0","4 en x=1","2 en x=3","1 en x=2"],correcta:0,solucion:"Vértice: x=2, f(2)=4-8+7=3."},
+{enunciado:"Derivada de f(x)=ln(sen x):",opciones:["cot x","tan x","sec x","csc x","cos x/sen x"],correcta:0,solucion:"(cos x)/sen x=cot x."},
+{enunciado:"Recta tangente a f(x)=x³ en x=1:",opciones:["y=3x-2","y=x+1","y=3x","y=x³","y=1"],correcta:0,solucion:"f(1)=1, f'(1)=3. y-1=3(x-1)→y=3x-2."},
+{enunciado:"Derivada de f(x)=5:",opciones:["0","5","1","x","-5"],correcta:0,solucion:"Derivada de constante es 0."},
+{enunciado:"f'(x) si f(x)=x⁵-3x⁴+2x:",opciones:["5x⁴-12x³+2","5x⁴-12x³+2x","5x⁴-3x³+2","x⁴-12x³+2","5x³-12x²+2"],correcta:0,solucion:"5x⁴-12x³+2."},
+{enunciado:"Derivada de f(x)=eˣ·sen x:",opciones:["eˣ(sen x+cos x)","eˣ·cos x","eˣ·sen x","eˣ(cos x-sen x)","cos x"],correcta:0,solucion:"Regla producto: eˣ·sen x+eˣ·cos x=eˣ(sen x+cos x)."},
+// ===== BLOQUE 3: INTEGRALES (261-350) =====
+{enunciado:"∫ 3x² dx:",opciones:["x³+C","3x³+C","6x+C","x²+C","3x+C"],correcta:0,solucion:"3·x³/3=x³+C."},
+{enunciado:"∫₀² 2x dx:",opciones:["4","2","8","6","0"],correcta:0,solucion:"[x²]₀²=4-0=4."},
+{enunciado:"Área bajo y=x entre x=1 y x=3:",opciones:["4","2","6","8","3"],correcta:0,solucion:"[x²/2]₁³=9/2-1/2=4."},
+{enunciado:"∫(2x+3)dx:",opciones:["x²+3x+C","2x²+3x+C","x²+3+C","2x+3+C","x²+3x²+C"],correcta:0,solucion:"∫2x dx=x², ∫3dx=3x. x²+3x+C."},
+{enunciado:"∫ eˣ dx:",opciones:["eˣ+C","xeˣ+C","eˣ/x+C","ln(x)+C","e²ˣ/2+C"],correcta:0,solucion:"∫eˣdx=eˣ+C."},
+{enunciado:"∫ 1/x dx:",opciones:["ln|x|+C","x+C","1/x²+C","eˣ+C","x⁻¹+C"],correcta:0,solucion:"∫dx/x=ln|x|+C."},
+{enunciado:"∫ cos x dx:",opciones:["sen x+C","-sen x+C","cos x+C","tan x+C","sec x+C"],correcta:0,solucion:"∫cos x dx=sen x+C."},
+{enunciado:"∫ sen x dx:",opciones:["-cos x+C","cos x+C","sen x+C","tan x+C","-sen x+C"],correcta:0,solucion:"∫sen x dx=-cos x+C."},
+{enunciado:"Área bajo f(x)=4 entre x=1 y x=3:",opciones:["8","4","12","16","2"],correcta:0,solucion:"∫₁³4dx=[4x]₁³=12-4=8."},
+{enunciado:"∫₀¹ x² dx:",opciones:["1/3","1","1/2","2/3","1/4"],correcta:0,solucion:"[x³/3]₀¹=1/3."},
+// ===== BLOQUE 4: PROBABILIDAD Y DISTRIBUCIONES (351-480) =====
+{enunciado:"P(A|B) si P(A)=0.4, P(B)=0.5, P(A∩B)=0.2:",opciones:["0.4","0.5","0.2","0.8","0.6"],correcta:0,solucion:"0.2/0.5=0.4."},
+{enunciado:"Binomial n=5, p=0.5, P(X=3):",opciones:["0.3125","0.5","0.25","0.125","0.625"],correcta:0,solucion:"C(5,3)·(0.5)⁵=10·0.03125=0.3125."},
+{enunciado:"E(X) binomial n=10, p=0.3:",opciones:["3","10","7","0.3","5"],correcta:0,solucion:"10·0.3=3."},
+{enunciado:"σ binomial n=16, p=0.5:",opciones:["2","4","8","1","0.5"],correcta:0,solucion:"√(16·0.5·0.5)=2."},
+{enunciado:"P(Z<0) normal estándar:",opciones:["0.5","0","1","0.25","0.75"],correcta:0,solucion:"Simetría: 0.5."},
+{enunciado:"P(A∩B) si P(A)=0.3, P(B|A)=0.4:",opciones:["0.12","0.7","0.4","0.3","0.1"],correcta:0,solucion:"0.3·0.4=0.12."},
+{enunciado:"Independencia si:",opciones:["P(A∩B)=P(A)P(B)","P(A∪B)=P(A)+P(B)","P(A|B)=1","Excluyentes","P(A)=P(B)"],correcta:0,solucion:"Definición de independencia."},
+{enunciado:"P(A∪B) si P(A)=0.5, P(B)=0.4, P(A∩B)=0.1:",opciones:["0.8","0.9","0.5","0.4","0.2"],correcta:0,solucion:"0.5+0.4-0.1=0.8."},
+{enunciado:"Distribución de Poisson con λ=3, P(X=0):",opciones:["e⁻³","3e⁻³","e³","0","1"],correcta:0,solucion:"P(X=0)=e⁻³·3⁰/0!=e⁻³."},
+{enunciado:"En normal N(100,15), P(X<100):",opciones:["0.5","0.68","0.95","0.997","1"],correcta:0,solucion:"100 es la media, por simetría 0.5."},
+// ===== BLOQUE 5: GEOMETRÍA ANALÍTICA (481-580) =====
+{enunciado:"Distancia entre (2,3) y (5,7):",opciones:["5","4","6","7","3"],correcta:0,solucion:"√(9+16)=5."},
+{enunciado:"Punto medio de A(1,4) y B(7,10):",opciones:["(4,7)","(3,5)","(8,14)","(6,6)","(4,4)"],correcta:0,solucion:"(8/2,14/2)=(4,7)."},
+{enunciado:"Recta pendiente 3 por (1,2):",opciones:["y=3x-1","y=3x+2","y=x+3","y=3x+1","y=2x+3"],correcta:0,solucion:"y-2=3(x-1)→y=3x-1."},
+{enunciado:"Pendiente de 2x-4y+8=0:",opciones:["1/2","2","-1/2","-2","4"],correcta:0,solucion:"y=(1/2)x+2, m=1/2."},
+{enunciado:"Centro de x²+y²-6x+4y-3=0:",opciones:["(3,-2)","(-3,2)","(6,-4)","(3,2)","(-3,-2)"],correcta:0,solucion:"(x-3)²+(y+2)²=16, centro (3,-2)."},
+{enunciado:"Radio de x²+y²=25:",opciones:["5","25","10","√5","12.5"],correcta:0,solucion:"r²=25→r=5."},
+{enunciado:"Ecuación circunferencia centro (0,0) radio 3:",opciones:["x²+y²=9","x²+y²=3","(x-3)²+y²=9","x²+(y-3)²=9","x²+y²=6"],correcta:0,solucion:"x²+y²=r²=9."},
+{enunciado:"Pendiente recta que pasa por (1,1) y (4,7):",opciones:["2","3","1","4","6"],correcta:0,solucion:"(7-1)/(4-1)=6/3=2."},
+{enunciado:"Recta paralela a y=2x+1 que pasa por (0,3):",opciones:["y=2x+3","y=-2x+3","y=3x+2","y=x+3","y=2x-3"],correcta:0,solucion:"Paralela: misma pendiente (2), pasa por (0,3)→y=2x+3."},
+{enunciado:"Distancia del punto (1,1) a la recta 3x+4y-10=0:",opciones:["3/5","1","2","5/3","4/5"],correcta:0,solucion:"|3+4-10|/√(9+16)=|-3|/5=3/5."},
+// ===== BLOQUE 6: PREGUNTAS ADICIONALES VARIADAS (581-650) =====
+{enunciado:"La función f(x)=x³-3x tiene puntos críticos en:",opciones:["x=±1","x=0,3","x=1,2","x=-1,0","x=0"],correcta:0,solucion:"f'(x)=3x²-3=0→x=±1."},
+{enunciado:"∫₁⁴ (2x-1)dx:",opciones:["12","10","8","14","6"],correcta:0,solucion:"[x²-x]₁⁴=(16-4)-(1-1)=12."},
+{enunciado:"P(A)=0.6, P(B)=0.5, independientes. P(A∩B):",opciones:["0.3","0.6","0.5","1.1","0"],correcta:0,solucion:"0.6·0.5=0.3."},
+{enunciado:"Vértice de y=2x²-8x+7:",opciones:["(2,-1)","(-2,1)","(2,1)","(4,7)","(0,7)"],correcta:0,solucion:"x=8/4=2, y=8-16+7=-1."},
+{enunciado:"log₅(1/25):",opciones:["-2","2","-5","5","1/5"],correcta:0,solucion:"5⁻²=1/25→log₅(1/25)=-2."},
+{enunciado:"Dominio de f(x)=√(9-x²):",opciones:["[-3,3]","[-9,9]","[0,3]","[-3,0]","Todos ℝ"],correcta:0,solucion:"9-x²≥0→x²≤9→|x|≤3→[-3,3]."},
+{enunciado:"Derivada de f(x)=x·ln x:",opciones:["ln x+1","ln x","1/x","x/ln x","1"],correcta:0,solucion:"Regla producto: 1·ln x+x·(1/x)=ln x+1."},
+{enunciado:"Área entre y=x² e y=x desde x=0 a x=1:",opciones:["1/6","1/3","1/2","1","2/3"],correcta:0,solucion:"∫₀¹(x-x²)dx=[x²/2-x³/3]₀¹=1/2-1/3=1/6."},
+{enunciado:"E(X) de distribución uniforme discreta en {1,2,3,4,5,6}:",opciones:["3.5","3","4","6","2.5"],correcta:0,solucion:"(1+2+3+4+5+6)/6=21/6=3.5."},
+{enunciado:"Recta perpendicular a y=4x-2 por (0,1):",opciones:["y=-x/4+1","y=4x+1","y=x/4+1","y=-4x+1","y=-x+1"],correcta:0,solucion:"m₁=4→m₂=-1/4. y-1=(-1/4)(x-0)→y=-x/4+1."},
+{enunciado:"∫ sec²x dx:",opciones:["tan x+C","sec x+C","cot x+C","sen x+C","cos x+C"],correcta:0,solucion:"d/dx(tan x)=sec²x."},
+{enunciado:"f(x)=eˣ tiene inversa:",opciones:["f⁻¹(x)=ln x","f⁻¹(x)=eˣ","f⁻¹(x)=x","No tiene","f⁻¹(x)=1/x"],correcta:0,solucion:"ln(eˣ)=x, e^(ln x)=x."},
+{enunciado:"Cónica: x²+y²+4x-6y-3=0 es:",opciones:["Circunferencia","Parábola","Elipse","Hipérbola","Recta"],correcta:0,solucion:"(x+2)²+(y-3)²=16. Circunferencia centro (-2,3), r=4."},
+{enunciado:"P(X>2) en Poisson λ=1:",opciones:["1-2.5e⁻¹","e⁻¹","2e⁻¹","1-e⁻¹","0.5"],correcta:0,solucion:"P(X≤2)=e⁻¹(1+1+1/2)=2.5e⁻¹. P(X>2)=1-2.5e⁻¹."},
+{enunciado:"Elipse x²/9+y²/4=1 tiene semiejes:",opciones:["a=3, b=2","a=9, b=4","a=2, b=3","a=4, b=9","a=1, b=1"],correcta:0,solucion:"a²=9→a=3, b²=4→b=2."},
+{enunciado:"Derivada de f(x)=arcsen(x):",opciones:["1/√(1-x²)","1/(1+x²)","-1/√(1-x²)","√(1-x²)","cos x"],correcta:0,solucion:"d/dx(arcsen x)=1/√(1-x²)."},
+{enunciado:"Límite x→∞ de (3x²+2x)/(x²-1):",opciones:["3","0","∞","2","1"],correcta:0,solucion:"Grados iguales: 3/1=3."},
+{enunciado:"Límite x→0 de sen(3x)/x:",opciones:["3","0","1","∞","-3"],correcta:0,solucion:"lim(sen ax/x)=a=3."},
+{enunciado:"∫₀^π sen x dx:",opciones:["2","0","1","π","-2"],correcta:0,solucion:"[-cos x]₀^π=(-cos π)-(-cos 0)=(-(-1))-(-1)=1+1=2."},
+{enunciado:"Hipérbola: x²/4-y²/9=1. Asíntotas:",opciones:["y=±(3/2)x","y=±(2/3)x","y=±x","y=±2x","y=±3x"],correcta:0,solucion:"Asíntotas: y=±(b/a)x=±(3/2)x."},
+{enunciado:"Varianza de binomial n=20, p=0.25:",opciones:["3.75","5","2.5","4","15"],correcta:0,solucion:"np(1-p)=20·0.25·0.75=3.75."},
+{enunciado:"Distribución normal: P(μ-σ<X<μ+σ):",opciones:["≈0.68","≈0.95","≈0.997","0.5","1"],correcta:0,solucion:"Regla empírica: 68% de datos en ±1σ."},
+{enunciado:"Parábola y²=8x. Foco:",opciones:["(2,0)","(4,0)","(0,2)","(8,0)","(0,0)"],correcta:0,solucion:"4p=8→p=2. Foco (p,0)=(2,0)."},
+{enunciado:"Vector director de recta (x,y)=(1,2)+t(3,-1):",opciones:["(3,-1)","(1,2)","(-1,3)","(2,-3)","(4,1)"],correcta:0,solucion:"El vector director es (3,-1)."},
+{enunciado:"Producto punto de (1,2,3) y (4,-5,6):",opciones:["12","32","-12","0","10"],correcta:0,solucion:"1·4+2·(-5)+3·6=4-10+18=12."},
+{enunciado:"Módulo del vector (3,4):",opciones:["5","7","12","1","25"],correcta:0,solucion:"√(3²+4²)=√25=5."},
+{enunciado:"Ángulo entre vectores (1,0) y (0,1):",opciones:["90°","0°","45°","60°","180°"],correcta:0,solucion:"Producto punto=0→perpendiculares→90°."},
+{enunciado:"Recta en forma simétrica: (x-1)/2=(y+3)/-1. Pendiente:",opciones:["-1/2","2","-2","1/2","1"],correcta:0,solucion:"m=(y₂-y₁)/(x₂-x₁)=-1/2."},
+{enunciado:"Ecuación vectorial de recta por A(2,1) y B(5,4):",opciones:["(x,y)=(2,1)+t(3,3)","(x,y)=(2,1)+t(5,4)","(x,y)=(5,4)+t(2,1)","(x,y)=(3,3)+t(2,1)","(x,y)=(1,1)+t(4,5)"],correcta:0,solucion:"Vector director = B-A = (3,3)."},
+{enunciado:"Cónica degenerada: x²-y²=0 representa:",opciones:["Dos rectas","Circunferencia","Parábola","Elipse","Un punto"],correcta:0,solucion:"(x+y)(x-y)=0→y=-x, y=x (dos rectas)."},
+// ===== BLOQUE 2: MÁS ÁLGEBRA AVANZADA =====
+{enunciado:"Si f(x)=x³-3x²+2x, f(1) es:",opciones:["0","2","1","-1","3"],correcta:0,solucion:"f(1)=1-3+2=0."},
+{enunciado:"Dominio de f(x)=√(2x-6):",opciones:["x ≥ 3","x > 3","x ≤ 3","x < 3","x ≥ 0"],correcta:0,solucion:"2x-6≥0→2x≥6→x≥3."},
+{enunciado:"Inversa de f(x)=(x-3)/2:",opciones:["f⁻¹(x)=2x+3","f⁻¹(x)=2x-3","f⁻¹(x)=x/2+3","f⁻¹(x)=(x+3)/2","f⁻¹(x)=2/(x-3)"],correcta:0,solucion:"y=(x-3)/2→2y=x-3→x=2y+3→f⁻¹(x)=2x+3."},
+{enunciado:"Vértice de y=3x²-12x+7:",opciones:["(2,-5)","(-2,5)","(2,5)","(4,7)","(0,7)"],correcta:0,solucion:"x=12/6=2, y=12-24+7=-5. (2,-5)."},
+{enunciado:"Suma de raíces de 3x²-6x+2=0:",opciones:["2","-2","2/3","-2/3","6"],correcta:0,solucion:"Vieta: -b/a=6/3=2."},
+{enunciado:"Producto de raíces de 4x²-8x+3=0:",opciones:["3/4","3","-3/4","-3","8/4"],correcta:0,solucion:"c/a=3/4."},
+{enunciado:"k para raíz doble en 2x²+kx+8=0:",opciones:["±8","8","±4","4","16"],correcta:0,solucion:"Δ=0→k²-64=0→k=±8."},
+{enunciado:"log₄(64):",opciones:["3","4","16","8","2"],correcta:0,solucion:"4³=64→log₄64=3."},
+{enunciado:"Si ln(x)=2, x vale:",opciones:["e²","2","10²","2e","100"],correcta:0,solucion:"ln(x)=2→x=e²."},
+{enunciado:"Asíntota vertical de f(x)=3/(x-2):",opciones:["x=2","x=3","x=-2","y=0","y=3"],correcta:0,solucion:"Denominador=0: x-2=0→x=2."},
+{enunciado:"Recorrido de f(x)=eˣ:",opciones:["]0,∞[","ℝ","[0,∞[","]1,∞[","[-1,∞["],correcta:0,solucion:"eˣ>0 para todo x. Recorrido: ]0,∞[."},
+{enunciado:"(g∘f)(x) si f(x)=2x y g(x)=x²:",opciones:["4x²","2x²","x²","2x","4x"],correcta:0,solucion:"g(f(x))=g(2x)=(2x)²=4x²."},
+{enunciado:"Valor de x en 5ˣ⁻¹=125:",opciones:["4","3","2","5","1"],correcta:0,solucion:"125=5³→x-1=3→x=4."},
+{enunciado:"Concavidad hacia abajo si:",opciones:["a<0","a>0","b<0","c<0","Δ<0"],correcta:0,solucion:"a<0: parábola abre hacia abajo."},
+{enunciado:"Eje de simetría de y=-x²+6x-8:",opciones:["x=3","x=-3","x=6","x=-6","x=8"],correcta:0,solucion:"x=-b/(2a)=-6/(-2)=3."},
+{enunciado:"Raíces de x²-8x+15=0:",opciones:["x=3, x=5","x=1, x=15","x=-3, x=-5","x=2, x=6","x=0, x=8"],correcta:0,solucion:"(x-3)(x-5)=0→x=3,5."},
+{enunciado:"Si f(x)=eˣ, f⁻¹(1) es:",opciones:["0","1","e","-1","2"],correcta:0,solucion:"eˣ=1→x=0."},
+{enunciado:"Dominio de f(x)=ln(5-x):",opciones:["x<5","x>5","x≤5","x≥5","Todos ℝ"],correcta:0,solucion:"5-x>0→x<5."},
+{enunciado:"f(x)=|x+1|-2 evaluada en x=-3:",opciones:["0","-2","2","-4","4"],correcta:0,solucion:"|-3+1|-2=|-2|-2=2-2=0."},
+{enunciado:"Sistema: 3x+2y=8, 2x-y=3:",opciones:["(2,1)","(1,2)","(3,0)","(0,4)","(2,2)"],correcta:0,solucion:"De 2ª: y=2x-3. En 1ª: 3x+2(2x-3)=8→3x+4x-6=8→7x=14→x=2,y=1."},
+{enunciado:"Sistema: x+y=3, 2x+2y=6:",opciones:["Infinitas","Única","Ninguna","Dos","No se sabe"],correcta:0,solucion:"2ª=2×(1ª). Infinitas soluciones."},
+{enunciado:"Si x+y=5, xy=6, x²+y²:",opciones:["13","25","1","36","7"],correcta:0,solucion:"(x+y)²=x²+2xy+y²→25=x²+y²+12→x²+y²=13."},
+{enunciado:"Factorizar x³+27:",opciones:["(x+3)(x²-3x+9)","(x+3)³","(x-3)(x²+3x+9)","(x+3)(x²+3x+9)","x(x²+27)"],correcta:0,solucion:"Suma de cubos: a³+b³=(a+b)(a²-ab+b²)."},
+{enunciado:"log₂(x²-4)=3:",opciones:["x=±2√3","x=12","x=8","x=±4","x=2"],correcta:0,solucion:"x²-4=8→x²=12→x=±2√3."},
+{enunciado:"Ecuación logarítmica: log(x)+log(x-3)=1:",opciones:["x=5","x=2","x=10","x=-2","x=3"],correcta:0,solucion:"log(x(x-3))=1→x²-3x=10→x²-3x-10=0→x=5 (x=-2 descartado)."},
+// ===== BLOQUE 2: MÁS CÁLCULO =====
+{enunciado:"Derivada de f(x)=x⁵-2x³+x:",opciones:["5x⁴-6x²+1","5x⁴-6x²","5x⁴-2x²+1","x⁴-6x²+1","5x³-6x+1"],correcta:0,solucion:"5x⁴-6x²+1."},
+{enunciado:"Derivada de f(x)=ln(3x):",opciones:["1/x","3/x","1/(3x)","3","x/3"],correcta:0,solucion:"ln(3)+ln(x)→0+1/x=1/x."},
+{enunciado:"Derivada de f(x)=e⁻ˣ:",opciones:["-e⁻ˣ","e⁻ˣ","-eˣ","eˣ","-xe⁻ˣ"],correcta:0,solucion:"e⁻ˣ·(-1)=-e⁻ˣ."},
+{enunciado:"Pendiente tangente a f(x)=ln x en x=1:",opciones:["1","0","e","-1","1/e"],correcta:0,solucion:"f'(x)=1/x. f'(1)=1."},
+{enunciado:"Punto crítico de f(x)=x⁴-4x³:",opciones:["x=0, x=3","x=0, x=2","x=1, x=3","x=0","x=4"],correcta:0,solucion:"f'(x)=4x³-12x²=4x²(x-3)=0→x=0,3."},
+{enunciado:"Derivada de f(x)=cos(5x):",opciones:["-5sen(5x)","5sen(5x)","-sen(5x)","5cos(5x)","sen(5x)"],correcta:0,solucion:"-sen(5x)·5=-5sen(5x)."},
+{enunciado:"f''(x) de f(x)=x³-6x²+9x:",opciones:["6x-12","3x²-12x+9","6x-6","12x-12","6x+12"],correcta:0,solucion:"f'(x)=3x²-12x+9, f''(x)=6x-12."},
+{enunciado:"Derivada de f(x)=tan(2x):",opciones:["2sec²(2x)","sec²(2x)","2tan(2x)","-2sec²(2x)","sec(2x)"],correcta:0,solucion:"sec²(2x)·2=2sec²(2x)."},
+{enunciado:"Si f'(a)=0 y f''(a)>0, hay:",opciones:["Mínimo local","Máximo local","Inflexión","Asíntota","Nada"],correcta:0,solucion:"f''>0→cóncava hacia arriba→mínimo."},
+{enunciado:"Derivada de f(x)=x²eˣ:",opciones:["eˣ(x²+2x)","2xeˣ","eˣ","x²eˣ","2eˣ"],correcta:0,solucion:"2x·eˣ+x²·eˣ=eˣ(x²+2x)."},
+{enunciado:"Derivada de f(x)=sen x·cos x:",opciones:["cos²x-sen²x","2sen x·cos x","cos(2x)","-sen²x+cos²x","Todas las anteriores"],correcta:0,solucion:"Regla producto: cos x·cos x+sen x·(-sen x)=cos²x-sen²x=cos(2x)."},
+{enunciado:"Derivada de f(x)=ln(x²+1):",opciones:["2x/(x²+1)","1/(x²+1)","2x","x/(x²+1)","1/x"],correcta:0,solucion:"(2x)/(x²+1)."},
+{enunciado:"Máximo de f(x)=-2x²+8x-5:",opciones:["3 en x=2","5 en x=0","8 en x=2","1 en x=1","7 en x=4"],correcta:0,solucion:"x=-8/(-4)=2, f(2)=-8+16-5=3."},
+{enunciado:"Mínimo de f(x)=x²-6x+13:",opciones:["4 en x=3","13 en x=0","6 en x=3","1 en x=6","0 en x=2"],correcta:0,solucion:"x=6/2=3, f(3)=9-18+13=4."},
+{enunciado:"Derivada de f(x)=√(x²+1):",opciones:["x/√(x²+1)","1/(2√(x²+1))","2x/√(x²+1)","x","√(x²+1)"],correcta:0,solucion:"(1/2)(x²+1)^(-1/2)·2x=x/√(x²+1)."},
+{enunciado:"Recta tangente a f(x)=eˣ en x=0:",opciones:["y=x+1","y=eˣ","y=x","y=1","y=x-1"],correcta:0,solucion:"f(0)=1, f'(0)=1. y-1=1(x-0)→y=x+1."},
+{enunciado:"Derivada de f(x)=arcsen(x/2):",opciones:["1/√(4-x²)","1/√(1-x²)","2/√(4-x²)","1/(2√(1-x²))","2/√(1-x²)"],correcta:0,solucion:"1/√(1-(x/2)²)·(1/2)=1/√(4-x²)."},
+{enunciado:"f'(x) si f(x)=x³ln x:",opciones:["x²(3ln x+1)","3x²ln x","x²·ln x","3x²","x²(ln x+3)"],correcta:0,solucion:"3x²·ln x+x³·(1/x)=3x²ln x+x²=x²(3ln x+1)."},
+{enunciado:"Derivada de f(x)=eˣ/x:",opciones:["eˣ(x-1)/x²","eˣ/x²","eˣ(x+1)/x²","-eˣ/x²","eˣ"],correcta:0,solucion:"(eˣ·x-eˣ·1)/x²=eˣ(x-1)/x²."},
+// ===== BLOQUE 2: MÁS INTEGRALES =====
+{enunciado:"∫ x³ dx:",opciones:["x⁴/4+C","x⁴+C","3x²+C","x³/3+C","4x⁴+C"],correcta:0,solucion:"∫xⁿdx=xⁿ⁺¹/(n+1). x⁴/4+C."},
+{enunciado:"∫₀³ x dx:",opciones:["9/2","3","6","9","4"],correcta:0,solucion:"[x²/2]₀³=9/2."},
+{enunciado:"Área bajo y=2x entre x=0 y x=2:",opciones:["4","2","8","6","1"],correcta:0,solucion:"[x²]₀²=4."},
+{enunciado:"∫ (x²+x)dx:",opciones:["x³/3+x²/2+C","x³+x²+C","2x+1+C","x²+x+C","x³/3+x+C"],correcta:0,solucion:"∫x²dx=x³/3, ∫xdx=x²/2. x³/3+x²/2+C."},
+{enunciado:"∫ e²ˣ dx:",opciones:["e²ˣ/2+C","2e²ˣ+C","e²ˣ+C","eˣ+C","2eˣ+C"],correcta:0,solucion:"∫eᵃˣdx=eᵃˣ/a+C. e²ˣ/2+C."},
+{enunciado:"∫ 1/(x+1) dx:",opciones:["ln|x+1|+C","1/(x+1)²+C","x+C","ln x+C","eˣ⁺¹+C"],correcta:0,solucion:"∫dx/(x+a)=ln|x+a|+C."},
+{enunciado:"∫ sen(2x) dx:",opciones:["-cos(2x)/2+C","cos(2x)/2+C","-cos(2x)+C","2cos(2x)+C","sen(2x)/2+C"],correcta:0,solucion:"∫sen(ax)dx=-cos(ax)/a+C."},
+{enunciado:"∫ sec x·tan x dx:",opciones:["sec x+C","tan x+C","sec²x+C","ln|sec x|+C","cos x+C"],correcta:0,solucion:"d/dx(sec x)=sec x·tan x."},
+{enunciado:"Área bajo f(x)=x³ entre x=1 y x=2:",opciones:["15/4","4","8","7/2","3"],correcta:0,solucion:"[x⁴/4]₁²=16/4-1/4=15/4."},
+{enunciado:"∫₀¹ eˣ dx:",opciones:["e-1","e","1","e+1","0"],correcta:0,solucion:"[eˣ]₀¹=e-1."},
+// ===== BLOQUE 2: MÁS PROBABILIDAD AVANZADA =====
+{enunciado:"P(A)=0.7, P(B)=0.4, P(A∩B)=0.3. P(A|B):",opciones:["0.75","0.3","0.4","0.7","0.5"],correcta:0,solucion:"0.3/0.4=0.75."},
+{enunciado:"Binomial n=8, p=0.5, P(X=4):",opciones:["0.273","0.5","0.25","0.125","0.375"],correcta:0,solucion:"C(8,4)·(0.5)⁸=70/256≈0.273."},
+{enunciado:"E(X) binomial n=15, p=0.4:",opciones:["6","4","8","10","15"],correcta:0,solucion:"15·0.4=6."},
+{enunciado:"σ² binomial n=12, p=0.25:",opciones:["2.25","3","1.5","4","9"],correcta:0,solucion:"np(1-p)=12·0.25·0.75=2.25."},
+{enunciado:"P(-1<Z<1) normal estándar:",opciones:["≈0.68","≈0.95","0.5","≈0.997","0.9"],correcta:0,solucion:"Regla empírica: 68% en ±1σ."},
+{enunciado:"P(A∩B) independientes, P(A)=0.4, P(B)=0.5:",opciones:["0.2","0.9","0.1","0.7","0.6"],correcta:0,solucion:"0.4·0.5=0.2."},
+{enunciado:"P(A∪B) si P(A)=0.3, P(B)=0.5, independientes:",opciones:["0.65","0.8","0.15","0.5","0.3"],correcta:0,solucion:"0.3+0.5-0.15=0.65."},
+{enunciado:"Poisson λ=2, P(X=1):",opciones:["2e⁻²","e⁻²","2e⁻¹","e⁻¹","4e⁻²"],correcta:0,solucion:"e⁻²·2¹/1!=2e⁻²."},
+{enunciado:"Normal N(50,10), P(X>60):",opciones:["≈0.16","≈0.5","≈0.84","≈0.025","≈0.975"],correcta:0,solucion:"Z=1→P(Z>1)≈0.1587≈0.16."},
+{enunciado:"Percentil 97.5 normal estándar:",opciones:["1.96","1.645","2.33","1","2.58"],correcta:0,solucion:"Z₀.₉₇₅=1.96."},
+{enunciado:"Media muestral de n=36 de población σ=12:",opciones:["σₓ̄=2","σₓ̄=12","σₓ̄=6","σₓ̄=3","σₓ̄=4"],correcta:0,solucion:"σₓ̄=σ/√n=12/6=2."},
+{enunciado:"Intervalo de confianza 95% para μ con x̄=100, σ=15, n=25:",opciones:["100±5.88","100±15","100±7.5","100±3","100±1.96"],correcta:0,solucion:"1.96·15/5=5.88. IC: 100±5.88."},
+// ===== BLOQUE 2: MÁS GEOMETRÍA ANALÍTICA =====
+{enunciado:"Distancia de (1,1) a 3x+4y+5=0:",opciones:["12/5","5","2","3","7/5"],correcta:0,solucion:"|3+4+5|/5=12/5."},
+{enunciado:"Punto medio de (-2,5) y (4,-1):",opciones:["(1,2)","(2,3)","(-3,2)","(1,-3)","(3,1)"],correcta:0,solucion:"(2/2,4/2)=(1,2)."},
+{enunciado:"Recta pendiente -2 por (3,-1):",opciones:["y=-2x+5","y=-2x-5","y=2x-7","y=-2x+7","y=2x+5"],correcta:0,solucion:"y+1=-2(x-3)→y=-2x+6-1=-2x+5."},
+{enunciado:"Pendiente de recta perpendicular a y=(1/3)x+2:",opciones:["-3","3","-1/3","1/3","-2"],correcta:0,solucion:"m₁=1/3→m₂=-3."},
+{enunciado:"Centro de x²+y²+8x-2y+1=0:",opciones:["(-4,1)","(4,-1)","(-4,-1)","(4,1)","(-8,2)"],correcta:0,solucion:"(x+4)²+(y-1)²=16. Centro (-4,1)."},
+{enunciado:"Radio de x²+y²-6x+4y-12=0:",opciones:["5","1","3","7","25"],correcta:0,solucion:"(x-3)²+(y+2)²=25. r=5."},
+{enunciado:"Circunferencia centro (2,-1) y radio 4:",opciones:["(x-2)²+(y+1)²=16","(x+2)²+(y-1)²=4","(x-2)²+(y-1)²=16","x²+y²=16","(x+2)²+(y+1)²=4"],correcta:0,solucion:"(x-h)²+(y-k)²=r²."},
+{enunciado:"Pendiente recta que pasa por (-1,3) y (4,-2):",opciones:["-1","1","-5","5","-2"],correcta:0,solucion:"(-2-3)/(4-(-1))=-5/5=-1."},
+{enunciado:"Recta paralela a 2x-y+1=0 por (0,4):",opciones:["y=2x+4","y=-2x+4","y=x+4","y=2x-4","y=-x+4"],correcta:0,solucion:"y=2x+1→m=2. y-4=2(x-0)→y=2x+4."},
+{enunciado:"Distancia entre rectas paralelas y=2x+1 e y=2x-5:",opciones:["6/√5","6","3/√5","4","5/√5"],correcta:0,solucion:"|1-(-5)|/√(2²+1)=6/√5."},
+// ===== BLOQUE 2: PREGUNTAS VARIADAS ADICIONALES =====
+{enunciado:"La función f(x)=x⁴-2x² tiene puntos críticos en:",opciones:["x=-1,0,1","x=0,2","x=±1","x=0","x=±2"],correcta:0,solucion:"f'(x)=4x³-4x=4x(x²-1)=0→x=-1,0,1."},
+{enunciado:"∫₁² (3x²-2x)dx:",opciones:["5","4","6","3","7"],correcta:0,solucion:"[x³-x²]₁²=(8-4)-(1-1)=4."},
+{enunciado:"P(A)=0.5, P(B)=0.3, mutuamente excluyentes. P(A∪B):",opciones:["0.8","0.15","0.2","0.5","0.3"],correcta:0,solucion:"0.5+0.3=0.8."},
+{enunciado:"Vértice de y=-x²+2x+3:",opciones:["(1,4)","(-1,2)","(1,2)","(2,3)","(0,3)"],correcta:0,solucion:"x=-2/(-2)=1, y=-1+2+3=4."},
+{enunciado:"log₅(1/125):",opciones:["-3","3","-5","5","-2"],correcta:0,solucion:"5⁻³=1/125→log₅(1/125)=-3."},
+{enunciado:"Dominio de f(x)=√(x²-9):",opciones:["x≤-3 o x≥3","[-3,3]","x≥3","x≤-3","Todos ℝ"],correcta:0,solucion:"x²-9≥0→|x|≥3."},
+{enunciado:"Derivada de f(x)=x·cos x:",opciones:["cos x-x·sen x","cos x+x·sen x","-sen x","sen x+cos x","-x·sen x"],correcta:0,solucion:"1·cos x+x·(-sen x)=cos x-x·sen x."},
+{enunciado:"Área entre y=x² y y=4:",opciones:["32/3","16/3","8","4","16"],correcta:0,solucion:"∫₋₂²(4-x²)dx=[4x-x³/3]₋₂²=32/3."},
+{enunciado:"E(X) de dado cargado: P(1)=0.3, P(2-6)=0.14 c/u:",opciones:["3.4","3.5","3","4","2.5"],correcta:0,solucion:"1·0.3+2·0.14+3·0.14+4·0.14+5·0.14+6·0.14=0.3+0.14(20)=0.3+2.8=3.1+0.3=3.4."},
+{enunciado:"Recta perpendicular a y=-x+1 por (2,3):",opciones:["y=x+1","y=x-1","y=-x+5","y=-x+1","y=x+5"],correcta:0,solucion:"m₁=-1→m₂=1. y-3=1(x-2)→y=x+1."},
+{enunciado:"∫ csc²x dx:",opciones:["-cot x+C","cot x+C","tan x+C","-tan x+C","sec x+C"],correcta:0,solucion:"d/dx(cot x)=-csc²x. ∫csc²xdx=-cot x+C."},
+{enunciado:"f(x)=ln x tiene inversa:",opciones:["f⁻¹(x)=eˣ","f⁻¹(x)=1/x","f⁻¹(x)=x","No tiene","f⁻¹(x)=ln(1/x)"],correcta:0,solucion:"e^(ln x)=x, ln(eˣ)=x."},
+{enunciado:"Cónica: 4x²+9y²=36 es:",opciones:["Elipse","Circunferencia","Parábola","Hipérbola","Recta"],correcta:0,solucion:"x²/9+y²/4=1. Elipse."},
+{enunciado:"P(X<3) Poisson λ=4:",opciones:["∑ᵢ₌₀² e⁻⁴4ⁱ/i!","e⁻⁴","1","0.5","0.2"],correcta:0,solucion:"P(X=0)+P(X=1)+P(X=2)=e⁻⁴(1+4+8)=13e⁻⁴."},
+{enunciado:"Hipérbola x²/16-y²/9=1. Focos:",opciones:["(±5,0)","(±4,0)","(±3,0)","(0,±5)","(±√7,0)"],correcta:0,solucion:"c²=a²+b²=16+9=25→c=5. Focos (±5,0)."},
+{enunciado:"Derivada de f(x)=arctan(x):",opciones:["1/(1+x²)","1/√(1-x²)","-1/(1+x²)","1/(1-x²)","tan x"],correcta:0,solucion:"d/dx(arctan x)=1/(1+x²)."},
+{enunciado:"Límite x→0 de (1-cos x)/x²:",opciones:["1/2","0","1","∞","-1"],correcta:0,solucion:"Por L'Hôpital o serie: lim=1/2."},
+{enunciado:"Límite x→∞ de (2x³-5x)/(x³+1):",opciones:["2","0","∞","5","-5"],correcta:0,solucion:"Grados iguales: 2/1=2."},
+{enunciado:"∫₀^π/² cos x dx:",opciones:["1","0","2","π/2","-1"],correcta:0,solucion:"[sen x]₀^π/²=1-0=1."},
+{enunciado:"Parábola y²=12x. Directriz:",opciones:["x=-3","x=3","y=-3","y=3","x=0"],correcta:0,solucion:"4p=12→p=3. Directriz x=-p=-3."},
+{enunciado:"Varianza de binomial n=10, p=0.1:",opciones:["0.9","0.09","1","9","0.3"],correcta:0,solucion:"10·0.1·0.9=0.9."},
+{enunciado:"Normal: P(μ-2σ<X<μ+2σ):",opciones:["≈0.95","≈0.68","≈0.997","0.5","1"],correcta:0,solucion:"Regla empírica: 95% en ±2σ."},
+{enunciado:"Elipse x²/25+y²/9=1. Vértices:",opciones:["(±5,0)","(±3,0)","(0,±5)","(0,±3)","(±4,0)"],correcta:0,solucion:"a²=25→a=5. Vértices en (±5,0)."},
+{enunciado:"Vector director de recta 2x-3y+6=0:",opciones:["(3,2)","(2,3)","(-2,3)","(3,-2)","(2,-3)"],correcta:0,solucion:"Recta: vector normal (2,-3). Vector director perpendicular (3,2)."},
+{enunciado:"Producto cruz de (1,0,0) y (0,1,0):",opciones:["(0,0,1)","(1,1,0)","(0,1,1)","(1,0,1)","(0,0,-1)"],correcta:0,solucion:"i×j=k=(0,0,1)."},
+{enunciado:"Módulo del vector (1,-2,2):",opciones:["3","5","√5","1","4"],correcta:0,solucion:"√(1+4+4)=√9=3."},
+{enunciado:"Ángulo entre vectores (1,1) y (1,-1):",opciones:["90°","0°","45°","60°","180°"],correcta:0,solucion:"Producto punto=0→90°."},
+{enunciado:"Recta forma simétrica: (x-2)/3=(y+1)/-2. Punto:",opciones:["(2,-1)","(-2,1)","(3,-2)","(-3,2)","(1,0)"],correcta:0,solucion:"Pasa por (x₀,y₀)=(2,-1)."},
+{enunciado:"Ecuación paramétrica de recta por A(1,0) y B(4,3):",opciones:["x=1+3t, y=0+3t","x=1+t, y=0+3t","x=4+3t, y=3+t","x=1+4t, y=0+3t","x=3+t, y=3+0t"],correcta:0,solucion:"Vector=(3,3). x=1+3t, y=0+3t."},
+{enunciado:"Cónica degenerada: x²+y²=0 representa:",opciones:["Un punto (0,0)","Circunferencia","Dos rectas","Nada","Todo ℝ²"],correcta:0,solucion:"Solo se cumple para x=y=0."},
+// ===== BLOQUE 3: M2 =====
+{enunciado:"Derivada de f(x)=x²sen x:",opciones:["2x·sen x+x²·cos x","2x·cos x","x²·cos x","2x·sen x","x·sen x"],correcta:0,solucion:"Regla producto: 2x·sen x+x²·cos x."},
+{enunciado:"∫ x·eˣ dx:",opciones:["eˣ(x-1)+C","eˣ(x+1)+C","xeˣ+C","eˣ+C","x²eˣ/2+C"],correcta:0,solucion:"Integración por partes: u=x, dv=eˣdx. eˣ(x-1)+C."},
+{enunciado:"Límite x→0 de (eˣ-1)/x:",opciones:["1","0","e","∞","-1"],correcta:0,solucion:"Límite fundamental: lim(eˣ-1)/x=1."},
+{enunciado:"Asíntota oblicua de f(x)=(x²+1)/(x-1):",opciones:["y=x+1","y=x","y=x-1","y=2x","y=x+2"],correcta:0,solucion:"División: (x²+1)/(x-1)=x+1+2/(x-1). Asíntota: y=x+1."},
+{enunciado:"Máximo absoluto de f(x)=x³-3x en [-2,2]:",opciones:["2","-2","0","3","-1"],correcta:0,solucion:"f(-2)=-2, f(2)=2, f(-1)=2, f(1)=-2. Máximo=2."},
+{enunciado:"Mínimo absoluto de f(x)=x³-3x en [-2,2]:",opciones:["-2","2","0","-1","1"],correcta:0,solucion:"f(1)=-2, f(-2)=-2. Mínimo=-2."},
+{enunciado:"Radio de convergencia de Σxⁿ/n:",opciones:["1","∞","0","2","e"],correcta:0,solucion:"Criterio del cociente: lim|aₙ₊₁/aₙ|=|x|. Converge si |x|<1. R=1."},
+{enunciado:"∫₀^∞ e⁻ˣ dx:",opciones:["1","0","∞","e","-1"],correcta:0,solucion:"[-e⁻ˣ]₀^∞=0-(-1)=1."},
+{enunciado:"Derivada direccional de f(x,y)=x²+y² en (1,1) dirección (1,0):",opciones:["2","1","0","4","√2"],correcta:0,solucion:"∇f=(2x,2y). En (1,1): (2,2). D_u=(2,2)·(1,0)=2."},
+{enunciado:"Gradiente de f(x,y)=x²y+y³ en (1,2):",opciones:["(4,13)","(2,7)","(4,7)","(2,13)","(1,8)"],correcta:0,solucion:"∇f=(2xy, x²+3y²). En (1,2): (4,1+12)=(4,13)."},
+{enunciado:"Matriz Jacobiana de f(x,y)=(x²y, xy²) en (1,1):",opciones:["[[2,1],[1,2]]","[[2,2],[2,2]]","[[1,1],[1,1]]","[[2,0],[0,2]]","[[1,2],[2,1]]"],correcta:0,solucion:"J=[[2xy,x²],[y²,2xy]]. En (1,1): [[2,1],[1,2]]."},
+{enunciado:"Regla de la cadena: si z=x²+y², x=t², y=2t, dz/dt en t=1:",opciones:["12","8","4","10","6"],correcta:0,solucion:"dz/dt=2x·2t+2y·2=4xt+4y. t=1: x=1,y=2. 4+8=12."},
+{enunciado:"Derivada parcial ∂/∂x de f(x,y)=eˣʸ:",opciones:["yeˣʸ","xeˣʸ","eˣʸ","xyeˣʸ","eʸ"],correcta:0,solucion:"∂/∂x(eˣʸ)=eˣʸ·y=yeˣʸ."},
+{enunciado:"Punto silla de f(x,y)=x²-y²:",opciones:["(0,0)","(1,0)","(0,1)","(1,1)","No tiene"],correcta:0,solucion:"∇f=(2x,-2y)=(0,0)→(0,0). Hessiano=-4<0→punto silla."},
+{enunciado:"Mínimo de f(x,y)=x²+y² sujeto a x+y=2:",opciones:["2","0","4","1","8"],correcta:0,solucion:"Lagrange: ∇f=λ∇g. (2x,2y)=λ(1,1). x=y. Con x+y=2: x=y=1. f=2."},
+{enunciado:"∫∫_R xy dA, R=[0,1]×[0,2]:",opciones:["1","2","0.5","4","0"],correcta:0,solucion:"∫₀¹∫₀² xy dy dx=∫₀¹[x·y²/2]₀²dx=∫₀¹2x dx=[x²]₀¹=1."},
+{enunciado:"Volumen bajo z=x+y sobre R=[0,1]×[0,1]:",opciones:["1","0.5","2","0","4"],correcta:0,solucion:"∫₀¹∫₀¹(x+y)dx dy=∫₀¹[1/2+y]dy=[y/2+y²/2]₀¹=1."},
+{enunciado:"Serie de Taylor de eˣ alrededor de x=0 hasta grado 3:",opciones:["1+x+x²/2+x³/6","1+x+x²+x³","x+x²/2+x³/6","1+x/2+x²/3+x³/4","eˣ"],correcta:0,solucion:"eˣ=1+x+x²/2!+x³/3!+...=1+x+x²/2+x³/6."},
+{enunciado:"Serie de Maclaurin de sen x hasta grado 3:",opciones:["x-x³/6","x+x³/6","1-x²/2","x-x²/2","1+x-x³/6"],correcta:0,solucion:"sen x=x-x³/3!+...=x-x³/6."},
+{enunciado:"Ecuación diferencial: dy/dx=ky tiene solución:",opciones:["y=Ceᵏˣ","y=kx+C","y=Cxᵏ","y=eᵏˣ+C","y=ln(kx)+C"],correcta:0,solucion:"Separable: dy/y=k dx→ln|y|=kx+C→y=Ceᵏˣ."},
+{enunciado:"Solución de y'+2y=0:",opciones:["y=Ce⁻²ˣ","y=Ce²ˣ","y=2x+C","y=e⁻²ˣ","y=Cx²"],correcta:0,solucion:"y'=-2y→dy/y=-2dx→ln|y|=-2x+C→y=Ce⁻²ˣ."},
+{enunciado:"Ecuación característica de y''-4y'+4y=0:",opciones:["r²-4r+4=0","r²+4r+4=0","r²-4=0","r²+4=0","r-4=0"],correcta:0,solucion:"y''→r², y'→r, y→1. r²-4r+4=0."},
+{enunciado:"Raíces de r²-4r+4=0:",opciones:["r=2 (doble)","r=±2","r=2, r=-2","r=4","r=0, r=4"],correcta:0,solucion:"(r-2)²=0→r=2 (raíz doble)."},
+{enunciado:"Solución general de y''-4y'+4y=0:",opciones:["y=(C₁+C₂x)e²ˣ","y=C₁e²ˣ+C₂e⁻²ˣ","y=C₁cos2x+C₂sen2x","y=C₁e⁴ˣ+C₂","y=e²ˣ"],correcta:0,solucion:"Raíz doble r=2: y=(C₁+C₂x)e²ˣ."},
+{enunciado:"Transformada de Laplace de f(t)=1:",opciones:["1/s","1","s","1/s²","s²"],correcta:0,solucion:"ℒ{1}=1/s para s>0."},
+{enunciado:"Transformada de Laplace de f(t)=t:",opciones:["1/s²","1/s","s","1","s²"],correcta:0,solucion:"ℒ{t}=1/s²."},
+{enunciado:"Transformada de Laplace de f(t)=eᵃᵗ:",opciones:["1/(s-a)","1/(s+a)","s/(s²+a²)","a/s²","eᵃˢ"],correcta:0,solucion:"ℒ{eᵃᵗ}=1/(s-a)."},
+{enunciado:"Probabilidad condicional: P(A|B)=0.5, P(B)=0.4, P(A∩B):",opciones:["0.2","0.9","0.5","0.4","0.1"],correcta:0,solucion:"P(A∩B)=P(A|B)·P(B)=0.5·0.4=0.2."},
+{enunciado:"Teorema de Bayes: P(A|B)=[P(B|A)P(A)]/P(B). Si P(B|A)=0.8, P(A)=0.3, P(B)=0.5:",opciones:["0.48","0.24","0.8","0.3","0.5"],correcta:0,solucion:"(0.8·0.3)/0.5=0.24/0.5=0.48."},
+{enunciado:"Variable aleatoria continua: f(x)=2x, 0<x<1. P(X<0.5):",opciones:["0.25","0.5","0.75","1","0.125"],correcta:0,solucion:"∫₀⁰·⁵2x dx=[x²]₀⁰·⁵=0.25."},
+{enunciado:"Esperanza de X con f(x)=2x, 0<x<1:",opciones:["2/3","1/2","1/3","1","3/4"],correcta:0,solucion:"E(X)=∫₀¹x·2x dx=2∫₀¹x²dx=2[x³/3]₀¹=2/3."},
+{enunciado:"Varianza de X con f(x)=2x:",opciones:["1/18","1/9","1/3","2/3","1/2"],correcta:0,solucion:"E(X²)=∫₀¹x²·2x dx=2/4=1/2. V(X)=1/2-(2/3)²=1/2-4/9=1/18."},
+{enunciado:"Función generadora de momentos de X~N(0,1):",opciones:["e^(t²/2)","eᵗ","t²/2","e^(t²)","1"],correcta:0,solucion:"M_X(t)=e^(μt+σ²t²/2)=e^(t²/2)."},
+{enunciado:"Covarianza: Cov(X,Y)=E(XY)-E(X)E(Y). Si E(X)=2, E(Y)=3, E(XY)=8:",opciones:["2","8","6","-2","5"],correcta:0,solucion:"Cov=8-2·3=8-6=2."},
+{enunciado:"Coeficiente de correlación ρ toma valores en:",opciones:["[-1,1]","[0,1]","[-∞,∞]","[0,∞]","[-1,0]"],correcta:0,solucion:"ρ∈[-1,1]."},
+{enunciado:"Recta de regresión de Y sobre X: y=2x+1. Si x=3, ŷ:",opciones:["7","6","5","8","3"],correcta:0,solucion:"ŷ=2·3+1=7."},
+{enunciado:"Número combinatorio C(10,3):",opciones:["120","60","30","90","720"],correcta:0,solucion:"10!/(3!7!)=10·9·8/6=120."},
+{enunciado:"Permutaciones de 5 elementos tomados de 3:",opciones:["60","120","10","20","30"],correcta:0,solucion:"P(5,3)=5·4·3=60."},
+{enunciado:"Combinaciones con repetición: CR(4,2):",opciones:["10","6","8","12","16"],correcta:0,solucion:"C(4+2-1,2)=C(5,2)=10."},
+{enunciado:"Principio multiplicativo: 3 camisas y 4 pantalones, ¿outfits?",opciones:["12","7","1","24","6"],correcta:0,solucion:"3×4=12."},
+{enunciado:"Principio aditivo: elegir 1 de 5 libros o 1 de 3 revistas:",opciones:["8","15","2","5","3"],correcta:0,solucion:"5+3=8."},
+{enunciado:"Diagrama de árbol: lanzar moneda 3 veces, ¿ramas finales?",opciones:["8","6","3","2","9"],correcta:0,solucion:"2³=8."},
+{enunciado:"Número de formas de ordenar 4 libros distintos:",opciones:["24","12","6","4","16"],correcta:0,solucion:"4!=24."},
+{enunciado:"Combinación de 6 elementos tomados de 2:",opciones:["15","12","30","6","3"],correcta:0,solucion:"C(6,2)=15."},
+{enunciado:"Probabilidad de full en póker (5 cartas, 52 cartas):",opciones:["C(13,1)C(4,3)C(12,1)C(4,2)/C(52,5)","13·12/52","4/52","13/52","1/52"],correcta:0,solucion:"Fórmula de full house: elegir valor del trío y valor del par."},
+{enunciado:"Ley de los grandes números: a medida que n crece, x̄:",opciones:["Converge a μ","Diverge","Es constante","Vale 0","Es aleatorio"],correcta:0,solucion:"La media muestral converge a la media poblacional."},
+{enunciado:"Teorema del límite central: para n grande, x̄:",opciones:["~N(μ,σ²/n)","~N(0,1)","Es exactamente normal","~Binomial","~Poisson"],correcta:0,solucion:"Independientemente de la distribución original, x̄ es aproximadamente normal."},
+{enunciado:"Error estándar de la media: SE(x̄):",opciones:["σ/√n","σ","σ²","σ/n","√σ/n"],correcta:0,solucion:"SE=σ/√n."},
+{enunciado:"Margen de error para IC 95%:",opciones:["1.96·σ/√n","1.645·σ/√n","2.58·σ/√n","σ/√n","1·σ/√n"],correcta:0,solucion:"Z₀.₀₂₅=1.96."},
+{enunciado:"Tamaño muestral para error E con 95% confianza:",opciones:["n=(1.96σ/E)²","n=E/σ","n=σ/E","n=1.96σE","n=E²/σ²"],correcta:0,solucion:"E=1.96·σ/√n→n=(1.96σ/E)²."},
+{enunciado:"P-valor < 0.05 indica:",opciones:["Rechazar H₀","Aceptar H₀","No concluyente","Error tipo II","H₀ es verdadera"],correcta:0,solucion:"Si p-valor < α, se rechaza la hipótesis nula."},
+{enunciado:"Error tipo I es:",opciones:["Rechazar H₀ verdadera","Aceptar H₀ falsa","No rechazar H₀","Error de cálculo","Sesgo muestral"],correcta:0,solucion:"α = P(rechazar H₀|H₀ verdadera)."},
+{enunciado:"Error tipo II es:",opciones:["No rechazar H₀ falsa","Rechazar H₀ verdadera","Siempre ocurre","No existe","Error de medición"],correcta:0,solucion:"β = P(no rechazar H₀|H₀ falsa)."},
+{enunciado:"Potencia de una prueba es:",opciones:["1-β","α","β","1-α","α+β"],correcta:0,solucion:"Potencia = P(rechazar H₀|H₁ verdadera) = 1-β."},
+{enunciado:"Prueba t para una muestra: estadístico t =",opciones:["(x̄-μ)/(s/√n)","(x̄-μ)/σ","(x̄-μ)/s","(x̄-μ)/n","x̄/s"],correcta:0,solucion:"t de Student con n-1 grados de libertad."},
+{enunciado:"Grados de libertad de t para muestra de 25:",opciones:["24","25","26","1","0"],correcta:0,solucion:"gl=n-1=24."},
+{enunciado:"Prueba F para comparar varianzas: F =",opciones:["s₁²/s₂²","s₁/s₂","(s₁²+s₂²)/2","s₁²-s₂²","s₂²/s₁²"],correcta:0,solucion:"F = varianza mayor / varianza menor (o según diseño)."},
+{enunciado:"ANOVA de un factor compara:",opciones:["Medias de 3+ grupos","2 medias","Varianzas","Medianas","Proporciones"],correcta:0,solucion:"ANOVA prueba si al menos una media difiere entre 3 o más grupos."},
+{enunciado:"Coeficiente de determinación R² indica:",opciones:["Proporción de varianza explicada por el modelo","Correlación","Pendiente","Intercepto","Error estándar"],correcta:0,solucion:"R²=SSR/SST. Mide bondad de ajuste."},
+{enunciado:"Regresión lineal simple: y=β₀+β₁x+ε. β₁ estimado por:",opciones:["Mínimos cuadrados","Máxima verosimilitud","Método de momentos","Bayes","Bootstrap"],correcta:0,solucion:"MCO minimiza Σ(yᵢ-ŷᵢ)²."},
+{enunciado:"Supuesto de homocedasticidad:",opciones:["Varianza constante de errores","Media cero","Normalidad","Independencia","Linealidad"],correcta:0,solucion:"Homocedasticidad: Var(εᵢ)=σ² constante."},
+{enunciado:"Multicolinealidad ocurre cuando:",opciones:["Predictores altamente correlacionados","Errores correlacionados","Falta de datos","Outliers","Heterocedasticidad"],correcta:0,solucion:"Variables independientes muy correlacionadas entre sí."},
+{enunciado:"Método de máxima verosimilitud:",opciones:["Maximiza la probabilidad de observar los datos","Minimiza error cuadrático","Usa priors","No paramétrico","Bayesiano"],correcta:0,solucion:"Estima parámetros que hacen más probables los datos observados."},
+{enunciado:"Distribución χ² con k grados de libertad:",opciones:["Suma de k normales estándar al cuadrado","Producto de normales","Razón de normales","Exponencial","Uniforme"],correcta:0,solucion:"χ²ₖ=∑Zᵢ²."},
+{enunciado:"Prueba χ² de independencia:",opciones:["Evalúa asociación entre variables categóricas","Compara medias","Compara varianzas","Regresión","Correlación"],correcta:0,solucion:"Tabla de contingencia: frecuencias observadas vs esperadas."},
+{enunciado:"Corrección de continuidad de Yates:",opciones:["Ajuste para χ² en tablas 2×2","Para normal","Para t","Para F","Para Poisson"],correcta:0,solucion:"Mejora aproximación χ² para muestras pequeñas."},
+{enunciado:"Prueba de Kolmogorov-Smirnov:",opciones:["Bondad de ajuste a distribución","Compara medias","Compara varianzas","Independencia","Regresión"],correcta:0,solucion:"Compara función de distribución empírica con teórica."},
+{enunciado:"Muestreo aleatorio simple:",opciones:["Cada elemento igual probabilidad","Estratificado","Por conglomerados","Sistemático","Por conveniencia"],correcta:0,solucion:"Todos los individuos tienen la misma probabilidad de ser seleccionados."},
+{enunciado:"Sesgo de selección:",opciones:["Muestra no representativa de la población","Error de medición","Error aleatorio","Falta de datos","Censura"],correcta:0,solucion:"Ocurre cuando el método de selección distorsiona la representatividad."},
+{enunciado:"Variable de confusión:",opciones:["Variable asociada a exposición y desenlace","Variable independiente","Variable dependiente","Error","Constante"],correcta:0,solucion:"Puede distorsionar la relación entre las variables de interés."},
+{enunciado:"Estudio de cohortes:",opciones:["Sigue expuestos y no expuestos en el tiempo","Transversal","Casos y controles","Experimental","Aleatorio"],correcta:0,solucion:"Prospectivo: compara incidencia según exposición."},
+{enunciado:"Estudio de casos y controles:",opciones:["Compara enfermos (casos) con sanos (controles)","Sigue cohorte","Experimental","Aleatorio","Transversal"],correcta:0,solucion:"Retrospectivo: busca exposición previa."},
+{enunciado:"Riesgo relativo (RR):",opciones:["Incidencia expuestos/incidencia no expuestos","Diferencia de incidencias","Odds ratio","Prevalencia","Mortalidad"],correcta:0,solucion:"RR>1: factor de riesgo. RR<1: factor protector."},
+{enunciado:"Odds ratio (OR):",opciones:["(a/c)/(b/d) en tabla 2×2","a+b/c+d","a/b","c/d","(a+b)/(c+d)"],correcta:0,solucion:"OR=ad/bc. Estima RR en estudios de casos y controles."},
+{enunciado:"Intervalo de confianza del 95% para OR incluye 1:",opciones:["No hay asociación significativa","Asociación positiva","Asociación negativa","Error","Sesgo"],correcta:0,solucion:"Si IC incluye 1, no se rechaza H₀ de no asociación."},
+// ===== BLOQUE 4: M2 =====
+{enunciado:"Sensibilidad de una prueba diagnóstica:",opciones:["P(+|enfermo)","P(-|sano)","P(enfermo|+)","P(sano|-)","Prevalencia"],correcta:0,solucion:"Sensibilidad: probabilidad de que la prueba sea positiva dado que el paciente tiene la enfermedad."},
+{enunciado:"Especificidad de una prueba diagnóstica:",opciones:["P(-|sano)","P(+|enfermo)","P(sano|-)","P(enfermo|+)","Incidencia"],correcta:0,solucion:"Especificidad: probabilidad de que la prueba sea negativa dado que el paciente está sano."},
+{enunciado:"Valor predictivo positivo (VPP):",opciones:["P(enfermo|+)","P(+|enfermo)","P(-|sano)","P(sano|-)","Prevalencia"],correcta:0,solucion:"VPP: probabilidad de estar enfermo dado un resultado positivo."},
+{enunciado:"Teorema de Bayes para VPP:",opciones:["[Sens·Prev]/[Sens·Prev+(1-Esp)(1-Prev)]","Sens+Esp","Sens·Esp","Prev/Sens","Esp/Prev"],correcta:0,solucion:"VPP depende de sensibilidad, especificidad y prevalencia."},
+{enunciado:"Curva ROC:",opciones:["Sensibilidad vs 1-Especificidad","Sensibilidad vs Especificidad","VPP vs VPN","Prevalencia vs Incidencia","Tasa de FP vs Tasa de VN"],correcta:0,solucion:"Evalúa rendimiento diagnóstico. Área bajo curva (AUC) mide discriminación."},
+{enunciado:"AUC de una prueba perfecta:",opciones:["1","0.5","0","2","-1"],correcta:0,solucion:"AUC=1: discriminación perfecta entre sanos y enfermos."},
+{enunciado:"AUC de una prueba aleatoria:",opciones:["0.5","0","1","-1","2"],correcta:0,solucion:"AUC=0.5: la prueba no discrimina mejor que el azar."},
+{enunciado:"Prevalencia de una enfermedad:",opciones:["Casos existentes/población total","Casos nuevos/población","Muertes/población","Curados/población","Incidencia acumulada"],correcta:0,solucion:"Prevalencia mide proporción de enfermos en un momento dado."},
+{enunciado:"Incidencia acumulada:",opciones:["Casos nuevos/población en riesgo","Casos totales/población","Muertes/población","Prevalencia","Tasa de curación"],correcta:0,solucion:"Incidencia mide nuevos casos en un período."},
+{enunciado:"Tasa de incidencia:",opciones:["Casos nuevos/personas-tiempo","Casos/personas","Prevalencia/tiempo","Mortalidad/tiempo","Nacimientos/tiempo"],correcta:0,solucion:"Personas-tiempo considera el tiempo de seguimiento de cada individuo."},
+{enunciado:"Función de supervivencia S(t):",opciones:["P(T>t)","P(T<t)","P(T=t)","Tasa de fallo","Función de riesgo"],correcta:0,solucion:"S(t): probabilidad de sobrevivir más allá del tiempo t."},
+{enunciado:"Función de riesgo h(t):",opciones:["Tasa instantánea de fallo en t","Supervivencia en t","Probabilidad acumulada","Densidad","Media"],correcta:0,solucion:"h(t): riesgo de que ocurra el evento en t, dado que no ha ocurrido antes."},
+{enunciado:"Estimador de Kaplan-Meier:",opciones:["Estima S(t) con datos censurados","Regresión","Prueba t","ANOVA","Chi-cuadrado"],correcta:0,solucion:"Método no paramétrico para curvas de supervivencia."},
+{enunciado:"Prueba de log-rank:",opciones:["Compara curvas de supervivencia","Compara medias","Compara varianzas","Regresión","Correlación"],correcta:0,solucion:"Evalúa si dos o más curvas de supervivencia son estadísticamente diferentes."},
+{enunciado:"Regresión de Cox:",opciones:["Modela hazard ratio","Regresión lineal","ANOVA","Regresión logística","Chi-cuadrado"],correcta:0,solucion:"Modelo semiparamétrico para análisis de supervivencia con covariables."},
+{enunciado:"Hazard ratio (HR):",opciones:["Razón de riesgos instantáneos","Riesgo relativo","Odds ratio","Diferencia de riesgos","Prevalencia"],correcta:0,solucion:"HR>1: mayor riesgo en el grupo expuesto."},
+{enunciado:"Regresión logística:",opciones:["Modela P(Y=1|X)","Modela E(Y|X)","Modela S(t)","Modela varianza","Modela correlación"],correcta:0,solucion:"Para variable dependiente binaria. Usa función logit."},
+{enunciado:"Función logit:",opciones:["ln(p/(1-p))","ln(p)","p/(1-p)","eᵖ/(1+eᵖ)","1/(1+e⁻ˣ)"],correcta:0,solucion:"Logit transforma probabilidades (0,1) a valores en ℝ."},
+{enunciado:"Odds ratio en regresión logística:",opciones:["exp(β)","β","ln(β)","β²","1/β"],correcta:0,solucion:"OR=eᵝ: cambio en odds por unidad de cambio en X."},
+{enunciado:"Criterio de información de Akaike (AIC):",opciones:["Mide bondad de ajuste penalizando complejidad","Solo bondad de ajuste","Solo complejidad","Correlación","Varianza"],correcta:0,solucion:"AIC=2k-2ln(L). Menor AIC indica mejor modelo."},
+{enunciado:"Validación cruzada k-fold:",opciones:["Divide datos en k subconjuntos para validar modelo","Muestreo aleatorio","Bootstrap","Jackknife","Regularización"],correcta:0,solucion:"Evalúa rendimiento del modelo en datos no vistos."},
+{enunciado:"Sobreajuste (overfitting):",opciones:["Modelo se ajusta demasiado a datos de entrenamiento","Falta de ajuste","Datos insuficientes","Variables incorrectas","Error de medición"],correcta:0,solucion:"Buena performance en entrenamiento, mala en prueba."},
+{enunciado:"Regularización L1 (Lasso):",opciones:["Penaliza |β|, puede eliminar variables","Penaliza β²","No penaliza","Usa priors","No paramétrico"],correcta:0,solucion:"Lasso fuerza algunos coeficientes a cero (selección de variables)."},
+{enunciado:"Regularización L2 (Ridge):",opciones:["Penaliza β², reduce coeficientes","Penaliza |β|","Elimina variables","No paramétrico","Bayesiano"],correcta:0,solucion:"Ridge reduce la magnitud de coeficientes sin eliminarlos."},
+{enunciado:"Método de Bootstrap:",opciones:["Remuestreo con reemplazo","Sin reemplazo","Estratificado","Sistemático","Por conveniencia"],correcta:0,solucion:"Genera múltiples muestras para estimar distribución de un estadístico."},
+{enunciado:"Vector propio de matriz A:",opciones:["Av=λv","A=λv","A+v=λ","Av=λ","det(A-λI)=0"],correcta:0,solucion:"v es vector propio si Av es múltiplo escalar de v."},
+{enunciado:"Valor propio λ se encuentra con:",opciones:["det(A-λI)=0","traza(A)","det(A)","A⁻¹","rango(A)"],correcta:0,solucion:"Ecuación característica: determinante de (A-λI) igual a cero."},
+{enunciado:"Traza de matriz 2×2 [[a,b],[c,d]]:",opciones:["a+d","a·d","a·d-b·c","b+c","a·b·c·d"],correcta:0,solucion:"Traza = suma de elementos diagonales."},
+{enunciado:"Determinante de [[a,b],[c,d]]:",opciones:["ad-bc","a+d","ab+cd","ac-bd","ad+bc"],correcta:0,solucion:"det = ad-bc."},
+{enunciado:"Matriz inversa de [[a,b],[c,d]]:",opciones:["(1/det)[[d,-b],[-c,a]]","(1/det)[[a,b],[c,d]]","[[d,b],[c,a]]","[[a,-b],[-c,d]]","No existe"],correcta:0,solucion:"A⁻¹=(1/det)·adjunta(A)."},
+{enunciado:"Rango de una matriz:",opciones:["Número de filas/columnas linealmente independientes","Número de filas","Número de columnas","Traza","Determinante"],correcta:0,solucion:"Dimensión del espacio generado por sus filas o columnas."},
+{enunciado:"Sistema Ax=b tiene solución única si:",opciones:["det(A)≠0","det(A)=0","Rango(A)<n","b=0","A es singular"],correcta:0,solucion:"A invertible → solución única x=A⁻¹b."},
+{enunciado:"Espacio nulo de A:",opciones:["{x: Ax=0}","{x: Ax=b}","{b: Ax=b}","{x: xᵀA=0}","Columna de A"],correcta:0,solucion:"Núcleo de la transformación lineal."},
+{enunciado:"Dimensión del espacio columna:",opciones:["Rango(A)","Nulidad(A)","n-rango(A)","Traza(A)","det(A)"],correcta:0,solucion:"Rango = dim(espacio columna) = dim(espacio fila)."},
+{enunciado:"Teorema de la dimensión:",opciones:["n = rango(A) + nulidad(A)","n = rango(A)","n = nulidad(A)","rango = nulidad","n = 2·rango(A)"],correcta:0,solucion:"Para matriz A de n columnas."},
+{enunciado:"Matriz ortogonal Q cumple:",opciones:["QᵀQ=I","Q=Qᵀ","Q²=I","det(Q)=0","Q=Q⁻¹"],correcta:0,solucion:"Columnas ortonormales. Q⁻¹=Qᵀ."},
+{enunciado:"Descomposición QR:",opciones:["A=QR, Q ortogonal, R triangular superior","A=Q+R","A=Q-R","A=RQ","A=QR⁻¹"],correcta:0,solucion:"Útil para resolver sistemas y calcular valores propios."},
+{enunciado:"Descomposición en valores singulares (SVD):",opciones:["A=UΣVᵀ","A=U+V","A=UΣ","A=ΣV","A=UV"],correcta:0,solucion:"U y V ortogonales, Σ diagonal con valores singulares."},
+{enunciado:"Norma de vector (3,4):",opciones:["5","7","12","25","1"],correcta:0,solucion:"||v||=√(3²+4²)=5."},
+{enunciado:"Producto interno <u,v>:",opciones:["∑uᵢvᵢ","∑uᵢ+vᵢ","∑|uᵢ-vᵢ|","∏uᵢvᵢ","max(uᵢvᵢ)"],correcta:0,solucion:"Suma del producto componente a componente."},
+{enunciado:"Vectores ortogonales:",opciones:["<u,v>=0","<u,v>=1","<u,v>=-1","u=v","u=-v"],correcta:0,solucion:"Producto interno cero → ángulo 90°."},
+{enunciado:"Proyección de u sobre v:",opciones:["(<u,v>/<v,v>)v","(<u,v>)u","u+v","u-v","(<u,v>/<u,u>)u"],correcta:0,solucion:"Proyección ortogonal de u en dirección de v."},
+{enunciado:"Distancia entre vectores u y v:",opciones:["||u-v||","||u+v||","<u,v>","||u||+||v||","|<u,v>|"],correcta:0,solucion:"Distancia euclidiana = norma de la diferencia."},
+{enunciado:"Conjunto generador:",opciones:["Vectores cuyas combinaciones lineales generan el espacio","Vectores ortogonales","Vectores unitarios","Base canónica","Vectores propios"],correcta:0,solucion:"Span del conjunto = todo el espacio vectorial."},
+{enunciado:"Base de un espacio vectorial:",opciones:["Conjunto LI que genera el espacio","Conjunto generador cualquiera","Conjunto ortogonal","Vectores unitarios","Cualquier conjunto"],correcta:0,solucion:"Linealmente independiente y generador."},
+{enunciado:"Dimensión de ℝⁿ:",opciones:["n","1","0","∞","n-1"],correcta:0,solucion:"Número de vectores en cualquier base de ℝⁿ."},
+{enunciado:"Transformación lineal T:",opciones:["T(u+v)=T(u)+T(v), T(cu)=cT(u)","T(uv)=T(u)T(v)","T(u+v)=T(u)T(v)","T(cu)=c+T(u)","T(0)≠0"],correcta:0,solucion:"Preserva suma y producto por escalar."},
+{enunciado:"Matriz de rotación en ℝ² ángulo θ:",opciones:["[[cosθ,-senθ],[senθ,cosθ]]","[[cosθ,senθ],[-senθ,cosθ]]","[[1,0],[0,1]]","[[cosθ,0],[0,senθ]]","[[senθ,cosθ],[cosθ,-senθ]]"],correcta:0,solucion:"Rota vectores en sentido antihorario."},
+{enunciado:"Forma canónica de Jordan:",opciones:["Diagonal por bloques con autovalores","Matriz diagonal","Matriz identidad","Matriz nula","Matriz simétrica"],correcta:0,solucion:"Representa transformaciones no diagonalizables."},
+{enunciado:"Matriz diagonalizable:",opciones:["A=PDP⁻¹","A=PPᵀ","A=D","A=P+D","A=P-D"],correcta:0,solucion:"Existe P invertible y D diagonal tal que A=PDP⁻¹."},
+{enunciado:"Polinomio característico de A:",opciones:["p(λ)=det(A-λI)","p(λ)=det(A)","p(λ)=traza(A)","p(λ)=rango(A)","p(λ)=A-λ"],correcta:0,solucion:"Sus raíces son los valores propios de A."},
+{enunciado:"Matriz definida positiva:",opciones:["xᵀAx>0 ∀x≠0","xᵀAx<0","det(A)>0","traza(A)>0","A=Aᵀ"],correcta:0,solucion:"Todos los valores propios son positivos."},
+{enunciado:"Criterio de Sylvester:",opciones:["Menores principales >0","Traza >0","Determinante >0","Rango máximo","Invertible"],correcta:0,solucion:"Matriz simétrica es definida positiva sii todos los menores principales son positivos."},
+{enunciado:"Norma de Frobenius:",opciones:["√∑∑aᵢⱼ²","∑∑|aᵢⱼ|","max|aᵢⱼ|","√∑aᵢᵢ²","∑aᵢᵢ"],correcta:0,solucion:"Raíz cuadrada de la suma de los cuadrados de todos los elementos."},
+{enunciado:"Radio espectral:",opciones:["max|λᵢ|","∑λᵢ","∏λᵢ","min|λᵢ|","Traza(A)"],correcta:0,solucion:"Máximo de los valores absolutos de los valores propios."},
+{enunciado:"Método de Gauss-Seidel:",opciones:["Iterativo para resolver Ax=b","Directo","Factorización","Eliminación","Inversión"],correcta:0,solucion:"Usa valores actualizados en cada iteración."},
+{enunciado:"Factorización LU:",opciones:["A=LU (L triangular inferior, U superior)","A=L+U","A=L-U","A=UL","A=LU⁻¹"],correcta:0,solucion:"Descompone A para resolver sistemas eficientemente."},
+{enunciado:"Número de condición de A:",opciones:["||A||·||A⁻¹||","det(A)","traza(A)","rango(A)","||A||"],correcta:0,solucion:"Mide sensibilidad a errores. Cond>>1: mal condicionada."},
+{enunciado:"Interpolación de Lagrange:",opciones:["Polinomio que pasa por n+1 puntos","Recta de regresión","Spline","Aproximación","Extrapolación"],correcta:0,solucion:"P(x)=∑yᵢLᵢ(x) donde Lᵢ son polinomios base de Lagrange."},
+{enunciado:"Método de Newton-Raphson:",opciones:["xₙ₊₁=xₙ-f(xₙ)/f'(xₙ)","xₙ₊₁=xₙ+f(xₙ)","xₙ₊₁=f(xₙ)","xₙ₊₁=xₙ-f'(xₙ)/f(xₙ)","xₙ₊₁=xₙ·f(xₙ)"],correcta:0,solucion:"Iteración para encontrar raíces de f(x)=0."},
+{enunciado:"Diferenciación numérica: f'(x)≈",opciones:["[f(x+h)-f(x)]/h","f(x+h)","[f(x+h)+f(x)]/2","f(x)/h","f(x+h)-f(x)"],correcta:0,solucion:"Aproximación por diferencia hacia adelante."},
+{enunciado:"Integración numérica: regla del trapecio:",opciones:["(h/2)[f(a)+f(b)]","h·f((a+b)/2)","(h/3)[f(a)+4f(m)+f(b)]","h[f(a)+f(b)]","f(a)+f(b)"],correcta:0,solucion:"Aproxima integral con trapecio simple."},
+{enunciado:"Regla de Simpson:",opciones:["(h/3)[f(a)+4f(m)+f(b)]","(h/2)[f(a)+f(b)]","h·f(m)","h[f(a)+f(b)]","f(a)+f(b)"],correcta:0,solucion:"Más precisa que trapecio. Usa parábola."},
+{enunciado:"Método de Euler para EDO:",opciones:["yₙ₊₁=yₙ+h·f(tₙ,yₙ)","yₙ₊₁=yₙ+h","yₙ₊₁=f(tₙ,yₙ)","yₙ₊₁=yₙ-f(tₙ,yₙ)","yₙ₊₁=h·f(tₙ,yₙ)"],correcta:0,solucion:"Aproximación de primer orden para y'=f(t,y)."},
+{enunciado:"Método de Runge-Kutta de orden 4:",opciones:["Más preciso que Euler","Igual a Euler","Menos preciso","No converge","Explícito"],correcta:0,solucion:"RK4 tiene error de truncamiento O(h⁴)."},
+// ===== BLOQUE 5: M2 (Ecuaciones Diferenciales, Optimización, Series) =====
+{enunciado:"EDO de variables separables: dy/dx = xy:",opciones:["y=Ce^(x²/2)","y=Cx","y=x²+C","y=e^x+C","y=ln x+C"],correcta:0,solucion:"dy/y = x dx → ln|y| = x²/2 + C → y = Ce^(x²/2)."},
+{enunciado:"EDO lineal de primer orden: y' + P(x)y = Q(x). Factor integrante:",opciones:["μ(x)=e^∫P(x)dx","μ(x)=∫P(x)dx","μ(x)=P(x)","μ(x)=Q(x)","μ(x)=e^Q(x)"],correcta:0,solucion:"μ(x)=exp(∫P(x)dx). Multiplica la EDO para resolver."},
+{enunciado:"Solución de y' + y = e^x:",opciones:["y=e^x/2+Ce^(-x)","y=e^x+C","y=Ce^x","y=xe^x+C","y=e^(2x)+C"],correcta:0,solucion:"μ(x)=e^x. e^x y = ∫e^(2x)dx = e^(2x)/2 + C → y=e^x/2+Ce^(-x)."},
+{enunciado:"EDO de Bernoulli: y' + P(x)y = Q(x)y^n. Sustitución:",opciones:["v=y^(1-n)","v=y^n","v=y'","v=ln y","v=e^y"],correcta:0,solucion:"Transforma en EDO lineal en v."},
+{enunciado:"EDO exacta: M(x,y)dx + N(x,y)dy = 0. Condición:",opciones:["∂M/∂y = ∂N/∂x","∂M/∂x = ∂N/∂y","M=N","M+N=0","MN=1"],correcta:0,solucion:"Existe F(x,y) tal que dF=Mdx+Ndy."},
+{enunciado:"EDO homogénea de grado n: f(tx,ty) =:",opciones:["t^n f(x,y)","t f(x,y)","f(x,y)","n f(x,y)","f(x,y)/t"],correcta:0,solucion:"Sustitución y=vx transforma en variables separables."},
+{enunciado:"EDO de segundo orden con coeficientes constantes: ay''+by'+cy=0. Ecuación característica:",opciones:["ar²+br+c=0","ar+br+c=0","a+br+cr²=0","ar²+b+c=0","a+b+c=0"],correcta:0,solucion:"Sustituyendo y=e^(rx)."},
+{enunciado:"Raíces complejas r=α±βi de ec. característica:",opciones:["y=e^(αx)(C₁cos βx+C₂sen βx)","y=C₁e^(αx)+C₂e^(βx)","y=(C₁+C₂x)e^(αx)","y=e^(αx)","y=cos βx+sen βx"],correcta:0,solucion:"Solución oscilatoria amortiguada."},
+{enunciado:"EDO no homogénea: método de coeficientes indeterminados para:",opciones:["f(x) polinomio, exponencial, seno/coseno","Cualquier f(x)","Solo polinomios","Solo exponenciales","Funciones arbitrarias"],correcta:0,solucion:"Propone solución particular similar a f(x)."},
+{enunciado:"Método de variación de parámetros:",opciones:["Para cualquier f(x) en EDO no homogénea","Solo polinomios","Solo exponenciales","Coeficientes indeterminados","Separación de variables"],correcta:0,solucion:"y_p = u₁y₁ + u₂y₂ donde u₁,u₂ se determinan por fórmulas."},
+{enunciado:"Wronskiano W(y₁,y₂):",opciones:["y₁y₂' - y₁'y₂","y₁y₂ + y₁'y₂'","y₁y₂","y₁/y₂","∫y₁y₂dx"],correcta:0,solucion:"Determina independencia lineal de soluciones."},
+{enunciado:"Sistema de EDOs: X' = AX. Solución:",opciones:["X(t)=e^(At)X(0)","X(t)=AX(0)","X(t)=A^t X(0)","X(t)=X(0)e^t","X(t)=ln(A)X(0)"],correcta:0,solucion:"Exponencial matricial: e^(At)=∑(At)^n/n!."},
+{enunciado:"Punto de equilibrio de X'=AX:",opciones:["X=0 (si A invertible)","Cualquier X","X=A","X=I","No existe"],correcta:0,solucion:"AX=0. Si det(A)≠0, único equilibrio en el origen."},
+{enunciado:"Estabilidad: si todos los valores propios tienen Re(λ)<0:",opciones:["Asintóticamente estable","Inestable","Marginalmente estable","Oscilatorio","Caótico"],correcta:0,solucion:"Soluciones convergen al equilibrio."},
+{enunciado:"Sistema de Lorenz:",opciones:["Ejemplo de caos determinista","Lineal","Estable","Unidimensional","Conservativo"],correcta:0,solucion:"Ecuaciones que exhiben dependencia sensible a condiciones iniciales."},
+{enunciado:"Optimización: gradiente ∇f(x)=0 en:",opciones:["Puntos críticos","Máximos","Mínimos","Globales","Locales"],correcta:0,solucion:"Condición necesaria de primer orden."},
+{enunciado:"Matriz Hessiana para clasificar punto crítico:",opciones:["Definida positiva → mínimo","Definida negativa → máximo","Indefinida → punto silla","Semidefinida → no concluyente","Todas las anteriores"],correcta:0,solucion:"Segunda derivada generalizada para funciones multivariadas."},
+{enunciado:"Multiplicadores de Lagrange para:",opciones:["Optimización con restricciones","Sin restricciones","Solo lineales","Solo cuadráticos","Solo convexos"],correcta:0,solucion:"∇f = λ∇g con restricción g(x)=0."},
+{enunciado:"Programación lineal: método simplex:",opciones:["Optimiza función lineal con restricciones lineales","No lineal","Sin restricciones","Entera","Estocástica"],correcta:0,solucion:"Algoritmo para problemas de PL en forma estándar."},
+{enunciado:"Dualidad en programación lineal:",opciones:["Problema dual asociado al primal","Mismo problema","No existe","Solo primal","Independiente"],correcta:0,solucion:"Teorema de dualidad débil y fuerte."},
+{enunciado:"Convergencia de series: Σ1/n²:",opciones:["Converge (p=2>1)","Diverge","Converge a 1","Converge a ∞","Oscila"],correcta:0,solucion:"Serie p: converge si p>1. Σ1/n²=π²/6."},
+{enunciado:"Serie Σ1/n:",opciones:["Diverge (armónica)","Converge","Converge a 1","Converge a e","Oscila"],correcta:0,solucion:"Serie armónica diverge (p=1)."},
+{enunciado:"Serie alternante Σ(-1)^n/n:",opciones:["Converge condicionalmente","Diverge","Converge absolutamente","Oscila","Converge a 0"],correcta:0,solucion:"Criterio de Leibniz: converge pero Σ1/n diverge."},
+{enunciado:"Criterio del cociente: lim|aₙ₊₁/aₙ|=",opciones:["L<1 converge","L>1 converge","L=1 converge","L<0 converge","L=∞ converge"],correcta:0,solucion:"L<1: converge absolutamente. L>1: diverge. L=1: no concluyente."},
+{enunciado:"Criterio de la raíz: limⁿ√|aₙ|=",opciones:["L<1 converge","L>1 converge","L=1 converge","L<0 converge","L=∞ converge"],correcta:0,solucion:"Similar al criterio del cociente."},
+{enunciado:"Radio de convergencia de Σxⁿ/n!:",opciones:["∞","1","0","e","2"],correcta:0,solucion:"Cociente: lim n!/(n+1)!=1/(n+1)→0. R=∞."},
+{enunciado:"Serie de Taylor de ln(1+x) alrededor de 0:",opciones:["x-x²/2+x³/3-...","1+x+x²+...","x+x²+x³+...","1-x+x²-...","x+x²/2+x³/3+..."],correcta:0,solucion:"ln(1+x)=∑(-1)^(n+1)x^n/n para |x|<1."},
+{enunciado:"Serie geométrica Σar^n converge si:",opciones:["|r|<1","|r|>1","r=1","r=0","r<0"],correcta:0,solucion:"Suma = a/(1-r) para |r|<1."},
+{enunciado:"Suma de Σ(1/2)^n desde n=1:",opciones:["1","2","1/2","∞","0"],correcta:0,solucion:"a=1/2, r=1/2. S=(1/2)/(1-1/2)=1."},
+{enunciado:"Ecuación de onda unidimensional: ∂²u/∂t²=",opciones:["c²∂²u/∂x²","c∂u/∂x","∂u/∂t","c²u","0"],correcta:0,solucion:"Describe propagación de ondas con velocidad c."},
+{enunciado:"Ecuación del calor: ∂u/∂t=",opciones:["α∂²u/∂x²","α∂u/∂x","∂²u/∂t²","αu","0"],correcta:0,solucion:"Difusión de calor. α es difusividad térmica."},
+{enunciado:"Ecuación de Laplace: ∇²u=",opciones:["0","1","u","∂u/∂t","f(x,y)"],correcta:0,solucion:"Describe potenciales en estado estacionario."},
+{enunciado:"Separación de variables para EDP:",opciones:["u(x,t)=X(x)T(t)","u(x,t)=X(x)+T(t)","u(x,t)=XT","u(x,t)=X/T","u(x,t)=X^T"],correcta:0,solucion:"Reduce EDP a EDOs acopladas."},
+{enunciado:"Serie de Fourier de f(x) en [-π,π]:",opciones:["a₀/2+∑(a_n cos nx+b_n sen nx)","∑a_n x^n","∑b_n e^nx","∑c_n x^n/n!","∑f(n)x^n"],correcta:0,solucion:"Representa función periódica como suma de senos y cosenos."},
+{enunciado:"Coeficiente a₀ de Fourier:",opciones:["(1/π)∫f(x)dx","∫f(x)dx","(1/2π)∫f(x)dx","2∫f(x)dx","∫f(x)cos x dx"],correcta:0,solucion:"Valor medio de f en el intervalo."},
+{enunciado:"Fenómeno de Gibbs:",opciones:["Oscilaciones cerca de discontinuidades","Convergencia uniforme","Suavidad","Diferenciabilidad","Integrabilidad"],correcta:0,solucion:"Exceso de ~9% en saltos al aproximar con series de Fourier."},
+{enunciado:"Transformada de Fourier de f(t):",opciones:["∫f(t)e^(-iωt)dt","∫f(t)dt","∫f(t)cos ωt dt","∑f(n)e^(inω)","f(ω)"],correcta:0,solucion:"Convierte señal del dominio temporal al frecuencial."},
+{enunciado:"Transformada inversa de Fourier:",opciones:["(1/2π)∫F(ω)e^(iωt)dω","∫F(ω)dω","F(t)","(1/π)∫F(ω)dω","∑F(n)e^(int)"],correcta:0,solucion:"Recupera señal original desde dominio frecuencial."},
+{enunciado:"Delta de Dirac δ(t):",opciones:["Impulso unitario en t=0","Función constante","Escalón unitario","Rampa","Exponencial"],correcta:0,solucion:"Distribución: ∫δ(t)f(t)dt=f(0)."},
+{enunciado:"Función escalón unitario u(t):",opciones:["0 para t<0, 1 para t≥0","1 para todo t","0 para todo t","t para t≥0","e^(-t)"],correcta:0,solucion:"Función de Heaviside."},
+{enunciado:"Teorema de convolución:",opciones:["ℒ{f*g}=F(s)G(s)","ℒ{f*g}=F(s)+G(s)","ℒ{f*g}=F(s)-G(s)","ℒ{f*g}=F(s)/G(s)","ℒ{f*g}=F(s)G(s)/s"],correcta:0,solucion:"Convolución en tiempo ↔ producto en frecuencia."},
+{enunciado:"Función de transferencia H(s):",opciones:["Y(s)/X(s) con condiciones iniciales cero","Y(s)","X(s)","Y(s)X(s)","Y(s)+X(s)"],correcta:0,solucion:"Relación entrada-salida de sistema LTI en dominio s."},
+{enunciado:"Polos de H(s):",opciones:["Raíces del denominador","Raíces del numerador","Ceros","Ganancia","Orden"],correcta:0,solucion:"Determinan estabilidad del sistema."},
+{enunciado:"Ceros de H(s):",opciones:["Raíces del numerador","Raíces del denominador","Polos","Ganancia","Orden"],correcta:0,solucion:"Frecuencias donde la salida es cero."},
+{enunciado:"Estabilidad BIBO:",opciones:["Todos los polos con Re(s)<0","Polos en origen","Polos imaginarios puros","Polos positivos","Sin polos"],correcta:0,solucion:"Entrada acotada produce salida acotada."},
+{enunciado:"Criterio de Routh-Hurwitz:",opciones:["Determina estabilidad sin calcular polos","Calcula polos","Calcula ceros","Diseña controlador","Optimiza respuesta"],correcta:0,solucion:"Análisis de signos de la primera columna del arreglo de Routh."},
+{enunciado:"Control PID:",opciones:["Proporcional+Integral+Derivativo","Solo proporcional","Solo integral","Proporcional+Derivativo","Integral+Derivativo"],correcta:0,solucion:"u(t)=K_p e(t)+K_i ∫e dt+K_d de/dt."},
+{enunciado:"Lugar geométrico de las raíces:",opciones:["Trayectoria de polos al variar ganancia","Ubicación de ceros","Respuesta temporal","Diagrama de Bode","Nyquist"],correcta:0,solucion:"Técnica de Evans para análisis de sistemas realimentados."},
+{enunciado:"Diagrama de Bode:",opciones:["Magnitud y fase vs frecuencia","Polos y ceros","Tiempo vs respuesta","Nyquist","Routh"],correcta:0,solucion:"Representación frecuencial de la función de transferencia."},
+{enunciado:"Margen de ganancia:",opciones:["Ganancia adicional para inestabilidad","Ganancia actual","Fase actual","Ancho de banda","Frecuencia de corte"],correcta:0,solucion:"Medida de estabilidad relativa en frecuencia."},
+{enunciado:"Margen de fase:",opciones:["Fase adicional para inestabilidad","Fase actual","Ganancia actual","Ancho de banda","Frecuencia de resonancia"],correcta:0,solucion:"Retardo de fase que el sistema puede tolerar."},
+{enunciado:"Ancho de banda:",opciones:["Frecuencia donde ganancia cae 3dB","Ganancia máxima","Frecuencia de resonancia","Frecuencia de Nyquist","Frecuencia de muestreo"],correcta:0,solucion:"Rango de frecuencias con respuesta significativa."},
+{enunciado:"Teorema de Nyquist-Shannon:",opciones:["f_s ≥ 2f_max para reconstruir señal","f_s ≥ f_max","f_s ≤ 2f_max","f_s = f_max","f_s arbitraria"],correcta:0,solucion:"Frecuencia de muestreo mínima para evitar aliasing."},
+{enunciado:"Transformada Z:",opciones:["Discreta equivalente a Laplace","Continua","Fourier","Wavelet","Coseno"],correcta:0,solucion:"X(z)=∑x[n]z^(-n). Para sistemas discretos."},
+{enunciado:"Función de transferencia discreta H(z):",opciones:["Y(z)/X(z)","Y(z)X(z)","Y(z)+X(z)","Y(z)-X(z)","Y(z)^X(z)"],correcta:0,solucion:"Relación entrada-salida en dominio z."},
+{enunciado:"Método de diferencias finitas:",opciones:["Aproxima derivadas con diferencias","Integración exacta","Solución analítica","Series de Fourier","Transformada de Laplace"],correcta:0,solucion:"Técnica numérica para EDPs y EDOs."},
+{enunciado:"Elementos finitos:",opciones:["Divide dominio en elementos pequeños","Diferencias finitas","Solución analítica","Series de Fourier","Método espectral"],correcta:0,solucion:"Aproxima solución con funciones base locales."},
+{enunciado:"Error de truncamiento:",opciones:["Error por aproximar serie infinita","Error de redondeo","Error de medición","Error humano","Error sistemático"],correcta:0,solucion:"Diferencia entre valor exacto y aproximación numérica."},
+{enunciado:"Error de redondeo:",opciones:["Error por precisión finita del computador","Error de truncamiento","Error de medición","Error humano","Error sistemático"],correcta:0,solucion:"Representación finita de números reales."},
+{enunciado:"Condicionamiento de un problema:",opciones:["Sensibilidad a perturbaciones en datos","Tamaño del problema","Número de variables","Complejidad","Tiempo de cómputo"],correcta:0,solucion:"Problema mal condicionado: pequeños errores → grandes cambios."},
+{enunciado:"Algoritmo estable:",opciones:["Errores de redondeo no se amplifican","Rápido","Preciso","Convergente","Iterativo"],correcta:0,solucion:"Estabilidad numérica: controla propagación de errores."},
+{enunciado:"Aproximación por mínimos cuadrados:",opciones:["Minimiza Σ(y_i-ŷ_i)²","Minimiza Σ|y_i-ŷ_i|","Maximiza correlación","Iguala momentos","Interpola exactamente"],correcta:0,solucion:"Ajuste de curva minimizando error cuadrático."},
+{enunciado:"Factorización QR para mínimos cuadrados:",opciones:["Resuelve Ax=b sobredeterminado","Resuelve Ax=b determinado","Resuelve Ax=b subdeterminado","Diagonaliza","Invierte"],correcta:0,solucion:"Rₓ=Qᵀb donde R es triangular superior."},
+// ===== BLOQUE 6 FINAL: M2 (Álgebra Lineal Avanzada, Probabilidad, Cálculo Vectorial) =====
+{enunciado:"El producto punto de (1,2,3) y (4,-5,6) es:",opciones:["12","32","-12","0","28"],correcta:0,solucion:"1·4 + 2·(-5) + 3·6 = 4-10+18=12."},
+{enunciado:"El producto cruz de (1,0,0) y (0,1,0) es:",opciones:["(0,0,1)","(1,1,0)","(0,1,1)","(1,0,1)","(0,0,-1)"],correcta:0,solucion:"i×j=k=(0,0,1)."},
+{enunciado:"La norma de (3,4,12) es:",opciones:["13","5","19","25","7"],correcta:0,solucion:"√(9+16+144)=√169=13."},
+{enunciado:"Dos vectores son ortogonales si su producto punto es:",opciones:["0","1","-1",">0","<0"],correcta:0,solucion:"Ortogonalidad: producto interno nulo."},
+{enunciado:"La proyección de u=(2,0) sobre v=(1,1) es:",opciones:["(1,1)","(2,2)","(0,0)","(2,0)","(1,0)"],correcta:0,solucion:"proy_v u = (<u,v>/<v,v>)v = (2/2)(1,1)=(1,1)."},
+{enunciado:"El área del paralelogramo formado por u=(1,2) y v=(3,4) es:",opciones:["2","5","10","1","4"],correcta:0,solucion:"|det([1,2;3,4])| = |4-6| = 2."},
+{enunciado:"El volumen del paralelepípedo con aristas u,v,w es:",opciones:["|u·(v×w)|","|u×v|","|u·v|","|u+v+w|","|u×v×w|"],correcta:0,solucion:"Producto triple escalar: valor absoluto del determinante."},
+{enunciado:"Un conjunto de vectores es linealmente independiente si:",opciones:["Ninguno es combinación lineal de los otros","Son ortogonales","Son unitarios","Su producto punto es 0","Son paralelos"],correcta:0,solucion:"Definición de independencia lineal."},
+{enunciado:"La dimensión del espacio generado por (1,0,0), (0,1,0), (1,1,0) es:",opciones:["2","3","1","0","4"],correcta:0,solucion:"(1,1,0)=(1,0,0)+(0,1,0). Solo 2 son LI. Dimensión=2."},
+{enunciado:"La matriz de rotación en ℝ² de 90° antihorario es:",opciones:["[[0,-1],[1,0]]","[[-1,0],[0,-1]]","[[0,1],[-1,0]]","[[1,0],[0,1]]","[[-1,0],[0,1]]"],correcta:0,solucion:"cos90°=0, sen90°=1. [[0,-1],[1,0]]."},
+{enunciado:"Los valores propios de [[2,0],[0,3]] son:",opciones:["2 y 3","0 y 5","1 y 4","2 y 2","3 y 3"],correcta:0,solucion:"Matriz diagonal: valores propios son los elementos diagonales."},
+{enunciado:"Los valores propios de [[1,2],[2,1]] son:",opciones:["3 y -1","1 y 1","2 y 0","4 y -2","3 y 1"],correcta:0,solucion:"det([[1-λ,2],[2,1-λ]])=(1-λ)²-4=λ²-2λ-3=(λ-3)(λ+1)=0. λ=3,-1."},
+{enunciado:"Una matriz A es diagonalizable si:",opciones:["Tiene n vectores propios LI","Es simétrica","Es triangular","Es invertible","Es cuadrada"],correcta:0,solucion:"Existe base de vectores propios. Toda matriz simétrica es diagonalizable."},
+{enunciado:"La traza de [[1,2,3],[4,5,6],[7,8,9]] es:",opciones:["15","18","12","45","30"],correcta:0,solucion:"1+5+9=15."},
+{enunciado:"El determinante de [[2,1],[4,3]] es:",opciones:["2","6","-2","10","5"],correcta:0,solucion:"2·3-1·4=6-4=2."},
+{enunciado:"La inversa de [[2,0],[0,4]] es:",opciones:["[[1/2,0],[0,1/4]]","[[2,0],[0,4]]","[[-2,0],[0,-4]]","[[0,2],[4,0]]","No existe"],correcta:0,solucion:"Matriz diagonal: inversa tiene recíprocos en la diagonal."},
+{enunciado:"El rango de [[1,2,3],[2,4,6],[3,6,9]] es:",opciones:["1","2","3","0","9"],correcta:0,solucion:"Filas 2 y 3 son múltiplos de fila 1. Rango=1."},
+{enunciado:"El núcleo de la transformación T(x)=Ax tiene dimensión:",opciones:["nulidad(A)","rango(A)","n","m","0"],correcta:0,solucion:"Nulidad = número de columnas - rango."},
+{enunciado:"Un sistema Ax=b es compatible si:",opciones:["rango(A)=rango(A|b)","rango(A)<n","det(A)=0","b=0","A es cuadrada"],correcta:0,solucion:"Teorema de Rouché-Frobenius."},
+{enunciado:"La matriz identidad Iₙ cumple:",opciones:["AI=IA=A para toda A","I+A=A","I-A=A","IA=0","I=0"],correcta:0,solucion:"Elemento neutro del producto matricial."},
+{enunciado:"La matriz transpuesta de [[1,2],[3,4]] es:",opciones:["[[1,3],[2,4]]","[[1,2],[3,4]]","[[4,3],[2,1]]","[[2,1],[4,3]]","[[1,4],[2,3]]"],correcta:0,solucion:"Intercambia filas por columnas."},
+{enunciado:"(AB)ᵀ =",opciones:["BᵀAᵀ","AᵀBᵀ","AB","BA","(BA)ᵀ"],correcta:0,solucion:"La transpuesta del producto es el producto de transpuestas en orden inverso."},
+{enunciado:"(A⁻¹)⁻¹ =",opciones:["A","A²","I","Aᵀ","det(A)A"],correcta:0,solucion:"La inversa de la inversa es la matriz original."},
+{enunciado:"det(A⁻¹) =",opciones:["1/det(A)","det(A)","-det(A)","0","det(Aᵀ)"],correcta:0,solucion:"Propiedad del determinante de la inversa."},
+{enunciado:"det(AB) =",opciones:["det(A)det(B)","det(A)+det(B)","det(A)-det(B)","det(A)/det(B)","0"],correcta:0,solucion:"Determinante del producto = producto de determinantes."},
+{enunciado:"Si A es simétrica, entonces:",opciones:["A=Aᵀ","A=-Aᵀ","A=I","A=0","A=A⁻¹"],correcta:0,solucion:"Simétrica: igual a su transpuesta."},
+{enunciado:"Si A es antisimétrica, entonces:",opciones:["A=-Aᵀ","A=Aᵀ","A=I","A=0","A=A⁻¹"],correcta:0,solucion:"Antisimétrica: Aᵀ=-A."},
+{enunciado:"El polinomio característico de [[3,1],[0,2]] es:",opciones:["(λ-3)(λ-2)","λ²-5λ+6","λ²-5λ+7","(λ-1)(λ-5)","λ²-6"],correcta:0,solucion:"det([[3-λ,1],[0,2-λ]])=(3-λ)(2-λ)."},
+{enunciado:"La multiplicidad algebraica de λ=2 en [[2,1],[0,2]] es:",opciones:["2","1","0","3","4"],correcta:0,solucion:"(λ-2)²=0. λ=2 tiene multiplicidad algebraica 2."},
+{enunciado:"La multiplicidad geométrica de λ=2 en [[2,1],[0,2]] es:",opciones:["1","2","0","3","4"],correcta:0,solucion:"dim(Núcleo(A-2I))=1. Solo un vector propio LI."},
+{enunciado:"Una matriz nilpotente A cumple:",opciones:["Aᵏ=0 para algún k","A=Aᵀ","A²=I","A=A⁻¹","det(A)≠0"],correcta:0,solucion:"Potencia finita se anula. Valores propios todos cero."},
+{enunciado:"Una matriz idempotente A cumple:",opciones:["A²=A","A²=I","A²=0","A=Aᵀ","A=A⁻¹"],correcta:0,solucion:"Proyección: A²=A."},
+{enunciado:"Una matriz involutiva A cumple:",opciones:["A²=I","A²=A","A²=0","A=Aᵀ","det(A)=0"],correcta:0,solucion:"Su propia inversa. Ej: reflexión."},
+{enunciado:"Una matriz ortogonal Q cumple:",opciones:["QᵀQ=I","Q=Qᵀ","Q²=I","det(Q)=0","Q=0"],correcta:0,solucion:"Columnas ortonormales. Q⁻¹=Qᵀ."},
+{enunciado:"El producto interno <f,g>=∫f(x)g(x)dx en [0,1] para f(x)=x, g(x)=x²:",opciones:["1/4","1/3","1/2","1","0"],correcta:0,solucion:"∫₀¹x·x²dx=∫₀¹x³dx=[x⁴/4]₀¹=1/4."},
+{enunciado:"Funciones ortogonales en [0,2π]: ∫₀²π sen(mx)cos(nx)dx =",opciones:["0","π","2π","1","-1"],correcta:0,solucion:"Integral de producto sen·cos en período completo es 0."},
+{enunciado:"La serie de Fourier de f(x)=x en [-π,π] tiene:",opciones:["Solo términos seno","Solo términos coseno","Ambos","Solo término constante","No converge"],correcta:0,solucion:"Función impar: aₙ=0, solo bₙ."},
+{enunciado:"En probabilidad continua, P(X=x) para cualquier x es:",opciones:["0","1","0.5","f(x)","F(x)"],correcta:0,solucion:"Variable continua: probabilidad puntual es 0."},
+{enunciado:"La función de densidad f(x) debe cumplir:",opciones:["∫f(x)dx=1 y f(x)≥0","∫f(x)dx=0","f(x)≤0","∫f(x)dx=∞","f(x) arbitraria"],correcta:0,solucion:"Condiciones de función de densidad de probabilidad."},
+{enunciado:"La función de distribución F(x) =",opciones:["P(X≤x)","f(x)","P(X=x)","1-f(x)","E(X)"],correcta:0,solucion:"Acumulada: integral de la densidad hasta x."},
+{enunciado:"La esperanza de g(X) para variable continua es:",opciones:["∫g(x)f(x)dx","∑g(x)f(x)","g(E(X))","g(μ)","∫f(x)dx"],correcta:0,solucion:"E(g(X))=∫g(x)f(x)dx."},
+{enunciado:"La varianza de X es:",opciones:["E(X²)-(E(X))²","E(X)","E(X²)","(E(X))²","E(X²)+(E(X))²"],correcta:0,solucion:"Var(X)=E(X-μ)²=E(X²)-μ²."},
+{enunciado:"La covarianza Cov(X,Y) mide:",opciones:["Relación lineal entre variables","Independencia","Varianza","Media","Mediana"],correcta:0,solucion:"Cov>0: relación directa. Cov<0: inversa. Cov=0: no lineal."},
+{enunciado:"Si X e Y son independientes, Cov(X,Y)=",opciones:["0","1","-1","E(X)E(Y)","Var(X)"],correcta:0,solucion:"Independencia implica Cov=0. El recíproco no siempre es cierto."},
+{enunciado:"El coeficiente de correlación ρ=",opciones:["Cov(X,Y)/(σₓσᵧ)","Cov(X,Y)","Cov(X,Y)/σₓ","Cov(X,Y)/σᵧ","Cov(X,Y)/(μₓμᵧ)"],correcta:0,solucion:"Adimensional. -1≤ρ≤1."},
+{enunciado:"La distribución uniforme en [a,b] tiene media:",opciones:["(a+b)/2","a","b","b-a","(b-a)/2"],correcta:0,solucion:"μ=(a+b)/2."},
+{enunciado:"La distribución exponencial con tasa λ tiene media:",opciones:["1/λ","λ","λ²","e^(-λ)","ln λ"],correcta:0,solucion:"E(X)=1/λ. Propiedad de falta de memoria."},
+{enunciado:"La distribución normal N(μ,σ²) tiene función de densidad:",opciones:["(1/√(2πσ²))e^(-(x-μ)²/(2σ²))","(1/σ)e^(-x/σ)","λe^(-λx)","1/(b-a)","e^(-x²/2)"],correcta:0,solucion:"Campana de Gauss centrada en μ."},
+{enunciado:"La distribución normal estándar tiene:",opciones:["μ=0, σ=1","μ=1, σ=0","μ=0, σ=0","μ=1, σ=1","μ=0, σ=2"],correcta:0,solucion:"Z~N(0,1)."},
+{enunciado:"Para estandarizar X~N(μ,σ²): Z=",opciones:["(X-μ)/σ","X/σ","X-μ","(X+μ)/σ","Xσ+μ"],correcta:0,solucion:"Transformación a normal estándar."},
+{enunciado:"El teorema del límite central se aplica cuando:",opciones:["n es grande (n≥30)","n es pequeño","Datos normales","Datos uniformes","Datos discretos"],correcta:0,solucion:"La distribución de la media muestral tiende a normal."},
+{enunciado:"Un intervalo de confianza del 95% para μ con σ conocida es:",opciones:["x̄±1.96σ/√n","x̄±1.645σ/√n","x̄±2.58σ/√n","x̄±σ/√n","x̄±σ"],correcta:0,solucion:"Z₀.₀₂₅=1.96."},
+{enunciado:"El estadístico de prueba para H₀: μ=μ₀ con σ conocida es:",opciones:["Z=(x̄-μ₀)/(σ/√n)","t=(x̄-μ₀)/(s/√n)","χ²","F","Z=(x̄-μ₀)/s"],correcta:0,solucion:"Prueba Z para una media con varianza conocida."},
+{enunciado:"El nivel de significancia α es:",opciones:["P(error tipo I)","P(error tipo II)","Potencia","1-β","P-valor"],correcta:0,solucion:"α = P(rechazar H₀ | H₀ verdadera)."},
+{enunciado:"El p-valor es:",opciones:["Probabilidad de observar resultado tan extremo como el obtenido bajo H₀","α","β","1-α","Potencia"],correcta:0,solucion:"Si p-valor < α, se rechaza H₀."},
+{enunciado:"La distribución t de Student se usa cuando:",opciones:["σ es desconocida y n es pequeño","σ es conocida","n es grande","Datos normales con σ conocida","Muestras pareadas"],correcta:0,solucion:"t=(x̄-μ)/(s/√n) con n-1 grados de libertad."},
+{enunciado:"Los grados de libertad de t para muestra de tamaño n son:",opciones:["n-1","n","n+1","2n","n/2"],correcta:0,solucion:"gl=n-1 para una muestra."},
+{enunciado:"La distribución F se usa para:",opciones:["Comparar varianzas","Comparar medias","Regresión","Bondad de ajuste","Independencia"],correcta:0,solucion:"F=s₁²/s₂² con gl (n₁-1, n₂-1)."},
+{enunciado:"La distribución χ² se usa para:",opciones:["Bondad de ajuste e independencia","Comparar medias","Comparar varianzas","Regresión","Correlación"],correcta:0,solucion:"Pruebas con datos categóricos."},
+{enunciado:"El gradiente ∇f apunta en dirección de:",opciones:["Máximo crecimiento","Máximo decrecimiento","Nivel constante","Mínimo","Cero"],correcta:0,solucion:"∇f indica dirección de mayor aumento de f."},
+{enunciado:"La divergencia de F=(P,Q,R) es:",opciones:["∂P/∂x+∂Q/∂y+∂R/∂z","∇×F","∇f","F·∇","∂²/∂x²+∂²/∂y²+∂²/∂z²"],correcta:0,solucion:"div F = ∇·F. Mide flujo neto."},
+{enunciado:"El rotacional de F=(P,Q,R) es:",opciones:["∇×F","∇·F","∇f","F·∇","∂²f/∂x²"],correcta:0,solucion:"rot F = ∇×F. Mide circulación."},
+{enunciado:"El laplaciano de f es:",opciones:["∇²f = ∂²f/∂x²+∂²f/∂y²+∂²f/∂z²","∇f","∇·f","∇×f","∂f/∂x"],correcta:0,solucion:"Δf = div(grad f)."},
+{enunciado:"Teorema de Green relaciona:",opciones:["Integral de línea con integral doble","Integral de superficie con triple","Divergencia con flujo","Rotacional con circulación","Gradiente con potencial"],correcta:0,solucion:"∮Pdx+Qdy=∬(∂Q/∂x-∂P/∂y)dA."},
+{enunciado:"Teorema de Stokes relaciona:",opciones:["Integral de superficie del rotacional con integral de línea","Flujo con divergencia","Área con perímetro","Volumen con superficie","Gradiente con potencial"],correcta:0,solucion:"∮F·dr=∬(∇×F)·dS."},
+{enunciado:"Teorema de la divergencia (Gauss):",opciones:["∬F·dS=∭(∇·F)dV","∮F·dr=∬(∇×F)·dS","∮Pdx+Qdy=∬(Qₓ-Pᵧ)dA","∇×∇f=0","∇·(∇×F)=0"],correcta:0,solucion:"Flujo a través de superficie = integral de divergencia en volumen."},
+{enunciado:"Un campo conservativo F cumple:",opciones:["F=∇f para algún potencial f","∇·F=0","∇×F≠0","F es constante","F no tiene potencial"],correcta:0,solucion:"El trabajo no depende del camino. ∇×F=0."},
+{enunciado:"∇×∇f =",opciones:["0","f","∇f","1","∇²f"],correcta:0,solucion:"El rotacional de un gradiente siempre es cero."},
+{enunciado:"∇·(∇×F) =",opciones:["0","F","∇F","1","∇²F"],correcta:0,solucion:"La divergencia de un rotacional siempre es cero."},
+// ===== BLOQUE 7 FINAL: M2 (completa las 650) =====
+{enunciado:"La derivada de f(x)=arctan(x) es:",opciones:["1/(1+x²)","1/√(1-x²)","-1/(1+x²)","1/(1-x²)","tan x"],correcta:0,solucion:"d/dx(arctan x)=1/(1+x²)."},
+{enunciado:"La derivada de f(x)=arcsen(x) es:",opciones:["1/√(1-x²)","1/(1+x²)","-1/√(1-x²)","√(1-x²)","cos x"],correcta:0,solucion:"d/dx(arcsen x)=1/√(1-x²) para |x|<1."},
+{enunciado:"La derivada de f(x)=arccos(x) es:",opciones:["-1/√(1-x²)","1/√(1-x²)","1/(1+x²)","-1/(1+x²)","sen x"],correcta:0,solucion:"d/dx(arccos x)=-1/√(1-x²) para |x|<1."},
+{enunciado:"∫ dx/(1+x²) =",opciones:["arctan x + C","arcsen x + C","ln|1+x²|+C","1/(1+x)+C","tan x + C"],correcta:0,solucion:"Integral directa: arctan x + C."},
+{enunciado:"∫ dx/√(1-x²) =",opciones:["arcsen x + C","arccos x + C","arctan x + C","ln|√(1-x²)|+C","sen x + C"],correcta:0,solucion:"Integral directa: arcsen x + C."},
+{enunciado:"Límite x→0 de tan(x)/x:",opciones:["1","0","∞","-1","e"],correcta:0,solucion:"Límite fundamental: lim tan(x)/x = 1."},
+{enunciado:"Límite x→∞ de (1+1/x)^x:",opciones:["e","1","∞","0","-1"],correcta:0,solucion:"Definición del número e."},
+{enunciado:"Límite x→0 de (1-cos x)/x:",opciones:["0","1","∞","-1","1/2"],correcta:0,solucion:"Por L'Hôpital o serie: lim = 0."},
+{enunciado:"Asíntota vertical de f(x)=ln(x-2):",opciones:["x=2","x=-2","x=0","x=1","No tiene"],correcta:0,solucion:"Argumento tiende a 0: x→2⁺, ln→-∞."},
+{enunciado:"Asíntota horizontal de f(x)=e^(-x):",opciones:["y=0","y=1","y=e","y=-1","No tiene"],correcta:0,solucion:"Cuando x→∞, e^(-x)→0."},
+{enunciado:"Función par: f(-x)=",opciones:["f(x)","-f(x)","0","1","-f(-x)"],correcta:0,solucion:"Simétrica respecto al eje Y."},
+{enunciado:"Función impar: f(-x)=",opciones:["-f(x)","f(x)","0","1","f(-x)"],correcta:0,solucion:"Simétrica respecto al origen."},
+{enunciado:"f(x)=x³ es:",opciones:["Impar","Par","Ninguna","Ambas","Constante"],correcta:0,solucion:"(-x)³=-x³=-f(x). Impar."},
+{enunciado:"f(x)=cos x es:",opciones:["Par","Impar","Ninguna","Ambas","Periódica"],correcta:0,solucion:"cos(-x)=cos x. Par."},
+{enunciado:"Período de f(x)=sen(2x):",opciones:["π","2π","π/2","4π","1"],correcta:0,solucion:"Período = 2π/2 = π."},
+{enunciado:"Período de f(x)=tan x:",opciones:["π","2π","π/2","3π","1"],correcta:0,solucion:"tan(x+π)=tan x. Período π."},
+{enunciado:"Amplitud de f(x)=3sen x:",opciones:["3","1","-3","6","0"],correcta:0,solucion:"Amplitud = |3| = 3."},
+{enunciado:"Desplazamiento de fase de f(x)=sen(x-π/4):",opciones:["π/4 a la derecha","π/4 a la izquierda","-π/4","π/2","0"],correcta:0,solucion:"x-π/4: desplazamiento π/4 a la derecha."},
+{enunciado:"La función f(x)=|x| es continua en x=0:",opciones:["Sí","No","Solo por derecha","Solo por izquierda","Depende"],correcta:0,solucion:"Límites laterales coinciden con f(0)=0. Continua."},
+{enunciado:"La función f(x)=|x| es derivable en x=0:",opciones:["No","Sí","Solo por derecha","Solo por izquierda","Depende"],correcta:0,solucion:"Derivadas laterales distintas (1 y -1). No derivable."},
+{enunciado:"f(x)=x² es continua en todo ℝ:",opciones:["Sí","No","Solo en [0,∞)","Solo en (-∞,0]","En ningún punto"],correcta:0,solucion:"Polinomio: continua en todo ℝ."},
+{enunciado:"f(x)=1/x es continua en:",opciones:["ℝ-{0}","ℝ","[0,∞)","(-∞,0]","Solo en x=1"],correcta:0,solucion:"Discontinua en x=0 (asíntota vertical)."},
+{enunciado:"Teorema de Bolzano: si f continua en [a,b] y f(a)f(b)<0:",opciones:["Existe c en (a,b) con f(c)=0","f es derivable","f es constante","f crece","f decrece"],correcta:0,solucion:"Garantiza al menos una raíz en el intervalo."},
+{enunciado:"Teorema del valor medio: existe c tal que f'(c)=",opciones:["[f(b)-f(a)]/(b-a)","f(b)-f(a)","f'(a)","f'(b)","0"],correcta:0,solucion:"Lagrange: pendiente de la secante igual a derivada en algún punto."},
+{enunciado:"Regla de L'Hôpital se aplica a límites de forma:",opciones:["0/0 o ∞/∞","0·∞","∞-∞","1^∞","∞⁰"],correcta:0,solucion:"Indeterminaciones que permiten derivar numerador y denominador."},
+{enunciado:"Serie de Maclaurin de cos x:",opciones:["1-x²/2!+x⁴/4!-...","x-x³/3!+...","1+x+x²+...","x+x²/2!+...","1-x+x²-..."],correcta:0,solucion:"cos x = ∑(-1)ⁿx²ⁿ/(2n)!."},
+{enunciado:"Serie de Maclaurin de e^x:",opciones:["∑xⁿ/n!","∑xⁿ/n","∑n!xⁿ","∑xⁿ","∑(-1)ⁿxⁿ/n!"],correcta:0,solucion:"e^x = 1+x+x²/2!+x³/3!+..."},
+{enunciado:"Aproximación lineal de f(x)≈f(a)+f'(a)(x-a) se llama:",opciones:["Linealización","Integración","Derivación","Optimización","Newton"],correcta:0,solucion:"Recta tangente como aproximación local."},
+{enunciado:"El diferencial dy =",opciones:["f'(x)dx","f(x)dx","∫f(x)dx","f(x+dx)","f'(x)"],correcta:0,solucion:"dy = f'(x)dx. Aproxima el cambio en y."},
+{enunciado:"Método de Newton para resolver f(x)=0:",opciones:["xₙ₊₁=xₙ-f(xₙ)/f'(xₙ)","xₙ₊₁=xₙ+f(xₙ)","xₙ₊₁=f(xₙ)","xₙ₊₁=xₙ/f(xₙ)","xₙ₊₁=f'(xₙ)"],correcta:0,solucion:"Iteración tangente. Convergencia cuadrática."},
+{enunciado:"Punto fijo de g(x):",opciones:["x=g(x)","x=0","g(x)=0","x=1","g'(x)=0"],correcta:0,solucion:"Resolver f(x)=0 equivale a x=g(x)."},
+{enunciado:"Método de bisección requiere:",opciones:["f(a)f(b)<0","f(a)=f(b)","f'(a)=0","f continua","Intervalo pequeño"],correcta:0,solucion:"Cambio de signo garantiza raíz en [a,b]."},
+{enunciado:"Orden de convergencia del método de bisección:",opciones:["Lineal","Cuadrática","Cúbica","Exponencial","Logarítmica"],correcta:0,solucion:"Error se reduce a la mitad cada iteración."},
+{enunciado:"Orden de convergencia de Newton-Raphson (raíz simple):",opciones:["Cuadrática","Lineal","Cúbica","Exponencial","Logarítmica"],correcta:0,solucion:"Convergencia cuadrática cerca de la raíz."},
+{enunciado:"Interpolación lineal entre (x₀,y₀) y (x₁,y₁):",opciones:["y=y₀+(y₁-y₀)(x-x₀)/(x₁-x₀)","y=y₀+y₁","y=(y₀+y₁)/2","y=y₀x+y₁","y=x"],correcta:0,solucion:"Recta que pasa por dos puntos."},
+{enunciado:"Polinomio interpolante de grado n requiere:",opciones:["n+1 puntos","n puntos","2n puntos","1 punto","n-1 puntos"],correcta:0,solucion:"Por n+1 puntos pasa un único polinomio de grado ≤n."},
+{enunciado:"Diferencias divididas de Newton:",opciones:["Forma de polinomio interpolante","Integración","Derivación","Ecuaciones diferenciales","Optimización"],correcta:0,solucion:"Coeficientes del polinomio en forma de Newton."},
+{enunciado:"Spline cúbico:",opciones:["Polinomio por tramos con derivadas continuas","Polinomio único","Recta","Parábola","Exponencial"],correcta:0,solucion:"Interpolación suave con polinomios de grado 3 en cada intervalo."},
+{enunciado:"Cuadratura de Gauss:",opciones:["Integración numérica óptima","Derivación","Interpolación","Ecuaciones","Optimización"],correcta:0,solucion:"Elige nodos y pesos para máxima precisión."},
+{enunciado:"Regla del trapecio compuesta:",opciones:["(h/2)[f₀+2f₁+...+2fₙ₋₁+fₙ]","hΣfᵢ","(h/3)[f₀+4f₁+f₂]","Σfᵢ/n","f(a)+f(b)"],correcta:0,solucion:"Divide intervalo en subintervalos iguales."},
+{enunciado:"Regla de Simpson compuesta requiere:",opciones:["Número par de subintervalos","Cualquier número","Número impar","n=2","n=1"],correcta:0,solucion:"Requiere cantidad par de subintervalos para aplicar 1/3."},
+{enunciado:"Error de la regla del trapecio es O(h²) donde h=",opciones:["(b-a)/n","b-a","n","1/n","(b+a)/n"],correcta:0,solucion:"h es el tamaño del subintervalo."},
+{enunciado:"Error de la regla de Simpson es:",opciones:["O(h⁴)","O(h²)","O(h)","O(h³)","O(h⁵)"],correcta:0,solucion:"Más precisa que trapecio por usar aproximación cuadrática."},
+{enunciado:"Extrapolación de Richardson:",opciones:["Mejora precisión combinando aproximaciones","Interpolación","Derivación","Ecuaciones","Optimización"],correcta:0,solucion:"Elimina términos de error de orden inferior."},
+{enunciado:"Integración de Romberg:",opciones:["Aplica Richardson a regla del trapecio","Gauss","Simpson","Newton","Lagrange"],correcta:0,solucion:"Tabla que combina trapecio con extrapolación."},
+{enunciado:"Ecuación diferencial rígida:",opciones:["Requiere métodos implícitos","Solución suave","Cualquier método sirve","Siempre explícita","No tiene solución"],correcta:0,solucion:"Escalas de tiempo muy diferentes. Explícitos fallan."},
+{enunciado:"Método de Euler implícito:",opciones:["yₙ₊₁=yₙ+hf(tₙ₊₁,yₙ₊₁)","yₙ₊₁=yₙ+hf(tₙ,yₙ)","yₙ₊₁=yₙ","yₙ₊₁=f(tₙ,yₙ)","yₙ₊₁=yₙ-hf(tₙ,yₙ)"],correcta:0,solucion:"Implícito: requiere resolver ecuación en cada paso."},
+{enunciado:"Método de Crank-Nicolson:",opciones:["Promedio de Euler explícito e implícito","Solo explícito","Solo implícito","Runge-Kutta","Multipaso"],correcta:0,solucion:"Segundo orden, incondicionalmente estable para difusión."},
+{enunciado:"Métodos multipaso usan:",opciones:["Varios valores previos","Solo un valor previo","Valores futuros","No usan historia","Solo condición inicial"],correcta:0,solucion:"Adams-Bashforth (explícito), Adams-Moulton (implícito)."},
+{enunciado:"Consistencia de un método numérico:",opciones:["Error local tiende a 0 cuando h→0","Estabilidad","Convergencia","Precisión","Eficiencia"],correcta:0,solucion:"El método aproxima la EDO cuando el paso tiende a cero."},
+{enunciado:"Estabilidad de un método numérico:",opciones:["Errores no se amplifican","Convergencia","Consistencia","Precisión","Velocidad"],correcta:0,solucion:"Pequeñas perturbaciones no crecen descontroladamente."},
+{enunciado:"Convergencia =",opciones:["Consistencia + Estabilidad","Solo consistencia","Solo estabilidad","Precisión","Eficiencia"],correcta:0,solucion:"Teorema de equivalencia de Lax."},
+{enunciado:"Autovalor dominante:",opciones:["Mayor magnitud","Menor magnitud","Cero","Positivo","Negativo"],correcta:0,solucion:"Determina comportamiento asintótico del sistema."},
+{enunciado:"Método de la potencia:",opciones:["Encuentra autovalor dominante","Encuentra todos","Encuentra el menor","Diagonaliza","Invierte"],correcta:0,solucion:"Iteración: xₖ₊₁=Axₖ/||Axₖ||."},
+{enunciado:"Método QR para autovalores:",opciones:["Itera Aₖ=QₖRₖ, Aₖ₊₁=RₖQₖ","Potencia","Potencia inversa","Jacobi","Gauss-Seidel"],correcta:0,solucion:"Converge a forma triangular superior con autovalores en diagonal."},
+{enunciado:"Descomposición de Cholesky:",opciones:["A=LLᵀ para A simétrica definida positiva","A=LU","A=QR","A=UΣVᵀ","A=PDP⁻¹"],correcta:0,solucion:"L triangular inferior. Más eficiente que LU para SPD."},
+{enunciado:"Norma infinito de vector:",opciones:["max|xᵢ|","∑|xᵢ|","√∑xᵢ²","∑xᵢ","∏xᵢ"],correcta:0,solucion:"||x||∞ = máx(|x₁|,|x₂|,...,|xₙ|)."},
+{enunciado:"Norma 1 de vector:",opciones:["∑|xᵢ|","max|xᵢ|","√∑xᵢ²","∑xᵢ","∏xᵢ"],correcta:0,solucion:"||x||₁ = |x₁|+|x₂|+...+|xₙ|."},
+{enunciado:"Norma 2 (euclidiana) de vector:",opciones:["√∑xᵢ²","∑|xᵢ|","max|xᵢ|","∑xᵢ","∏xᵢ"],correcta:0,solucion:"||x||₂ = √(x₁²+x₂²+...+xₙ²)."},
+{enunciado:"Número de condición κ(A) =",opciones:["||A||·||A⁻¹||","det(A)","traza(A)","rango(A)","||A||"],correcta:0,solucion:"κ grande → matriz mal condicionada."},
+{enunciado:"Mínimos cuadrados lineales: solución normal:",opciones:["AᵀAx=Aᵀb","Ax=b","x=A⁻¹b","x=Aᵀb","x=(AᵀA)⁻¹b"],correcta:0,solucion:"Ecuaciones normales de Gauss."},
+{enunciado:"Descomposición SVD para mínimos cuadrados:",opciones:["Pseudoinversa: x=A⁺b","QR","LU","Cholesky","Gauss"],correcta:0,solucion:"A⁺=VΣ⁺Uᵀ. Robusto para matrices mal condicionadas."},
+{enunciado:"Regularización de Tikhonov:",opciones:["min ||Ax-b||²+λ||x||²","min ||Ax-b||²","min ||x||²","max ||Ax-b||","Ax=b"],correcta:0,solucion:"Estabiliza solución de problemas mal condicionados."},
+{enunciado:"Norma de Frobenius de A:",opciones:["√∑∑|aᵢⱼ|²","max∑|aᵢⱼ|","max∑|aⱼᵢ|","σₘₐₓ","σₘᵢₙ"],correcta:0,solucion:"||A||_F = √(tr(AᵀA))."},
+{enunciado:"Norma espectral de A:",opciones:["σₘₐₓ (mayor valor singular)","σₘᵢₙ","tr(A)","det(A)","rango(A)"],correcta:0,solucion:"||A||₂ = σₘₐₓ."},
+{enunciado:"Teorema de Perron-Frobenius aplica a:",opciones:["Matrices positivas","Cualquier matriz","Matrices simétricas","Matrices diagonales","Matrices nulas"],correcta:0,solucion:"Autovalor dominante real positivo para matrices con entradas >0."},
+{enunciado:"Matriz de Hilbert:",opciones:["Mal condicionada clásica","Bien condicionada","Identidad","Cero","Aleatoria"],correcta:0,solucion:"Hᵢⱼ=1/(i+j-1). κ crece rápidamente con n."},
+{enunciado:"Factorización PA=LU:",opciones:["Con pivoteo parcial","Sin pivoteo","Solo L","Solo U","QR"],correcta:0,solucion:"P matriz de permutación para estabilidad numérica."},
+{enunciado:"Método de Jacobi para autovalores:",opciones:["Diagonaliza matrices simétricas","Resuelve Ax=b","Factoriza","Interpola","Integra"],correcta:0,solucion:"Rotaciones para anular elementos fuera de diagonal."},
+{enunciado:"Algoritmo de Strassen:",opciones:["Multiplica matrices en O(n^2.81)","Multiplica en O(n³)","Suma matrices","Invierte matrices","Diagonaliza"],correcta:0,solucion:"Divide y vencerás para multiplicación de matrices."},
+{enunciado:"Complejidad de eliminación gaussiana:",opciones:["O(n³)","O(n²)","O(n)","O(2ⁿ)","O(n log n)"],correcta:0,solucion:"Cúbica en el tamaño de la matriz."},
+{enunciado:"Matriz dispersa:",opciones:["Mayoría de entradas son cero","Todas entradas no cero","Matriz llena","Matriz identidad","Matriz nula"],correcta:0,solucion:"Almacenamiento eficiente con formatos especiales."},
+{enunciado:"Gradiente conjugado resuelve:",opciones:["Ax=b con A SPD","Cualquier sistema","Sobredeterminado","Subdeterminado","No lineales"],correcta:0,solucion:"Método iterativo para matrices simétricas definidas positivas."},
+{enunciado:"GMRES resuelve:",opciones:["Sistemas no simétricos","Solo SPD","Solo simétricos","Solo diagonales","Solo triangulares"],correcta:0,solucion:"Generalized Minimal Residual. Subespacio de Krylov."},
+{enunciado:"Precondicionador:",opciones:["Mejora convergencia de métodos iterativos","Resuelve directamente","Factoriza","Interpola","Deriva"],correcta:0,solucion:"Transforma sistema para reducir número de condición."},
+{enunciado:"Método de gradiente descendente:",opciones:["xₖ₊₁=xₖ-α∇f(xₖ)","xₖ₊₁=xₖ+α∇f","xₖ₊₁=∇f(xₖ)","xₖ₊₁=-∇f(xₖ)","xₖ₊₁=αxₖ"],correcta:0,solucion:"Avanza en dirección de máximo descenso."},
+{enunciado:"Método de Newton para optimización:",opciones:["xₖ₊₁=xₖ-[Hf(xₖ)]⁻¹∇f(xₖ)","xₖ₊₁=xₖ-∇f(xₖ)","xₖ₊₁=xₖ+∇f(xₖ)","xₖ₊₁=Hf(xₖ)","xₖ₊₁=0"],correcta:0,solucion:"Usa Hessiano para convergencia cuadrática."},
+{enunciado:"La derivada de f(x)=x⁵-3x³+2x es:",opciones:["5x⁴-9x²+2","5x⁴-9x²","5x⁴-6x²+2","x⁴-9x²+2","5x³-9x+2"],correcta:0,solucion:"f'(x)=5x⁴-9x²+2."},
+{enunciado:"∫(4x³-2x)dx:",opciones:["x⁴-x²+C","x⁴-x²","4x⁴-x²+C","x⁴-2x²+C","4x⁴-2x²+C"],correcta:0,solucion:"∫4x³dx=x⁴, ∫-2xdx=-x². x⁴-x²+C."},
+{enunciado:"Límite x→1 de (x³-1)/(x-1):",opciones:["3","1","0","∞","-1"],correcta:0,solucion:"(x-1)(x²+x+1)/(x-1)=x²+x+1→3."},
+{enunciado:"P(A)=0.3, P(B|A)=0.6. P(A∩B):",opciones:["0.18","0.9","0.5","0.3","0.6"],correcta:0,solucion:"0.3×0.6=0.18."},
+{enunciado:"Distancia del punto (0,0) a la recta x+y-2=0:",opciones:["√2","2","1","0","2√2"],correcta:0,solucion:"|0+0-2|/√2=2/√2=√2."},
+{enunciado:"Radio de x²+y²-4x+6y-3=0:",opciones:["4","16","2","8","√7"],correcta:0,solucion:"(x-2)²+(y+3)²=16. r=4."},
+{enunciado:"Derivada de f(x)=x·ln(x²):",opciones:["ln(x²)+2","ln(x²)+1","2ln(x)","1/x","ln(x²)"],correcta:0,solucion:"1·ln(x²)+x·(2x/x²)=ln(x²)+2."},
+{enunciado:"∫₀¹(3x²+2x)dx:",opciones:["2","1","3","0","4"],correcta:0,solucion:"[x³+x²]₀¹=1+1=2."},
+{enunciado:"Binomial n=6, p=0.5, P(X=3):",opciones:["0.3125","0.5","0.25","0.125","0.375"],correcta:0,solucion:"C(6,3)(0.5)⁶=20/64=0.3125."},
+{enunciado:"Vértice de y=2x²-4x+5:",opciones:["(1,3)","(-1,3)","(1,5)","(2,5)","(0,5)"],correcta:0,solucion:"x=4/4=1, y=2-4+5=3."},
+{enunciado:"log₃(1/9):",opciones:["-2","2","-3","3","1/3"],correcta:0,solucion:"3⁻²=1/9→log₃(1/9)=-2."},
+{enunciado:"Dominio de f(x)=ln(2x+1):",opciones:["x>-1/2","x>0","x≥-1/2","x<1/2","Todos ℝ"],correcta:0,solucion:"2x+1>0→x>-1/2."},
+{enunciado:"Derivada de f(x)=e^(x²):",opciones:["2x·e^(x²)","e^(x²)","2e^(x²)","x²·e^(x²)","2x·eˣ"],correcta:0,solucion:"e^(x²)·2x=2x·e^(x²)."},
+{enunciado:"∫ cos(3x)dx:",opciones:["sen(3x)/3+C","3sen(3x)+C","-sen(3x)/3+C","sen(3x)+C","cos(3x)/3+C"],correcta:0,solucion:"∫cos(ax)dx=sen(ax)/a+C."},
+{enunciado:"P(-2<Z<2) normal estándar:",opciones:["≈0.95","≈0.68","0.5","≈0.997","0.9"],correcta:0,solucion:"95% en ±2σ."},
+{enunciado:"Centro de x²+y²+10x-8y+5=0:",opciones:["(-5,4)","(5,-4)","(-5,-4)","(5,4)","(-10,8)"],correcta:0,solucion:"(x+5)²+(y-4)²=36. Centro (-5,4)."},
+{enunciado:"Derivada de f(x)=sen²(x):",opciones:["2sen x·cos x","2sen x","cos²x","sen(2x)","2cos x"],correcta:0,solucion:"2sen x·cos x=sen(2x)."},
+{enunciado:"∫(eˣ+1)dx:",opciones:["eˣ+x+C","eˣ+C","xeˣ+C","eˣ+1+C","eˣ+x"],correcta:0,solucion:"∫eˣdx=eˣ, ∫1dx=x."},
+{enunciado:"E(X) uniforme discreta en {2,4,6,8,10}:",opciones:["6","5","7","8","4"],correcta:0,solucion:"(2+4+6+8+10)/5=30/5=6."},
+{enunciado:"Recta paralela a 3x-y+2=0 por (1,1):",opciones:["y=3x-2","y=3x+2","y=-3x+4","y=x+3","y=3x-1"],correcta:0,solucion:"y=3x+2→m=3. y-1=3(x-1)→y=3x-2."},
+{enunciado:"Derivada de f(x)=arctan(2x):",opciones:["2/(1+4x²)","1/(1+4x²)","2/(1+x²)","1/(1+x²)","2x/(1+x²)"],correcta:0,solucion:"1/(1+(2x)²)·2=2/(1+4x²)."},
+{enunciado:"∫₀²(x²-x)dx:",opciones:["2/3","4/3","0","2","-2/3"],correcta:0,solucion:"[x³/3-x²/2]₀²=8/3-2=2/3."},
+{enunciado:"P(A)=0.4, P(B)=0.3, independientes. P(A∪B):",opciones:["0.58","0.7","0.12","0.5","1"],correcta:0,solucion:"0.4+0.3-0.12=0.58."},
+{enunciado:"Asíntota horizontal de f(x)=(5x-1)/(x+2):",opciones:["y=5","y=1","y=-2","y=0","y=-1/2"],correcta:0,solucion:"Grados iguales: 5/1=5."},
+{enunciado:"Derivada de f(x)=ln(sen x):",opciones:["cot x","tan x","sec x","csc x","cos x/sen x"],correcta:0,solucion:"cos x/sen x=cot x."},
+{enunciado:"∫ x·cos(x²)dx:",opciones:["sen(x²)/2+C","cos(x²)/2+C","-sen(x²)/2+C","sen(x²)+C","2sen(x²)+C"],correcta:0,solucion:"Sustitución u=x², du=2xdx. (1/2)∫cos u du=sen(x²)/2+C."},
+{enunciado:"σ² binomial n=25, p=0.2:",opciones:["4","5","2","3","1"],correcta:0,solucion:"np(1-p)=25×0.2×0.8=4."},
+{enunciado:"Punto medio de A(-3,5) y B(7,-1):",opciones:["(2,2)","(4,3)","(-5,2)","(2,4)","(5,2)"],correcta:0,solucion:"((-3+7)/2,(5-1)/2)=(2,2)."},
+{enunciado:"Derivada de f(x)=x²·e⁻ˣ:",opciones:["xe⁻ˣ(2-x)","2xe⁻ˣ","-x²e⁻ˣ","e⁻ˣ(2x-x²)","x²e⁻ˣ(2-x)"],correcta:0,solucion:"2x·e⁻ˣ+x²·(-e⁻ˣ)=e⁻ˣ(2x-x²)=xe⁻ˣ(2-x)."},
+{enunciado:"∫₁ᵉ(1/x)dx:",opciones:["1","e","0","ln e","-1"],correcta:0,solucion:"[ln|x|]₁ᵉ=ln e-ln 1=1-0=1."},
+{enunciado:"Período de f(x)=cos(4x):",opciones:["π/2","2π","π","4π","π/4"],correcta:0,solucion:"Período=2π/4=π/2."},
+{enunciado:"Ecuación característica de y''+3y'+2y=0:",opciones:["r²+3r+2=0","r²+3r-2=0","r²-3r+2=0","r²+2r+3=0","r+3r+2=0"],correcta:0,solucion:"r²+3r+2=0→(r+1)(r+2)=0. r=-1,-2."},
+{enunciado:"Solución de r²+3r+2=0:",opciones:["y=C₁e⁻ˣ+C₂e⁻²ˣ","y=C₁eˣ+C₂e²ˣ","y=e⁻ˣ(C₁cos x+C₂sen x)","y=(C₁+C₂x)e⁻ˣ","y=C₁+C₂e⁻³ˣ"],correcta:0,solucion:"Raíces reales distintas: y=C₁e⁻ˣ+C₂e⁻²ˣ."},
+{enunciado:"Derivada parcial ∂/∂y de f(x,y)=x²y³:",opciones:["3x²y²","2xy³","x²y²","3x²y","6xy"],correcta:0,solucion:"∂/∂y(x²y³)=x²·3y²=3x²y²."},
+{enunciado:"Gradiente de f(x,y)=x²+y² en (2,1):",opciones:["(4,2)","(2,1)","(4,1)","(2,2)","(1,4)"],correcta:0,solucion:"∇f=(2x,2y). En (2,1): (4,2)."},
+{enunciado:"Mínimo de f(x,y)=x²+y² sujeto a x+y=4:",opciones:["8","4","2","16","0"],correcta:0,solucion:"Lagrange: x=y=2. f(2,2)=8."},
+{enunciado:"∫∫_R (x+y)dA, R=[0,1]×[0,2]:",opciones:["3","2","1","4","0"],correcta:0,solucion:"∫₀¹∫₀²(x+y)dy dx=∫₀¹[xy+y²/2]₀²dx=∫₀¹(2x+2)dx=[x²+2x]₀¹=3."},
+{enunciado:"Serie de Taylor de cos x hasta grado 2:",opciones:["1-x²/2","1+x²/2","x-x²/2","1-x","1-x²"],correcta:0,solucion:"cos x=1-x²/2!+...=1-x²/2."},
+{enunciado:"Transformada de Laplace de f(t)=sen(2t):",opciones:["2/(s²+4)","1/(s²+4)","s/(s²+4)","2/(s²-4)","s/(s²-4)"],correcta:0,solucion:"ℒ{sen(at)}=a/(s²+a²)."},
+{enunciado:"Método de Newton: x₀=1 para f(x)=x²-2. x₁:",opciones:["1.5","1","2","0.5","3"],correcta:0,solucion:"x₁=1-(1-2)/(2)=1+0.5=1.5."},
+{enunciado:"Regla del trapecio para ∫₀¹x dx con n=1:",opciones:["0.5","1","0.25","0.75","0"],correcta:0,solucion:"(h/2)[f(0)+f(1)]=(1/2)(0+1)=0.5."},
+{enunciado:"Error de Simpson es O(h^p). p:",opciones:["4","2","1","3","5"],correcta:0,solucion:"Simpson tiene error O(h⁴)."},
+{enunciado:"Matriz Jacobiana de f(x,y)=(x+y,xy):",opciones:["[[1,1],[y,x]]","[[1,0],[0,1]]","[[x,y],[1,1]]","[[1,y],[1,x]]","[[y,x],[1,1]]"],correcta:0,solucion:"J=[[∂f₁/∂x,∂f₁/∂y],[∂f₂/∂x,∂f₂/∂y]]=[[1,1],[y,x]]."},
+{enunciado:"Autovalores de [[2,1],[1,2]]:",opciones:["3 y 1","2 y 2","1 y 1","3 y -1","4 y 0"],correcta:0,solucion:"det([[2-λ,1],[1,2-λ]])=(2-λ)²-1=λ²-4λ+3=(λ-3)(λ-1). λ=3,1."},
+{enunciado:"Determinante de [[3,1],[2,4]]:",opciones:["10","12","11","14","8"],correcta:0,solucion:"3×4-1×2=12-2=10."},
+{enunciado:"Inversa de [[1,0],[0,5]]:",opciones:["[[1,0],[0,1/5]]","[[1,0],[0,5]]","[[-1,0],[0,-5]]","[[0,1],[5,0]]","No existe"],correcta:0,solucion:"Diagonal: inversa con recíprocos."},
+{enunciado:"Rango de [[1,2,3],[2,4,6]]:",opciones:["1","2","3","0","6"],correcta:0,solucion:"Fila 2=2×Fila 1. Rango=1."},
+{enunciado:"Norma de (6,8):",opciones:["10","14","48","100","7"],correcta:0,solucion:"√(36+64)=√100=10."},
+{enunciado:"Producto punto (1,2)·(3,4):",opciones:["11","10","14","5","8"],correcta:0,solucion:"1×3+2×4=3+8=11."},
+{enunciado:"Proyección de (3,0) sobre (1,0):",opciones:["(3,0)","(1,0)","(0,0)","(3,3)","(1,1)"],correcta:0,solucion:"<u,v>/<v,v>·v=(3/1)(1,0)=(3,0)."},
+{enunciado:"Área del paralelogramo con lados (1,0) y (1,1):",opciones:["1","0","2","√2","1.5"],correcta:0,solucion:"|det([[1,0],[1,1]])|=|1|=1."},
+{enunciado:"Matriz ortogonal: columnas son:",opciones:["Ortonormales","Ortogonales solamente","Unitarias solamente","Cualesquiera","Linealmente dependientes"],correcta:0,solucion:"Columnas ortonormales: ortogonales y de norma 1."},
+{enunciado:"Polinomio característico de [[4,0],[0,9]]:",opciones:["(λ-4)(λ-9)","λ²-13λ+36","λ²-36","λ-13","λ²+13λ+36"],correcta:0,solucion:"det([[4-λ,0],[0,9-λ]])=(4-λ)(9-λ)."},
+{enunciado:"Traza de [[1,2],[3,4]]:",opciones:["5","10","-2","3","4"],correcta:0,solucion:"1+4=5."},
+{enunciado:"Matriz simétrica cumple:",opciones:["A=Aᵀ","A=-Aᵀ","A²=I","det(A)=0","A=0"],correcta:0,solucion:"Simétrica: igual a su transpuesta."},
+{enunciado:"Si A es nilpotente de índice 2:",opciones:["A²=0","A=I","A=Aᵀ","det(A)≠0","A es invertible"],correcta:0,solucion:"Nilpotente: Aᵏ=0 para algún k."},
+{enunciado:"Matriz diagonalizable requiere:",opciones:["n vectores propios LI","Ser simétrica","Ser triangular","Ser invertible","Ser cuadrada"],correcta:0,solucion:"Base de vectores propios linealmente independientes."},
+{enunciado:"Condición para sistema Ax=b compatible:",opciones:["rango(A)=rango(A|b)","det(A)=0","A es cuadrada","b=0","rango(A)<n"],correcta:0,solucion:"Rouché-Frobenius."},
+{enunciado:"Nulidad de A:",opciones:["n - rango(A)","rango(A)","n","m","0"],correcta:0,solucion:"Dimensión del núcleo = columnas - rango."},
+{enunciado:"(AB)⁻¹ =",opciones:["B⁻¹A⁻¹","A⁻¹B⁻¹","AB","BA","(BA)⁻¹"],correcta:0,solucion:"Inversa del producto en orden inverso."},
+{enunciado:"det(A⁻¹) =",opciones:["1/det(A)","det(A)","-det(A)","0","det(Aᵀ)"],correcta:0,solucion:"Propiedad del determinante de la inversa."},
+{enunciado:"Método de Gauss-Seidel es:",opciones:["Iterativo para Ax=b","Directo","Factorización","Eliminación","Inversión"],correcta:0,solucion:"Iterativo. Usa valores actualizados en cada paso."},
+{enunciado:"Factorización LU: A=",opciones:["LU","L+U","L-U","UL","L⁻¹U⁻¹"],correcta:0,solucion:"L triangular inferior, U triangular superior."},
+{enunciado:"Número de condición κ(A) grande indica:",opciones:["Mal condicionada","Bien condicionada","Invertible","Simétrica","Ortogonal"],correcta:0,solucion:"κ>>1: sensible a perturbaciones."},
+{enunciado:"Norma de Frobenius de [[1,0],[0,2]]:",opciones:["√5","3","2","1","√3"],correcta:0,solucion:"√(1²+0²+0²+2²)=√5."},
+{enunciado:"Radio espectral de [[3,0],[0,1]]:",opciones:["3","4","2","1","0"],correcta:0,solucion:"máx(|3|,|1|)=3."},
+{enunciado:"Interpolación de Lagrange usa:",opciones:["Polinomios base Lᵢ(x)","Solo rectas","Solo parábolas","Splines","Diferencias finitas"],correcta:0,solucion:"P(x)=∑yᵢLᵢ(x)."},
+{enunciado:"Diferenciación numérica: f''(x)≈",opciones:["[f(x+h)-2f(x)+f(x-h)]/h²","[f(x+h)-f(x)]/h","[f(x)-f(x-h)]/h","[f(x+h)+f(x)]/2","f'(x)/h"],correcta:0,solucion:"Aproximación de segunda derivada por diferencias centradas."},
+{enunciado:"Método de Euler para y'=2x, y(0)=1, h=0.5. y(0.5):",opciones:["1","1.5","2","0.5","0"],correcta:0,solucion:"y₁=1+0.5·2(0)=1."},
+{enunciado:"RK4 tiene error de truncamiento:",opciones:["O(h⁴)","O(h)","O(h²)","O(h³)","O(h⁵)"],correcta:0,solucion:"Runge-Kutta orden 4: error O(h⁴)."},
+{enunciado:"EDO y'=y tiene solución:",opciones:["y=Ceˣ","y=Cx","y=x+C","y=Ce⁻ˣ","y=1"],correcta:0,solucion:"dy/y=dx→ln|y|=x+C→y=Ceˣ."},
+{enunciado:"Factor integrante de y'+2y=eˣ:",opciones:["e²ˣ","eˣ","2x","e⁻²ˣ","x²"],correcta:0,solucion:"μ(x)=e^∫2dx=e²ˣ."},
+{enunciado:"Wronskiano de eˣ y e²ˣ:",opciones:["e³ˣ","eˣ","0","1","e²ˣ"],correcta:0,solucion:"W=eˣ·2e²ˣ-eˣ·e²ˣ=e³ˣ."},
+{enunciado:"Punto de equilibrio de X'=AX estable si:",opciones:["Re(λ)<0","Re(λ)>0","λ=0","|λ|=1","λ imaginario"],correcta:0,solucion:"Parte real negativa: converge al equilibrio."},
+{enunciado:"Criterio del cociente: lim|aₙ₊₁/aₙ|=L. Diverge si:",opciones:["L>1","L<1","L=1","L<0","L=0"],correcta:0,solucion:"L>1: la serie diverge."},
+{enunciado:"Serie Σ1/nᵖ converge si:",opciones:["p>1","p<1","p=1","p≤1","p=0"],correcta:0,solucion:"Serie p: converge para p>1."},
+{enunciado:"Suma de Σ(1/3)ⁿ desde n=0:",opciones:["1.5","3","1","2","0.5"],correcta:0,solucion:"1/(1-1/3)=1/(2/3)=1.5."},
+{enunciado:"Radio de convergencia de Σn!xⁿ:",opciones:["0","1","∞","e","-1"],correcta:0,solucion:"lim(n+1)!|x|/n!=∞. Converge solo en x=0. R=0."},
+{enunciado:"Derivada de f(x)=3x²-4x+7:",opciones:["6x-4","6x+4","3x-4","6x-7","3x²-4"],correcta:0,solucion:"f'(x)=6x-4."},
+{enunciado:"∫(6x²-2)dx:",opciones:["2x³-2x+C","6x³-2x+C","3x²-2x+C","2x³-2+C","6x²-2x+C"],correcta:0,solucion:"∫6x²dx=2x³, ∫-2dx=-2x. 2x³-2x+C."},
+{enunciado:"Distancia del punto (1,2) a la recta 3x+4y-5=0:",opciones:["6/5","1","2","3/5","4/5"],correcta:0,solucion:"|3+8-5|/5=6/5."},
+{enunciado:"P(A)=0.5, P(B)=0.4, P(A∩B)=0.3. Son independientes?",opciones:["No, porque 0.5×0.4≠0.3","Sí","No se sabe","Depende","Son excluyentes"],correcta:0,solucion:"0.5×0.4=0.2≠0.3. No son independientes."},
+{enunciado:"Centro de la elipse 4x²+9y²-16x+54y+61=0:",opciones:["(2,-3)","(-2,3)","(2,3)","(-2,-3)","(4,-6)"],correcta:0,solucion:"Completando cuadrados: 4(x-2)²+9(y+3)²=36. Centro (2,-3)."}
+];
+
+// ============ SISTEMA DE 10 INTENTOS ============
+function estimarPuntajePAES(pct){
+  if(pct>=98)return 1000;
+  if(pct>=95)return Math.round(950+(pct-95)*10);
+  if(pct>=85)return Math.round(800+(pct-85)*15);
+  if(pct>=75)return Math.round(700+(pct-75)*10);
+  if(pct>=60)return Math.round(600+(pct-60)*6.67);
+  if(pct>=45)return Math.round(500+(pct-45)*6.67);
+  if(pct>=30)return Math.round(400+(pct-30)*6.67);
+  if(pct>=15)return Math.round(250+(pct-15)*10);
+  return Math.round(100+(pct/15)*150);
+}
+
+let preguntasExamen=[], respuestas=new Array(65).fill(null), indice=0, finalizado=false, intentoActual=0;
+
+function barajar(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function barajarOpciones(pregunta){
+  const letras = ['A','B','C','D','E'];
+  const opcionesConIndice = pregunta.opciones.map((op, i) => ({texto: op, indiceOriginal: i}));
+  for(let i = opcionesConIndice.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [opcionesConIndice[i], opcionesConIndice[j]] = [opcionesConIndice[j], opcionesConIndice[i]];
+  }
+  const nuevaCorrecta = opcionesConIndice.findIndex(op => op.indiceOriginal === pregunta.correcta);
+  return {
+    opciones: opcionesConIndice.map(op => op.texto),
+    correcta: nuevaCorrecta
+  };
+
+function iniciarExamen(){
+  const prev=JSON.parse(localStorage.getItem('v3s_m2_650')||'[]');
+  if(prev.length>=10){
+    if(confirm('⚠️ Ya usaste los 10 intentos. ¿Reiniciar historial para 10 más?')){
+      localStorage.setItem('v3s_m2_650','[]');
+    }else return;
+  }
+  const usadas=new Set(prev.flat());
+  let disp=bancoM2.filter((_,i)=>!usadas.has(i));
+  if(disp.length<65){
+    alert('🔄 Banco agotado. Reiniciando historial automáticamente.');
+    localStorage.setItem('v3s_m2_650','[]');
+    disp=[...bancoM2];
+  }
+  const sel=barajar([...disp]).slice(0,65);
+  prev.push(sel.map(p=>bancoM2.indexOf(p)));
+  localStorage.setItem('v3s_m2_650',JSON.stringify(prev));
+  preguntasExamen = sel.map(p => {
+  const barajada = barajarOpciones(p);
+  return {
+    enunciado: p.enunciado,
+    opciones: barajada.opciones,
+    correcta: barajada.correcta,
+    solucion: p.solucion
+  };
+});
+respuestas=new Array(65).fill(null);indice=0;finalizado=false;intentoActual=prev.length;renderizar();
+}
+
+function seleccionar(idx){if(!finalizado){respuestas[indice]=idx;renderizar();}}
+function navegar(d){const n=indice+d;if(n>=0&&n<65){indice=n;renderizar();}}
+function finalizar(){finalizado=true;renderizar();}
+function volverInicio(){preguntasExamen=[];respuestas=new Array(65).fill(null);indice=0;finalizado=false;renderizar();}
+function calcular(){let c=0;preguntasExamen.forEach((p,i)=>{if(respuestas[i]===p.correcta)c++;});return{correctas:c,total:65};}
+
+function renderizar(){
+  const app=document.getElementById('contenidoDinamico');
+  const prev=JSON.parse(localStorage.getItem('v3s_m2_650')||'[]');
+  const usados=prev.length;
+  if(!preguntasExamen.length){
+    app.innerHTML=`<div style="text-align:center;"><p class="intentos-info">🎯 Intentos: <strong>${usados}</strong> de <strong>10</strong></p><p style="margin:1.2rem 0;font-size:1.05rem;">📚 <strong>650 preguntas únicas</strong> · 10 intentos sin repetición<br>📊 Álgebra avanzada, Cálculo, Probabilidad, Geometría Analítica</p><button onclick="window.iniciarExamen()" style="font-size:1.15rem;padding:0.9rem 2.8rem;background:#1a3c5e;color:white;border-color:#0f2a40;cursor:pointer;">▶ Iniciar intento ${usados+1}</button>${usados>=10?'<p style="color:#c0392b;margin-top:1rem;">⚠️ Límite de 10 intentos alcanzado.</p>':''}${usados>0&&usados<10?`<p style="color:#6b7d8e;margin-top:0.8rem;">Te quedan <strong>${10-usados}</strong> intento(s).</p>`:''}</div>`;
+    return;
+  }
+  if(finalizado){
+    const{correctas}=calcular();
+    const pct=Math.round((correctas/65)*100);
+    const puntaje=estimarPuntajePAES(pct);
+    let nivel='',cn='';
+    if(puntaje>=800){nivel='🏅 Puntaje destacado';cn='#27ae60';}
+    else if(puntaje>=650){nivel='📘 Buen desempeño';cn='#2c3e50';}
+    else if(puntaje>=500){nivel='📗 En desarrollo';cn='#f39c12';}
+    else{nivel='📕 Necesita refuerzo';cn='#c0392b';}
+    app.innerHTML=`<div class="resultado-final"><h2>📋 Resultado M2 · Intento ${intentoActual} de 10</h2><p class="puntaje-etiqueta">PUNTAJE PAES ESTIMADO</p><p class="puntaje-paes">${puntaje}</p><p>de 1000 puntos máximos</p><div class="barra-puntaje"><div class="barra-puntaje-lleno" style="width:${((puntaje-100)/900)*100}%;"></div></div><p>${correctas}/65 (${pct}%)</p><p style="color:${cn};font-weight:600;">${nivel}</p><div style="max-height:350px;overflow-y:auto;text-align:left;margin:1.2rem 0;">${preguntasExamen.map((p,i)=>{const u=respuestas[i];const ok=u===p.correcta;const lu=u!==null?String.fromCharCode(65+u):'—';const lc=String.fromCharCode(65+p.correcta);return`<div class="solucion-item" style="background:${ok?'#d4edda':'#f8d7da'};border-left:3px solid ${ok?'#4caf50':'#e53935'};"><strong>${i+1}.</strong> ${p.enunciado.substring(0,60)}...<br>🔹 Tu: <strong>${lu}</strong> | ✅: <strong>${lc}</strong><br>📘 ${p.solucion}</div>`;}).join('')}</div><button onclick="window.volverInicio()">↩️ Volver al inicio</button></div>`;
+    return;
+  }
+  const p=preguntasExamen[indice];
+  const letras=['A','B','C','D','E'];
+  const resp=respuestas.filter(r=>r!==null).length;
+  app.innerHTML=`<p class="intentos-info">📝 Intento ${intentoActual} de 10 · Respondidas: ${resp}/65</p><div class="barra-progreso"><div class="progreso-lleno" style="width:${((indice+1)/65)*100}%;"></div></div><div class="pregunta-box"><div class="numero-pregunta">Pregunta ${indice+1} de 65</div><div class="enunciado">${p.enunciado}</div><div class="opciones">${p.opciones.map((op,i)=>`<div class="opcion ${respuestas[indice]===i?'seleccionada':''}" onclick="window.seleccionar(${i})"><span class="letra">${letras[i]}</span> <span style="flex:1;">${op}</span>${respuestas[indice]===i?'<span style="color:#3a7ca5;">✓</span>':''}</div>`).join('')}</div></div><div class="navegacion"><button ${indice===0?'disabled':''} onclick="window.navegar(-1)">← Anterior</button><span style="font-weight:600;">${indice+1}/65</span><button ${indice===64?'disabled':''} onclick="window.navegar(1)">Siguiente →</button></div><div style="text-align:right;margin-top:1.5rem;"><button class="btn-finalizar" onclick="window.finalizar()">✅ Finalizar intento</button></div>`;
+}
+
+window.iniciarExamen=iniciarExamen;
+window.seleccionar=seleccionar;
+window.navegar=navegar;
+window.finalizar=finalizar;
+window.volverInicio=volverInicio;
+renderizar();
+})();
+</script>
+</body>
+</html>

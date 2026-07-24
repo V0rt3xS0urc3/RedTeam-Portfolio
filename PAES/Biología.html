@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+  <title>Simulador PAES Biología · V0rt3x_S0urc3</title>
+  <meta name="author" content="V0rt3x_S0urc3 · Diego Arriagada Zamora">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #f0f7f0; font-family: 'Georgia', 'Times New Roman', serif; color: #1a2e1a; padding: 1.5rem 1rem; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .contenedor { max-width: 800px; width: 100%; background: #fff; border-radius: 28px; box-shadow: 0 18px 36px rgba(0,0,0,0.07); padding: 2rem 2rem 2.2rem; border: 1px solid #c5d9c5; }
+    .marca-creador { text-align: right; font-size: 0.75rem; color: #5a7a5a; margin-bottom: 0.3rem; font-style: italic; }
+    .marca-creador span { font-weight: 700; color: #2d5a2d; }
+    h1 { font-size: 2rem; color: #1a3c1a; border-bottom: 2px solid #5a9a5a; padding-bottom: 0.5rem; margin-bottom: 0.4rem; }
+    .subtitulo { color: #3a5a3a; margin-bottom: 1.2rem; font-style: italic; }
+    .intentos-info { background: #e8f0e8; padding: 0.5rem 1rem; border-radius: 20px; display: inline-block; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .barra-progreso { width: 100%; height: 8px; background: #d0e0d0; border-radius: 10px; margin: 1rem 0 1.6rem; }
+    .progreso-lleno { height: 100%; width: 0%; background: #3d7a3d; border-radius: 10px; transition: width 0.2s; }
+    .pregunta-box { background: #f8fcf8; border-left: 6px solid #5a9a5a; padding: 1.5rem; border-radius: 18px; margin-bottom: 1.5rem; }
+    .numero-pregunta { font-weight: 700; color: #4a7a4a; font-size: 0.9rem; margin-bottom: 0.7rem; }
+    .enunciado { font-size: 1.2rem; line-height: 1.5; margin-bottom: 1.6rem; }
+    .opciones { display: flex; flex-direction: column; gap: 0.7rem; }
+    .opcion { background: white; border: 1.5px solid #c5d9c5; border-radius: 14px; padding: 0.75rem 1.1rem; display: flex; align-items: center; gap: 0.9rem; cursor: pointer; transition: 0.15s; }
+    .opcion:hover { background: #edf5ed; }
+    .opcion.seleccionada { background: #d8ead8; border-color: #3d7a3d; font-weight: 500; }
+    .letra { font-weight: 700; background: #d8ead8; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #1a3c1a; }
+    .navegacion { display: flex; justify-content: space-between; align-items: center; margin-top: 1.8rem; }
+    button { background: #f8fcf8; border: 1.5px solid #a0c4a0; padding: 0.7rem 1.6rem; border-radius: 30px; font-weight: 600; cursor: pointer; font-family: inherit; color: #1a3c1a; }
+    button:hover:not(:disabled) { background: #d0e8d0; border-color: #3d7a3d; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-finalizar { background: #2d5a2d; color: white; border-color: #1a3c1a; }
+    .btn-finalizar:hover:not(:disabled) { background: #1f451f; }
+    .resultado-final { background: #f0f5f0; border-radius: 24px; padding: 2rem; text-align: center; }
+    .puntaje-paes { font-size: 4rem; font-weight: 700; color: #1a3c1a; margin: 0.3rem 0; line-height: 1; }
+    .puntaje-etiqueta { font-size: 0.9rem; color: #5a7a5a; letter-spacing: 1px; }
+    .barra-puntaje { width: 80%; height: 12px; background: #c5d9c5; border-radius: 10px; margin: 1rem auto; }
+    .barra-puntaje-lleno { height: 100%; background: #3d7a3d; border-radius: 10px; transition: width 0.5s; }
+    .solucion-item { background: #e8f0e8; border-radius: 14px; padding: 0.7rem 1rem; margin-bottom: 0.5rem; font-size: 0.85rem; text-align: left; }
+    .footer-marca { text-align: center; margin-top: 1.5rem; font-size: 0.7rem; color: #5a7a5a; border-top: 1px solid #c5d9c5; padding-top: 0.8rem; }
+    @media (max-width: 500px) { .contenedor { padding: 1.5rem; } .puntaje-paes { font-size: 3rem; } }
+  </style>
+</head>
+<body>
+<div class="contenedor" id="app">
+  <div class="marca-creador">⚡ <span>V0rt3x_S0urc3</span> · Diego Arriagada Zamora</div>
+  <h1>🧬 PAES Ciencias · Biología</h1>
+  <p class="subtitulo">Mención Biología · 650 preguntas · 65 por intento · 10 intentos</p>
+  <div id="contenidoDinamico"></div>
+  <div class="footer-marca">© V0rt3x_S0urc3 | Diego Arriagada Zamora · Simulador educativo sin fines comerciales</div>
+</div>
+
+<script>
+(function(){
+
+// ============================================
+// PEGAR AQUÍ LAS 650 PREGUNTAS DE BIOLOGÍA
+// ============================================
+const bancoBio = [
+
+// ===== UNIDAD 1: CÉLULA Y BIOMOLÉCULAS (1-40) =====
+{enunciado:"La organela responsable de la respiración celular aeróbica es:",opciones:["Mitocondria","Ribosoma","Cloroplasto","Aparato de Golgi","Lisosoma"],correcta:0,solucion:"La mitocondria realiza la respiración celular, produciendo ATP mediante la cadena transportadora de electrones."},
+{enunciado:"¿Qué estructura celular está presente en células vegetales pero NO en animales?",opciones:["Pared celular de celulosa","Mitocondria","Membrana plasmática","Ribosoma","Aparato de Golgi"],correcta:0,solucion:"La pared celular de celulosa es exclusiva de células vegetales."},
+{enunciado:"La molécula que almacena y transfiere energía en la célula es:",opciones:["ATP (adenosín trifosfato)","ADN","Glucosa","NADH","FADH₂"],correcta:0,solucion:"El ATP es la principal molécula energética celular."},
+{enunciado:"El ADN eucariota se organiza en el núcleo formando:",opciones:["Cromatina y cromosomas","Ribosomas","Vesículas","Membranas","Nucleolos"],correcta:0,solucion:"El ADN se asocia con histonas formando cromatina, que se condensa en cromosomas."},
+{enunciado:"La fotosíntesis ocurre en los cloroplastos, específicamente en:",opciones:["Tilacoides (fase luminosa) y estroma (Ciclo de Calvin)","Membrana externa","Matriz","Crestas mitocondriales","Nucleoplasma"],correcta:0,solucion:"Fase luminosa en tilacoides; Ciclo de Calvin en estroma."},
+{enunciado:"¿Qué tipo de transporte celular NO requiere energía?",opciones:["Difusión facilitada","Endocitosis","Exocitosis","Bomba sodio-potasio","Transporte activo primario"],correcta:0,solucion:"La difusión facilitada usa proteínas transportadoras sin gasto de ATP."},
+{enunciado:"La enzima que sintetiza ATP en la mitocondria se llama:",opciones:["ATP sintasa","ADN polimerasa","ARN polimerasa","Hexoquinasa","Pepsina"],correcta:0,solucion:"La ATP sintasa aprovecha el gradiente de protones para fosforilar ADP → ATP."},
+{enunciado:"Los ribosomas están formados por:",opciones:["ARN ribosomal y proteínas","ADN y lípidos","Carbohidratos","Solo proteínas","Solo ARN mensajero"],correcta:0,solucion:"Los ribosomas son complejos de ARNr y proteínas."},
+{enunciado:"La meiosis se diferencia de la mitosis en que produce:",opciones:["4 células haploides genéticamente distintas","2 células diploides idénticas","Células somáticas","No tiene entrecruzamiento","Mantiene número cromosómico"],correcta:0,solucion:"Meiosis: 4 células haploides con variabilidad genética."},
+{enunciado:"El retículo endoplasmático rugoso se caracteriza por:",opciones:["Tener ribosomas adheridos y sintetizar proteínas","Sintetizar lípidos","Almacenar calcio","No tener ribosomas","Producir ATP"],correcta:0,solucion:"RER: ribosomas en su superficie, sintetiza proteínas de secreción."},
+{enunciado:"¿Cuál es la función principal del Aparato de Golgi?",opciones:["Modificar, empaquetar y distribuir proteínas y lípidos","Sintetizar proteínas","Realizar fotosíntesis","Degradar desechos celulares","Almacenar ADN"],correcta:0,solucion:"El Golgi modifica y distribuye proteínas y lípidos."},
+{enunciado:"La ósmosis es:",opciones:["Paso de agua a través de membrana semipermeable","Paso de solutos contra gradiente","Transporte de iones con ATP","Entrada de partículas sólidas","Salida de macromoléculas"],correcta:0,solucion:"Movimiento neto de agua de menor a mayor concentración de solutos."},
+{enunciado:"La pared celular bacteriana está compuesta principalmente de:",opciones:["Peptidoglicano","Celulosa","Quitina","Colágeno","Queratina"],correcta:0,solucion:"Bacterias: peptidoglicano. Celulosa: vegetal. Quitina: hongos."},
+{enunciado:"El nucléolo es una estructura nuclear encargada de:",opciones:["Sintetizar ARN ribosomal","Replicar ADN","Producir ATP","Degradar proteínas","Almacenar lípidos"],correcta:0,solucion:"El nucléolo sintetiza y ensambla ARNr con proteínas ribosomales."},
+{enunciado:"La cromatina se condensa en cromosomas durante:",opciones:["La profase de la división celular","La interfase","La fase S","La apoptosis","La necrosis"],correcta:0,solucion:"Profase: cromatina se compacta en cromosomas visibles."},
+{enunciado:"¿Qué ocurre en la fase S del ciclo celular?",opciones:["Replicación del ADN","División del citoplasma","Condensación cromosómica","Separación de cromátidas","Formación del huso"],correcta:0,solucion:"Fase S (Síntesis): duplicación del material genético."},
+{enunciado:"El entrecruzamiento (crossing-over) ocurre en:",opciones:["Profase I de la meiosis","Profase de la mitosis","Anafase II","Telofase","Interfase"],correcta:0,solucion:"Profase I meiótica: intercambio entre cromosomas homólogos."},
+{enunciado:"La difusión simple se caracteriza por:",opciones:["Movimiento a favor de gradiente sin proteínas transportadoras","Uso de ATP","Transporte contra gradiente","Requiere proteínas canal","Endocitosis"],correcta:0,solucion:"Moléculas pequeñas atraviesan la membrana directamente."},
+{enunciado:"Las células procariotas se diferencian de las eucariotas en que:",opciones:["Carecen de núcleo definido y organelos membranosos","Tienen mitocondrias","Poseen cloroplastos","Tienen RE","Presentan nucléolo"],correcta:0,solucion:"Procariotas: sin núcleo verdadero, sin organelos membranosos."},
+{enunciado:"El NADH y FADH₂ producidos en el Ciclo de Krebs:",opciones:["Transportan electrones a la cadena respiratoria","Se almacenan como grasa","Se convierten en glucosa","Se eliminan como desecho","Se usan en la glucólisis"],correcta:0,solucion:"Coenzimas reducidas que llevan electrones a la cadena transportadora."},
+{enunciado:"La glucólisis ocurre en:",opciones:["Citoplasma","Matriz mitocondrial","Membrana tilacoidal","Núcleo","Estroma"],correcta:0,solucion:"Glucólisis: degradación de glucosa a piruvato en el citoplasma."},
+{enunciado:"¿Cuántas moléculas de ATP se producen netamente en la glucólisis?",opciones:["2 ATP","36 ATP","4 ATP","38 ATP","0 ATP"],correcta:0,solucion:"4 producidos - 2 consumidos = 2 ATP netos."},
+{enunciado:"El Ciclo de Krebs ocurre en:",opciones:["Matriz mitocondrial","Citoplasma","Membrana plasmática","Núcleo","Tilacoides"],correcta:0,solucion:"Las reacciones del ciclo del ácido cítrico en la matriz mitocondrial."},
+{enunciado:"La cadena transportadora de electrones se ubica en:",opciones:["Membrana interna mitocondrial (crestas)","Membrana externa","Citoplasma","Matriz","Estroma"],correcta:0,solucion:"Complejos proteicos en la membrana mitocondrial interna."},
+{enunciado:"El aceptor final de electrones en la respiración aeróbica es:",opciones:["Oxígeno (O₂)","Dióxido de carbono","Agua","Glucosa","NAD⁺"],correcta:0,solucion:"O₂ acepta electrones formando H₂O."},
+{enunciado:"En la fermentación láctica, el piruvato se convierte en:",opciones:["Ácido láctico","Etanol","Acetil-CoA","Glucosa","ATP"],correcta:0,solucion:"Piruvato acepta electrones del NADH y se reduce a ácido láctico."},
+{enunciado:"La clorofila se encuentra en:",opciones:["Membrana de los tilacoides","Estroma","Membrana externa del cloroplasto","Citoplasma","Pared celular"],correcta:0,solucion:"Pigmentos fotosintéticos en membrana tilacoidal."},
+{enunciado:"¿Qué producto de la fase luminosa se usa en el Ciclo de Calvin?",opciones:["ATP y NADPH","CO₂ y H₂O","Glucosa y O₂","NADH y FADH₂","Piruvato"],correcta:0,solucion:"Fase luminosa produce ATP y NADPH para fijar CO₂."},
+{enunciado:"La enzima RuBisCO:",opciones:["Fija CO₂ en el Ciclo de Calvin","Degrada glucosa","Sintetiza ATP","Transporta electrones","Rompe clorofila"],correcta:0,solucion:"RuBisCO cataliza la fijación del CO₂ atmosférico."},
+{enunciado:"Los peroxisomas se encargan de:",opciones:["Degradar peróxido de hidrógeno y oxidar ácidos grasos","Sintetizar proteínas","Realizar fotosíntesis","Almacenar ADN","Producir ribosomas"],correcta:0,solucion:"Contienen catalasa que descompone H₂O₂."},
+{enunciado:"El citoesqueleto está formado por:",opciones:["Microfilamentos, filamentos intermedios y microtúbulos","Solo membrana","ADN y ARN","Lípidos","Carbohidratos"],correcta:0,solucion:"Actina, filamentos intermedios y tubulina."},
+{enunciado:"La apoptosis es:",opciones:["Muerte celular programada","División celular descontrolada","Inflamación tisular","Necrosis por traumatismo","Replicación viral"],correcta:0,solucion:"Muerte celular regulada genéticamente sin dañar tejidos vecinos."},
+// ===== UNIDAD 2: GENÉTICA Y HERENCIA (41-80) =====
+{enunciado:"Un gen es:",opciones:["Segmento de ADN que codifica una proteína o ARN funcional","Proteína completa","Cromosoma entero","Orgánulo celular","Molécula de ATP"],correcta:0,solucion:"Gen: unidad hereditaria de ADN con información para un producto funcional."},
+{enunciado:"El alelo dominante se caracteriza por:",opciones:["Expresarse aún en heterocigosis","Expresarse solo en homocigosis","No expresarse nunca","Estar solo en cromosoma Y","Ser siempre recesivo"],correcta:0,solucion:"Alelo dominante (A) enmascara al recesivo (a) en Aa."},
+{enunciado:"Un individuo con genotipo Aa se denomina:",opciones:["Heterocigoto","Homocigoto dominante","Homocigoto recesivo","Haploide","Diploide puro"],correcta:0,solucion:"Heterocigoto: dos alelos distintos para un gen."},
+{enunciado:"La Primera Ley de Mendel establece:",opciones:["Los dos alelos de un gen se segregan en gametos","Los genes se heredan ligados","Todos los caracteres se mezclan","Solo un progenitor aporta","No existe dominancia"],correcta:0,solucion:"Ley de la Segregación: cada gameto recibe un alelo."},
+{enunciado:"En un cruce Aa × Aa, la proporción fenotípica (dominancia completa) es:",opciones:["3:1","1:2:1","9:3:3:1","1:1","4:0"],correcta:0,solucion:"AA(1/4), Aa(2/4), aa(1/4). 3 dominante:1 recesivo."},
+{enunciado:"La herencia ligada al cromosoma X implica:",opciones:["Varones expresan el rasgo con un solo alelo (hemicigotos)","Mujeres nunca expresan","Solo se transmite de padre a hijo","Afecta igual a ambos sexos","Determinada por cromosoma Y"],correcta:0,solucion:"Varones XY: basta un alelo en X. Mujeres XX: necesitan dos."},
+{enunciado:"El daltonismo y la hemofilia son ejemplos de:",opciones:["Herencia recesiva ligada al X","Herencia autosómica dominante","Herencia ligada al Y","Herencia mitocondrial","Codominancia"],correcta:0,solucion:"Ambas recesivas ligadas al X; afectan más a varones."},
+{enunciado:"¿Qué es el genoma humano?",opciones:["Conjunto completo de ADN de un organismo","Solo genes codificantes","Proteínas de una célula","ARN total","Cromosomas sexuales"],correcta:0,solucion:"Genoma: totalidad del material genético (~3,200 millones pb)."},
+{enunciado:"La replicación del ADN es semiconservativa porque:",opciones:["Cada nueva doble hélice contiene una hebra original y una nueva","Ambas hebras son nuevas","Se conserva todo el ADN","Se destruye el original","Solo se replica una hebra"],correcta:0,solucion:"Meselson-Stahl: cada hebra parental sirve de molde."},
+{enunciado:"La enzima que desenrolla el ADN durante la replicación es:",opciones:["Helicasa","ADN polimerasa","Ligasa","Primasa","Topoisomerasa"],correcta:0,solucion:"Helicasa rompe puentes de hidrógeno entre bases."},
+{enunciado:"Los fragmentos de Okazaki se forman en:",opciones:["La hebra rezagada durante la replicación","La hebra líder","El ARN mensajero","Las proteínas ribosomales","La transcripción inversa"],correcta:0,solucion:"Hebra rezagada: síntesis discontinua unida por ligasa."},
+{enunciado:"La transcripción convierte:",opciones:["ADN en ARN mensajero","ARN en proteína","ADN en ADN","Proteína en ADN","ARN en ADN"],correcta:0,solucion:"ARN polimerasa sintetiza ARNm usando molde de ADN."},
+{enunciado:"Un codón está formado por:",opciones:["3 nucleótidos consecutivos en el ARNm","1 nucleótido","2 nucleótidos","4 nucleótidos","Una proteína"],correcta:0,solucion:"Triplete de bases que especifica un aminoácido."},
+{enunciado:"El codón de inicio de la traducción es:",opciones:["AUG (metionina)","UAA","UAG","UGA","TAC"],correcta:0,solucion:"AUG codifica metionina e inicia la síntesis proteica."},
+{enunciado:"Una mutación puntual por sustitución puede ser:",opciones:["Silenciosa, de cambio de sentido o sin sentido","Solo silenciosa","Solo de cambio de sentido","Siempre letal","Siempre beneficiosa"],correcta:0,solucion:"Silenciosa (mismo aa), cambio sentido (otro aa), sin sentido (STOP)."},
+{enunciado:"La aneuploidía es:",opciones:["Alteración en el número de cromosomas (ej: trisomía 21)","Cambio en un nucleótido","Duplicación génica","Inversión cromosómica","Translocación balanceada"],correcta:0,solucion:"Número anormal de cromosomas por no disyunción meiótica."},
+{enunciado:"El síndrome de Down (trisomía 21) se produce por:",opciones:["No disyunción durante la meiosis","Mutación puntual","Deleción cromosómica","Translocación exclusivamente","Infección viral"],correcta:0,solucion:"Gameto con dos copias del cromosoma 21."},
+{enunciado:"El Proyecto Genoma Humano determinó ~:",opciones:["20,000 - 25,000 genes","100,000 genes","46 genes","3,000 genes","1,000,000 genes"],correcta:0,solucion:"Estimación de genes codificantes de proteínas."},
+{enunciado:"La epigenética estudia:",opciones:["Cambios heredables en expresión génica sin alterar secuencia de ADN","Mutaciones puntuales","Translocaciones","Duplicación del genoma","Secuenciación"],correcta:0,solucion:"Metilación del ADN y modificación de histonas."},
+{enunciado:"En la traducción, el ARN de transferencia (ARNt):",opciones:["Transporta aminoácidos específicos al ribosoma según el codón","Sintetiza ADN","Forma membrana nuclear","Degrada proteínas","Replica el genoma"],correcta:0,solucion:"ARNt tiene anticodón complementario al codón del ARNm."},
+{enunciado:"La Segunda Ley de Mendel (segregación independiente) aplica a:",opciones:["Genes en cromosomas distintos","Genes ligados","Un solo gen","Herencia ligada al sexo","Genes mitocondriales"],correcta:0,solucion:"Alelos de diferentes genes se distribuyen independientemente."},
+{enunciado:"Un gen recesivo solo se expresa en:",opciones:["Homocigosis","Heterocigosis","Cualquier condición","Alelo dominante","Cromosoma Y"],correcta:0,solucion:"Alelo recesivo requiere homocigosis (aa) para expresarse."},
+{enunciado:"La hemofilia A se debe a deficiencia del factor:",opciones:["Factor VIII","Factor IX","Factor X","Factor V","Fibrinógeno"],correcta:0,solucion:"Hemofilia A: déficit de factor VIII de coagulación."},
+{enunciado:"La fibrosis quística es causada por mutación en:",opciones:["Gen CFTR","Hemoglobina","Distrofina","Huntingtina","BRCA1"],correcta:0,solucion:"CFTR: canal de cloro defectuoso. Autosómica recesiva."},
+{enunciado:"El gen supresor tumoral p53:",opciones:["Detiene ciclo celular o induce apoptosis ante daño en ADN","Promueve división","Es un oncogén","Solo actúa en neuronas","Causa cáncer"],correcta:0,solucion:"'Guardián del genoma'. Mutado en >50% de cánceres."},
+{enunciado:"Los oncogenes son:",opciones:["Genes que al mutar promueven proliferación descontrolada","Genes supresores tumorales","Genes de reparación","Genes mitocondriales","Genes virales exclusivamente"],correcta:0,solucion:"Protooncogenes mutados → oncogenes hiperactivos."},
+{enunciado:"La tecnología CRISPR-Cas9 permite:",opciones:["Editar genes cortando y modificando secuencias de ADN","Clonar organismos","Sintetizar proteínas artificiales","Crear vida","Fusionar especies"],correcta:0,solucion:"Sistema bacteriano: Cas9 guiada por ARN corta ADN diana."},
+{enunciado:"Las células madre embrionarias son:",opciones:["Pluripotentes","Multipotentes","Unipotentes","Diferenciadas","Solo hematopoyéticas"],correcta:0,solucion:"Masa interna del blastocisto: pueden generar todos los tejidos."},
+{enunciado:"La clonación reproductiva (oveja Dolly) usó:",opciones:["Transferencia nuclear de célula somática a óvulo enucleado","Fecundación in vitro","CRISPR","Células madre","Hibridación"],correcta:0,solucion:"Núcleo de célula adulta → óvulo sin núcleo → embrión."},
+// ===== UNIDAD 3: EVOLUCIÓN (81-110) =====
+{enunciado:"La teoría de la evolución por selección natural fue propuesta por:",opciones:["Charles Darwin y Alfred Wallace","Gregor Mendel","Lamarck","Louis Pasteur","Carl Linneo"],correcta:0,solucion:"Darwin y Wallace: selección natural."},
+{enunciado:"Una adaptación evolutiva es:",opciones:["Rasgo que mejora supervivencia y reproducción","Cualquier característica","Solo cambios de comportamiento","Mutaciones siempre beneficiosas","Caracteres adquiridos"],correcta:0,solucion:"Adaptación: rasgo moldeado por selección natural que incrementa fitness."},
+{enunciado:"Las estructuras homólogas son:",opciones:["Estructuras con origen evolutivo común pero función diferente","Misma función, distinto origen","Órganos vestigiales","Sin función","Adaptaciones convergentes"],correcta:0,solucion:"Homología: ancestro común (ala de murciélago y brazo humano)."},
+{enunciado:"Las estructuras análogas:",opciones:["Tienen función similar pero origen evolutivo distinto","Comparten ancestro común","Son idénticas genéticamente","Exclusivas de vertebrados","Prueban selección artificial"],correcta:0,solucion:"Analogía: convergencia evolutiva (ala de ave y de insecto)."},
+{enunciado:"La especiación alopátrica ocurre por:",opciones:["Aislamiento geográfico de poblaciones","Cambios sin barreras","Selección artificial","Mutaciones dirigidas","Hibridación"],correcta:0,solucion:"Barrera geográfica separa poblaciones que divergen."},
+{enunciado:"El registro fósil evidencia:",opciones:["Cambios en las especies a lo largo del tiempo geológico","Que las especies no cambian","Creación simultánea","Fósiles recientes","Solo extinción por meteoritos"],correcta:0,solucion:"Muestra transiciones, extinciones y aparición de nuevas formas."},
+{enunciado:"La selección natural actúa sobre:",opciones:["Fenotipos (características observables)","Genotipos directamente","Alelos individuales","ADN no codificante","Caracteres adquiridos"],correcta:0,solucion:"Selección sobre fenotipo; frecuencias genotípicas cambian."},
+{enunciado:"La deriva génica es:",opciones:["Cambio aleatorio en frecuencias alélicas en población pequeña","Selección direccional","Mutación inducida","Migración masiva","Selección artificial"],correcta:0,solucion:"Efecto aleatorio notable en poblaciones pequeñas."},
+{enunciado:"El flujo génico se refiere a:",opciones:["Transferencia de alelos entre poblaciones por migración","Mutaciones espontáneas","Deriva genética","Selección natural","Endogamia"],correcta:0,solucion:"Movimiento de individuos o gametos entre poblaciones."},
+{enunciado:"La teoría endosimbiótica explica el origen de:",opciones:["Mitocondrias y cloroplastos a partir de bacterias ancestrales","Núcleo celular","Pared celular","Ribosomas","Membrana plasmática"],correcta:0,solucion:"Lynn Margulis: bacterias fagocitadas que establecieron simbiosis."},
+{enunciado:"La selección natural estabilizadora favorece:",opciones:["Fenotipos intermedios, eliminando extremos","Fenotipos extremos","Un solo extremo","Desaparición","Más mutaciones"],correcta:0,solucion:"Reduce variabilidad favoreciendo el promedio."},
+{enunciado:"La selección disruptiva:",opciones:["Favorece fenotipos extremos y elimina intermedios","Favorece promedio","Elimina extremos","No afecta","Solo en plantas"],correcta:0,solucion:"Puede conducir a especiación."},
+{enunciado:"La selección direccional:",opciones:["Favorece un fenotipo extremo sobre los demás","Mantiene promedio","Elimina variabilidad","Solo caracteres recesivos","Es artificial"],correcta:0,solucion:"Desplaza la media poblacional hacia un extremo."},
+{enunciado:"El efecto fundador es un tipo de:",opciones:["Deriva génica por migración de pocos individuos","Selección natural","Mutación dirigida","Flujo génico masivo","Especiación simpátrica"],correcta:0,solucion:"Pocos colonizadores: frecuencias alélicas distintas al azar."},
+{enunciado:"El efecto cuello de botella ocurre cuando:",opciones:["Población se reduce drásticamente por evento catastrófico","Aumenta población","Hay mucha migración","Selección artificial","Nuevos genes"],correcta:0,solucion:"Reduce diversidad genética (ej: guepardos)."},
+{enunciado:"La evolución convergente produce:",opciones:["Estructuras análogas en especies no emparentadas","Estructuras homólogas","Especiación alopátrica","Aislamiento reproductivo","Deriva génica"],correcta:0,solucion:"Ambientes similares seleccionan adaptaciones parecidas."},
+{enunciado:"La coevolución es:",opciones:["Cambio evolutivo recíproco entre dos especies que interactúan","Evolución de una especie","Extinción masiva","Selección artificial","Mutagénesis"],correcta:0,solucion:"Plantas-polinizadores, depredador-presa."},
+{enunciado:"El equilibrio puntuado propone:",opciones:["Evolución en períodos rápidos seguidos de estabilidad","Siempre gradual","No existe evolución","Solo deriva génica","Solo mutaciones"],correcta:0,solucion:"Eldredge y Gould: cambios rápidos + estasis."},
+{enunciado:"La taxonomía cladística clasifica por:",opciones:["Relaciones filogenéticas (ancestro común)","Similitud superficial","Tamaño corporal","Hábitat","Coloración"],correcta:0,solucion:"Cladogramas agrupan por caracteres derivados compartidos."},
+{enunciado:"Concepto biológico de especie:",opciones:["Grupo que puede reproducirse y tener descendencia fértil","Apariencia similar","Mismo hábitat","Mismo número cromosómico","Cualquier población aislada"],correcta:0,solucion:"Mayr: aislamiento reproductivo."},
+// ===== UNIDAD 4: ECOLOGÍA Y ECOSISTEMAS (111-130) =====
+{enunciado:"En un ecosistema, los productores son:",opciones:["Organismos autótrofos (plantas, algas, cianobacterias)","Herbívoros","Carnívoros","Descomponedores","Parásitos"],correcta:0,solucion:"Transforman energía lumínica en química mediante fotosíntesis."},
+{enunciado:"El nivel trófico de los consumidores primarios:",opciones:["Herbívoros que se alimentan de productores","Carnívoros","Descomponedores","Productores","Superdepredadores"],correcta:0,solucion:"Consumidores primarios = herbívoros."},
+{enunciado:"La biomasa en una pirámide ecológica representa:",opciones:["Cantidad de materia orgánica por nivel trófico","Número de individuos","Energía lumínica","Tasa de fotosíntesis","Cantidad de agua"],correcta:0,solucion:"Masa total de organismos por nivel (g/m² o kg)."},
+{enunciado:"En una cadena trófica, la energía:",opciones:["Disminuye en cada nivel (~10% se transfiere)","Aumenta en niveles superiores","Se mantiene constante","Se recicla completamente","Es ilimitada"],correcta:0,solucion:"Regla del 10%: solo ~10% pasa al siguiente nivel."},
+{enunciado:"Los descomponedores (hongos y bacterias):",opciones:["Degradan materia orgánica muerta y reciclan nutrientes","Producen oxígeno","Fijan nitrógeno","Realizan fotosíntesis","Son consumidores primarios"],correcta:0,solucion:"Mineralización: cierran ciclos biogeoquímicos."},
+{enunciado:"El nitrógeno atmosférico es aprovechado por:",opciones:["Bacterias fijadoras de nitrógeno","Fotosíntesis directa","Respiración celular","Animales herbívoros","Evaporación"],correcta:0,solucion:"Rhizobium y cianobacterias convierten N₂ en amonio."},
+{enunciado:"El CO₂ es captado de la atmósfera por:",opciones:["Organismos fotosintéticos","Animales","Hongos","Bacterias descomponedoras","Protozoos"],correcta:0,solucion:"Plantas, algas y cianobacterias fijan CO₂."},
+{enunciado:"El efecto invernadero es causado por:",opciones:["Acumulación de CO₂, CH₄ y vapor de H₂O","Disminución de oxígeno","Exceso de nitrógeno","Falta de nubes","Aumento de ozono"],correcta:0,solucion:"Gases que retienen calor irradiado por la Tierra."},
+{enunciado:"La lluvia ácida se produce por:",opciones:["Emisión de SO₂ y NOₓ que forman ácidos","Exceso de oxígeno","Falta de CO₂","Evaporación marina","Fotosíntesis excesiva"],correcta:0,solucion:"Óxidos de azufre y nitrógeno + vapor de agua → ácidos."},
+{enunciado:"Una especie introducida se vuelve invasora cuando:",opciones:["Se reproduce descontroladamente y desplaza nativas","Es nativa","No afecta","Es depredada","No se reproduce"],correcta:0,solucion:"Sin depredadores naturales, altera el equilibrio."},
+// ===== UNIDAD 4: ECOLOGÍA (continuación 131-160) =====
+{enunciado:"La capacidad de carga (K) de un ecosistema es:",opciones:["Número máximo de individuos que el ambiente puede sostener","Tasa de natalidad","Tasa de mortalidad","Número mínimo","Tasa de migración"],correcta:0,solucion:"K: límite poblacional determinado por recursos disponibles."},
+{enunciado:"El crecimiento exponencial ocurre cuando:",opciones:["Los recursos son ilimitados y no hay competencia","La población alcanza K","Hay alta depredación","Ocurre una catástrofe","La natalidad es cero"],correcta:0,solucion:"dN/dt = rN. Crecimiento ilimitado en etapas iniciales."},
+{enunciado:"La relación de competencia interespecífica:",opciones:["Dos especies distintas compiten por el mismo recurso","Misma especie compite","Una se beneficia","Ambas se benefician","No hay interacción"],correcta:0,solucion:"Competencia entre especies distintas (león vs hiena)."},
+{enunciado:"El mutualismo es una relación donde:",opciones:["Ambas especies se benefician","Una se beneficia, otra no","Una se beneficia, otra perjudicada","Ambas se perjudican","No hay interacción"],correcta:0,solucion:"Abejas y flores, líquenes (alga + hongo)."},
+{enunciado:"El comensalismo se caracteriza por:",opciones:["Una especie se beneficia, la otra no es afectada","Ambas se benefician","Una mata a la otra","Ambas se perjudican","Competencia"],correcta:0,solucion:"Rémora y tiburón: transporte sin afectar al huésped."},
+{enunciado:"En el parasitismo:",opciones:["El parásito se beneficia a expensas del huésped","Ambos se benefician","El huésped se beneficia","Ninguno es afectado","Es temporal"],correcta:0,solucion:"Parásito obtiene nutrientes causando daño (tenia, pulgas)."},
+{enunciado:"La sucesión ecológica primaria ocurre en:",opciones:["Terreno virgen sin suelo previo (roca, lava)","Bosque tras incendio","Campo abandonado","Pradera tras sequía","Lago eutrofizado"],correcta:0,solucion:"Líquenes y musgos pioneros forman suelo."},
+{enunciado:"La sucesión ecológica secundaria:",opciones:["Ocurre donde existía suelo y comunidad previa","Parte de roca desnuda","No implica cambios","Solo en desiertos","Es instantánea"],correcta:0,solucion:"Bosque tras incendio: hay suelo y banco de semillas."},
+{enunciado:"El bioma de la tundra se caracteriza por:",opciones:["Permafrost, bajas temperaturas, musgos y líquenes","Selva tropical","Altas temperaturas y cactus","Bosque caducifolio","Praderas extensas"],correcta:0,solucion:"Suelo congelado permanente, vegetación baja, regiones árticas."},
+{enunciado:"El bioma del desierto se caracteriza por:",opciones:["Precipitaciones muy escasas y adaptaciones xerófitas","Alta humedad","Suelo congelado","Lluvias constantes","Dosel cerrado"],correcta:0,solucion:"Cactus almacenan agua; animales nocturnos."},
+{enunciado:"La biodiversidad incluye:",opciones:["Diversidad genética, de especies y de ecosistemas","Solo número de especies","Solo variedad de plantas","Animales grandes","Especies domésticas"],correcta:0,solucion:"Tres niveles: genes, especies y ecosistemas."},
+{enunciado:"Un servicio ecosistémico es:",opciones:["Beneficio que los humanos obtienen de los ecosistemas","Costo ambiental","Impuesto ecológico","Contaminación","Especie invasora"],correcta:0,solucion:"Polinización, purificación del agua, control de plagas."},
+{enunciado:"La eutrofización es causada por:",opciones:["Exceso de nutrientes (N y P) que prolifera algas","Falta de oxígeno","Ausencia de peces","Agua pura","Bajas temperaturas"],correcta:0,solucion:"Fertilizantes → algas → descomposición agota O₂."},
+{enunciado:"El ozono estratosférico (O₃):",opciones:["Filtra radiación ultravioleta dañina","Produce lluvia ácida","Aumenta efecto invernadero","Contamina el aire","Destruye nubes"],correcta:0,solucion:"Absorbe UV-B y UV-C protegiendo a los seres vivos."},
+{enunciado:"Los CFC son responsables de:",opciones:["Destrucción de la capa de ozono","Aumento de oxígeno","Fotosíntesis","Fijación de nitrógeno","Producción de ozono"],correcta:0,solucion:"Liberan cloro atómico que cataliza destrucción de O₃."},
+{enunciado:"El ciclo del carbono incluye:",opciones:["Fotosíntesis, respiración, combustión y sedimentación","Solo fotosíntesis","Solo respiración","Solo combustión","Solo sedimentación"],correcta:0,solucion:"Flujo de C entre atmósfera, biosfera, hidrosfera y litosfera."},
+{enunciado:"El ciclo del nitrógeno incluye:",opciones:["Fijación, nitrificación, asimilación, desnitrificación","Solo fotosíntesis","Solo respiración","Solo combustión","Solo evaporación"],correcta:0,solucion:"Transformaciones del N entre formas orgánicas e inorgánicas."},
+{enunciado:"Las bacterias desnitrificantes:",opciones:["Convierten nitrato en N₂ atmosférico","Fijan N₂","Oxidan amonio","Reducen nitrito","Producen oxígeno"],correcta:0,solucion:"Devuelven N₂ a la atmósfera cerrando el ciclo."},
+{enunciado:"La huella ecológica mide:",opciones:["Superficie necesaria para producir recursos y absorber residuos","Número de especies","Cantidad de agua","Emisiones de CO₂","Población humana"],correcta:0,solucion:"Impacto humano sobre el planeta."},
+{enunciado:"El desarrollo sustentable busca:",opciones:["Satisfacer necesidades presentes sin comprometer futuras","Crecimiento ilimitado","Explotación máxima","Conservación sin desarrollo","Solo crecimiento económico"],correcta:0,solucion:"Equilibrio entre lo económico, social y ambiental."},
+// ===== UNIDAD 5: FISIOLOGÍA HUMANA (161-220) =====
+{enunciado:"La unidad funcional del sistema nervioso es:",opciones:["Neurona","Glóbulo rojo","Hepatocito","Nefrona","Alvéolo"],correcta:0,solucion:"Neurona: transmite impulsos eléctricos y se comunica por sinapsis."},
+{enunciado:"El potencial de acción se genera por:",opciones:["Entrada de Na⁺ y salida de K⁺","Salida de Ca²⁺","Entrada de Cl⁻","Síntesis de ATP","Liberación de insulina"],correcta:0,solucion:"Despolarización (Na⁺), repolarización (K⁺)."},
+{enunciado:"La sinapsis química implica liberación de:",opciones:["Neurotransmisores en la hendidura sináptica","Iones de sodio","Glóbulos rojos","Hormonas tiroideas","ATP directo"],correcta:0,solucion:"Acetilcolina, dopamina, serotonina, etc."},
+{enunciado:"El sistema nervioso central está formado por:",opciones:["Encéfalo y médula espinal","Nervios periféricos","Solo cerebro","Músculos","Glándulas"],correcta:0,solucion:"SNC: centro de procesamiento e integración."},
+{enunciado:"El sistema nervioso simpático:",opciones:["Prepara al cuerpo para lucha o huida","Relaja el cuerpo","Controla digestión","Reduce ritmo cardíaco","Actúa durante el sueño"],correcta:0,solucion:"Aumenta FC, dilata pupilas, inhibe digestión (adrenalina)."},
+{enunciado:"El sistema nervioso parasimpático:",opciones:["Promueve funciones de reposo y digestión","Acelera corazón","Dilata pupilas","Prepara para emergencias","Inhibe salivación"],correcta:0,solucion:"Disminuye FC, estimula digestión (acetilcolina)."},
+{enunciado:"La hormona insulina es producida por:",opciones:["Células beta de islotes pancreáticos","Hígado","Riñones","Tiroides","Suprarrenales"],correcta:0,solucion:"Insulina: disminuye glucemia facilitando entrada de glucosa."},
+{enunciado:"El glucagón:",opciones:["Aumenta glucemia estimulando glucogenólisis","Disminuye glucemia","Produce insulina","Se secreta en riñón","Es enzima digestiva"],correcta:0,solucion:"Células alfa pancreáticas: secretan cuando glucemia baja."},
+{enunciado:"La diabetes mellitus tipo 1 se caracteriza por:",opciones:["Destrucción autoinmune de células beta","Resistencia a insulina","Exceso de insulina","Falta de glucagón","Hiperfunción tiroidea"],correcta:0,solucion:"Insulinodependiente. Requiere insulina exógena."},
+{enunciado:"La diabetes mellitus tipo 2 se asocia con:",opciones:["Resistencia a la insulina y obesidad","Destrucción autoinmune","Falta absoluta de insulina","Infección viral","Deficiencia de yodo"],correcta:0,solucion:"Células no responden a insulina. Sedentarismo y dieta."},
+{enunciado:"Las hormonas tiroideas T3 y T4 regulan:",opciones:["Metabolismo basal y desarrollo del sistema nervioso","Niveles de calcio","Ciclo menstrual","Presión arterial","Coagulación"],correcta:0,solucion:"Aumentan consumo de O₂ y producción de calor."},
+{enunciado:"La adrenalina es secretada por:",opciones:["Médula de glándulas suprarrenales","Corteza suprarrenal","Páncreas","Tiroides","Hipotálamo"],correcta:0,solucion:"Respuesta lucha/huida: aumenta FC, glucosa, flujo muscular."},
+{enunciado:"El cortisol es una hormona:",opciones:["Glucocorticoide que responde al estrés crónico","Tiroidea","Pancreática","Sexual","Hipofisiaria"],correcta:0,solucion:"Corteza suprarrenal: eleva glucemia, suprime sistema inmune."},
+{enunciado:"La hormona antidiurética (ADH):",opciones:["Reduce pérdida de agua en riñones","Aumenta diuresis","Estimula parto","Produce leche","Regula calcio"],correcta:0,solucion:"Hipotálamo/hipófisis posterior. Déficit: diabetes insípida."},
+{enunciado:"La oxitocina estimula:",opciones:["Contracciones uterinas y eyección de leche","Crecimiento óseo","Metabolismo basal","Producción de insulina","Filtración glomerular"],correcta:0,solucion:"Producida en hipotálamo, liberada por neurohipófisis."},
+{enunciado:"El intercambio gaseoso ocurre en:",opciones:["Alvéolos pulmonares","Bronquios","Tráquea","Laringe","Faringe"],correcta:0,solucion:"Alvéolos: sacos rodeados de capilares para difusión O₂/CO₂."},
+{enunciado:"La hemoglobina transporta:",opciones:["Oxígeno en glóbulos rojos","Solo dióxido de carbono","Glucosa","Hormonas","Anticuerpos"],correcta:0,solucion:"Cada hemoglobina une hasta 4 O₂. También transporta CO₂."},
+{enunciado:"El centro respiratorio se encuentra en:",opciones:["Bulbo raquídeo (tronco encefálico)","Cerebelo","Corteza cerebral","Médula espinal","Hipotálamo"],correcta:0,solucion:"Controla ritmo respiratorio según CO₂ y pH."},
+{enunciado:"Las arterias se caracterizan por:",opciones:["Llevar sangre del corazón con paredes gruesas","Llevar sangre al corazón","Tener válvulas","Paredes delgadas","Intercambio gaseoso"],correcta:0,solucion:"Alta presión, paredes musculares elásticas."},
+{enunciado:"Las venas:",opciones:["Retornan sangre al corazón, tienen válvulas","Llevan sangre del corazón","Sin válvulas","Alta presión","Intercambio gaseoso"],correcta:0,solucion:"Baja presión, válvulas impiden reflujo."},
+{enunciado:"Los capilares sanguíneos:",opciones:["Realizan intercambio de gases, nutrientes y desechos","Transportan a alta presión","Paredes gruesas","Tienen válvulas","Bombean sangre"],correcta:0,solucion:"Pared de una célula (endotelio). Difusión eficiente."},
+{enunciado:"La circulación mayor (sistémica):",opciones:["Ventrículo izquierdo → cuerpo → aurícula derecha","Ventrículo derecho → pulmones","Solo en cerebro","Solo en hígado","No involucra corazón"],correcta:0,solucion:"Lleva sangre oxigenada a tejidos."},
+{enunciado:"La circulación menor (pulmonar):",opciones:["Ventrículo derecho → pulmones → aurícula izquierda","Irriga todo el cuerpo","Parte del sistema linfático","No pasa por corazón","Solo ventrículo izquierdo"],correcta:0,solucion:"Oxigena sangre en pulmones."},
+{enunciado:"La principal función del sistema linfático:",opciones:["Recolectar líquido intersticial y defensa inmunológica","Bombear sangre","Transportar oxígeno","Producir glóbulos rojos","Sintetizar hormonas"],correcta:0,solucion:"Drena linfa, transporta linfocitos, filtra patógenos."},
+{enunciado:"Los riñones filtran sangre en:",opciones:["Nefronas (glomérulo + túbulos)","Alvéolos","Vellosidades intestinales","Hepatocitos","Sinapsis"],correcta:0,solucion:"~1 millón de nefronas por riñón."},
+{enunciado:"La hormona eritropoyetina (EPO):",opciones:["Estimula producción de glóbulos rojos ante hipoxia","Regula calcio","Controla glucemia","Induce digestión","Aumenta FC"],correcta:0,solucion:"Producida por riñones ante falta de O₂."},
+{enunciado:"El hígado participa en:",opciones:["Desintoxicación, síntesis de proteínas, almacenamiento de glucógeno","Filtración de orina","Intercambio gaseoso","Producción de insulina","Contracción muscular"],correcta:0,solucion:"Hepatocitos: metabolizan toxinas, producen albúmina."},
+{enunciado:"La digestión de proteínas comienza en:",opciones:["Estómago (pepsina)","Boca (amilasa)","Intestino delgado","Esófago","Hígado"],correcta:0,solucion:"Pepsina activada por HCl hidroliza proteínas."},
+{enunciado:"La bilis es producida por:",opciones:["Hígado, almacenada en vesícula biliar","Páncreas","Estómago","Intestino delgado","Riñones"],correcta:0,solucion:"Bilis emulsiona grasas en duodeno."},
+{enunciado:"La absorción de nutrientes ocurre en:",opciones:["Intestino delgado (vellosidades)","Estómago","Intestino grueso","Esófago","Boca"],correcta:0,solucion:"Yeyuno e íleon con enorme superficie de absorción."},
+{enunciado:"La flora intestinal (microbiota):",opciones:["Ayuda en digestión, sintetiza vitaminas, protege","Causa solo enfermedades","No tiene función","Solo consume nutrientes","Es siempre dañina"],correcta:0,solucion:"Bacterias comensales: vitamina K, B12, compiten con patógenos."},
+{enunciado:"La homeostasis es:",opciones:["Mantenimiento de condiciones internas estables","Crecimiento descontrolado","Muerte celular","Reproducción asexual","Mutación genética"],correcta:0,solucion:"Termorregulación, pH, glucemia (retroalimentación negativa)."},
+{enunciado:"La termorregulación es controlada por:",opciones:["Hipotálamo","Cerebelo","Médula espinal","Páncreas","Tiroides"],correcta:0,solucion:"Actúa como termostato: sudoración o escalofríos."},
+{enunciado:"Los osteocitos son:",opciones:["Células óseas maduras en matriz ósea","Formadoras de hueso","Destructoras de hueso","Células de cartílago","Células madre"],correcta:0,solucion:"Osteoblastos forman, osteoclastos reabsorben."},
+{enunciado:"La mielina en neuronas:",opciones:["Aísla axones y acelera conducción del impulso","Frena impulsos","Produce neurotransmisores","Destruye patógenos","Almacena energía"],correcta:0,solucion:"Células de Schwann (SNP), oligodendrocitos (SNC). Conducción saltatoria."},
+{enunciado:"El potencial de reposo neuronal es:",opciones:["-70 mV (interior negativo)","+30 mV","0 mV","-100 mV","+70 mV"],correcta:0,solucion:"Bomba Na⁺/K⁺: más K⁺ dentro, más Na⁺ fuera."},
+{enunciado:"La sinapsis neuromuscular usa:",opciones:["Acetilcolina","Dopamina","Serotonina","GABA","Noradrenalina"],correcta:0,solucion:"Placa motora: acetilcolina → receptores nicotínicos."},
+{enunciado:"¿Qué estructura del ojo regula la luz?",opciones:["Pupila (iris)","Retina","Cristalino","Córnea","Nervio óptico"],correcta:0,solucion:"Iris dilata o contrae pupila según intensidad lumínica."},
+{enunciado:"Los conos y bastones se ubican en:",opciones:["Retina","Córnea","Cristalino","Humor vítreo","Esclerótica"],correcta:0,solucion:"Conos (color, luz intensa), bastones (nocturna)."},
+{enunciado:"El órgano de Corti se encuentra en:",opciones:["Cóclea (oído interno)","Oído medio","Tímpano","Conducto auditivo","Trompa de Eustaquio"],correcta:0,solucion:"Células ciliadas convierten vibraciones en impulsos nerviosos."},
+{enunciado:"La hormona del crecimiento (GH):",opciones:["Adenohipófisis, estimula crecimiento óseo","Neurohipófisis","Tiroides","Páncreas","Glándula pineal"],correcta:0,solucion:"Exceso: gigantismo. Déficit: enanismo."},
+{enunciado:"La tiroxina (T4) contiene:",opciones:["Yodo","Calcio","Hierro","Sodio","Potasio"],correcta:0,solucion:"Deficiencia de yodo causa bocio."},
+{enunciado:"Las glándulas paratiroides regulan:",opciones:["Calcio en sangre (PTH)","Glucosa","Sodio","Agua corporal","Eritropoyesis"],correcta:0,solucion:"PTH eleva calcio: resorción ósea, absorción intestinal."},
+{enunciado:"La calcitonina:",opciones:["Disminuye calcio en sangre (inhibe osteoclastos)","Aumenta calcio","Estimula crecimiento","Regula sodio","Produce insulina"],correcta:0,solucion:"Tiroides (células parafoliculares). Efecto opuesto a PTH."},
+{enunciado:"El páncreas exocrino secreta:",opciones:["Enzimas digestivas al duodeno","Insulina","Glucagón","Somatostatina","Gastrina"],correcta:0,solucion:"Amilasa, lipasa, tripsina. Jugo pancreático alcalino."},
+{enunciado:"La gastrina:",opciones:["Estimula secreción de HCl en estómago","Inhibe digestión","Reduce apetito","Aumenta diuresis","Contrae bronquios"],correcta:0,solucion:"Células G del estómago."},
+{enunciado:"¿Qué vitamina se absorbe con factor intrínseco?",opciones:["Vitamina B12","Vitamina C","Vitamina A","Vitamina D","Vitamina K"],correcta:0,solucion:"Factor intrínseco gástrico. Su falta: anemia perniciosa."},
+{enunciado:"La vitamina K es esencial para:",opciones:["Coagulación sanguínea","Visión nocturna","Absorción de calcio","Síntesis de colágeno","Metabolismo energético"],correcta:0,solucion:"Cofactor para síntesis de protrombina."},
+{enunciado:"¿Qué vitaminas son liposolubles?",opciones:["A, D, E, K","Complejo B","Vitamina C","Solo B12","Ácido fólico"],correcta:0,solucion:"Liposolubles se almacenan en tejido adiposo."},
+{enunciado:"El escorbuto es por deficiencia de:",opciones:["Vitamina C","Vitamina A","Vitamina D","Vitamina B1","Hierro"],correcta:0,solucion:"Falta de vitamina C altera síntesis de colágeno."},
+{enunciado:"El raquitismo infantil es por falta de:",opciones:["Vitamina D","Vitamina A","Vitamina E","Vitamina K","Vitamina B12"],correcta:0,solucion:"Déficit de vitamina D altera mineralización ósea."},
+{enunciado:"¿Dónde ocurre la fecundación humana?",opciones:["Tercio externo de la trompa de Falopio","Útero","Ovario","Vagina","Cérvix"],correcta:0,solucion:"Ampolla tubárica: encuentro ovocito-espermatozoide."},
+{enunciado:"La implantación del embrión ocurre en:",opciones:["Endometrio del útero","Trompa de Falopio","Ovario","Cérvix","Vagina"],correcta:0,solucion:"Blastocisto se implanta ~6-7 días post-fecundación."},
+{enunciado:"La placenta produce:",opciones:["hCG, progesterona y estrógenos","Insulina","Adrenalina","Tiroxina","Glucagón"],correcta:0,solucion:"hCG mantiene cuerpo lúteo primer trimestre."},
+{enunciado:"¿Qué hormona detecta el test de embarazo?",opciones:["hCG (gonadotropina coriónica humana)","Progesterona","Estrógeno","LH","FSH"],correcta:0,solucion:"hCG aparece en sangre/orina tras implantación."},
+{enunciado:"La ovulación es desencadenada por:",opciones:["Pico de LH","Aumento de FSH","Disminución de estrógenos","Inhibina","Progesterona"],correcta:0,solucion:"LH alcanza pico ~día 14 del ciclo."},
+{enunciado:"El cuerpo lúteo secreta:",opciones:["Progesterona","Estrógeno exclusivamente","Testosterona","Insulina","LH"],correcta:0,solucion:"Prepara endometrio. Sin embarazo, degenera."},
+{enunciado:"La espermatogénesis ocurre en:",opciones:["Túbulos seminíferos de testículos","Epidídimo","Próstata","Vesículas seminales","Uretra"],correcta:0,solucion:"Espermatogonias → espermatozoides."},
+{enunciado:"La testosterona es producida por:",opciones:["Células de Leydig en testículos","Células de Sertoli","Hipófisis","Próstata","Vesículas seminales"],correcta:0,solucion:"LH estimula células de Leydig."},
+{enunciado:"La ovogénesis produce:",opciones:["Un ovocito funcional y cuerpos polares","Cuatro ovocitos","Dos óvulos","Espermatozoides","Células somáticas"],correcta:0,solucion:"Citocinesis asimétrica. Cuerpos polares degeneran."},
+{enunciado:"¿Qué cromosoma determina el sexo masculino?",opciones:["Cromosoma Y (gen SRY)","Cromosoma X","Autosoma 21","ADN mitocondrial","Cromosoma 22"],correcta:0,solucion:"Gen SRY desencadena diferenciación testicular."},
+// ===== UNIDAD 6: SISTEMA INMUNE Y SALUD (261-325) =====
+{enunciado:"La inmunidad innata se caracteriza por:",opciones:["Ser inespecífica y de respuesta rápida","Generar memoria inmunológica","Producir anticuerpos específicos","Ser lenta en primera exposición","Depender solo de linfocitos B"],correcta:0,solucion:"Barreras físicas, macrófagos, inflamación. No genera memoria."},
+{enunciado:"La inmunidad adaptativa:",opciones:["Es específica, genera memoria, participan linfocitos B y T","Es inmediata","No reconoce antígenos","Es igual en todos","Solo actúa en piel"],correcta:0,solucion:"Reconoce antígenos específicos. Memoria inmunológica."},
+{enunciado:"Los anticuerpos son producidos por:",opciones:["Linfocitos B (células plasmáticas)","Linfocitos T","Macrófagos","Neutrófilos","Plaquetas"],correcta:0,solucion:"Linfocitos B activados → células plasmáticas secretoras."},
+{enunciado:"La vacunación se basa en:",opciones:["Estimular sistema inmune con antígenos para generar memoria","Administrar antibióticos","Inyectar vitaminas","Transfundir sangre","Suministrar hormonas"],correcta:0,solucion:"Exposición controlada a patógeno atenuado o inactivado."},
+{enunciado:"Los antibióticos son efectivos contra:",opciones:["Bacterias (no virus)","Virus","Hongos exclusivamente","Parásitos exclusivamente","Células humanas"],correcta:0,solucion:"Atacan estructuras bacterianas sin afectar células humanas."},
+{enunciado:"La resistencia bacteriana se produce por:",opciones:["Selección natural de bacterias con mutaciones de resistencia","Uso adecuado de antibióticos","Vacunación masiva","Desinfección excesiva","Falta de higiene exclusivamente"],correcta:0,solucion:"Uso excesivo e inadecuado selecciona cepas resistentes."},
+{enunciado:"El VIH ataca principalmente:",opciones:["Linfocitos T CD4+","Glóbulos rojos","Neuronas","Células hepáticas","Plaquetas"],correcta:0,solucion:"Destruye linfocitos T helper. Progresa a SIDA."},
+{enunciado:"Una enfermedad autoinmune:",opciones:["Sistema inmune ataca tejidos propios","Falta de respuesta inmune","Infección viral aguda","Alergia al polen","Deficiencia de vitamina D"],correcta:0,solucion:"Lupus, artritis reumatoide, esclerosis múltiple."},
+{enunciado:"Las alergias son:",opciones:["Respuesta inmune exagerada a sustancias inofensivas","Infecciones bacterianas","Deficiencias vitamínicas","Enfermedades neurodegenerativas","Trastornos genéticos exclusivos"],correcta:0,solucion:"Hipersensibilidad tipo I: IgE, mastocitos, histamina."},
+{enunciado:"Los macrófagos:",opciones:["Fagocitan patógenos y presentan antígenos","Producen anticuerpos","Transportan oxígeno","Contraen músculos","Sintetizan colágeno"],correcta:0,solucion:"Derivan de monocitos. Células presentadoras de antígeno."},
+{enunciado:"La inflamación se caracteriza por:",opciones:["Rubor, calor, tumor (hinchazón) y dolor","Solo dolor","Falta de riego","Disminución de temperatura","Ausencia de células inmunes"],correcta:0,solucion:"Vasodilatación, aumento de permeabilidad, migración leucocitaria."},
+{enunciado:"La memoria inmunológica permite:",opciones:["Respuesta más rápida e intensa ante segunda exposición","No responder a infecciones","Olvidar patógenos","Rechazar vacunas","Disminuir defensas"],correcta:0,solucion:"Linfocitos de memoria perduran años."},
+{enunciado:"La técnica de PCR se usa para:",opciones:["Amplificar segmentos específicos de ADN","Sintetizar proteínas","Cortar ADN","Secuenciar ARN directamente","Crear células madre"],correcta:0,solucion:"Reacción en Cadena de la Polimerasa. Diagnóstico molecular."},
+{enunciado:"La tecnología CRISPR-Cas9 permite:",opciones:["Editar genes de forma específica","Clonar organismos completos","Sintetizar proteínas artificiales","Crear vida de novo","Fusionar especies"],correcta:0,solucion:"Nucleasa Cas9 guiada por ARN corta ADN en sitio diana."},
+{enunciado:"Las células madre embrionarias son:",opciones:["Pluripotentes","Multipotentes","Unipotentes","Diferenciadas terminalmente","Solo hematopoyéticas"],correcta:0,solucion:"Masa interna del blastocisto. Generan todos los tejidos."},
+{enunciado:"La clonación reproductiva (oveja Dolly):",opciones:["Transferencia nuclear de célula somática a óvulo enucleado","Fecundación in vitro","Edición genética CRISPR","Cultivo de células madre","Hibridación de especies"],correcta:0,solucion:"Núcleo adulto → óvulo sin núcleo → embrión genéticamente idéntico."},
+{enunciado:"El sistema de grupos sanguíneos ABO:",opciones:["Antígenos A/B en glóbulos rojos y anticuerpos en plasma","Solo factor Rh","Hemoglobina","Tamaño de glóbulos rojos","Forma del núcleo"],correcta:0,solucion:"Tipo A: antígeno A, anticuerpos anti-B, etc."},
+{enunciado:"El factor Rh:",opciones:["Antígeno D en glóbulos rojos; Rh+ si está presente","Una hormona","Una vitamina","Un antibiótico","Una enzima digestiva"],correcta:0,solucion:"Importante en embarazo (eritroblastosis fetal)."},
+{enunciado:"Las nefronas:",opciones:["Filtran sangre en riñones (glomérulo + túbulos)","Intercambian gases","Absorben nutrientes","Producen bilis","Transportan oxígeno"],correcta:0,solucion:"~1 millón por riñón. Filtran, reabsorben, secretan."},
+{enunciado:"La eritropoyetina (EPO):",opciones:["Estimula producción de glóbulos rojos ante hipoxia","Regula calcio","Controla glucemia","Induce digestión","Aumenta frecuencia cardíaca"],correcta:0,solucion:"Producida por riñones. Aumenta eritropoyesis."},
+{enunciado:"El hígado:",opciones:["Desintoxica, sintetiza proteínas, almacena glucógeno","Filtra orina","Intercambia gases","Produce insulina","Contrae músculos"],correcta:0,solucion:"Hepatocitos metabolizan toxinas, producen albúmina y factores."},
+{enunciado:"La pepsina:",opciones:["Digiere proteínas en estómago","Digiere carbohidratos en boca","Emulsiona grasas","Absorbe nutrientes","Produce bilis"],correcta:0,solucion:"Secretada como pepsinógeno, activada por HCl."},
+{enunciado:"La bilis:",opciones:["Emulsiona grasas en duodeno","Digiere proteínas","Absorbe agua","Produce insulina","Filtra sangre"],correcta:0,solucion:"Producida por hígado, almacenada en vesícula biliar."},
+{enunciado:"La absorción intestinal ocurre en:",opciones:["Yeyuno e íleon (vellosidades)","Estómago","Intestino grueso","Esófago","Boca"],correcta:0,solucion:"Enorme superficie por pliegues, vellosidades y microvellosidades."},
+{enunciado:"La microbiota intestinal:",opciones:["Sintetiza vitaminas K y B12, protege contra patógenos","Causa exclusivamente enfermedades","No tiene función","Solo consume nutrientes","Es siempre dañina"],correcta:0,solucion:"Bacterias comensales beneficiosas."},
+{enunciado:"El sistema renina-angiotensina-aldosterona:",opciones:["Regula presión arterial y equilibrio hídrico","Digiere proteínas","Transporta oxígeno","Produce insulina","Controla visión"],correcta:0,solucion:"Renina (riñón) → angiotensina → aldosterona (suprarrenal)."},
+{enunciado:"La acetilcolina es neurotransmisor de:",opciones:["Sistema parasimpático y placa motora","Sistema simpático","Solo cerebro","Solo médula espinal","Solo músculo cardíaco"],correcta:0,solucion:"Parasimpático y unión neuromuscular."},
+{enunciado:"La noradrenalina es neurotransmisor de:",opciones:["Sistema simpático","Parasimpático","Placa motora","Solo cerebro","Solo intestino"],correcta:0,solucion:"Simpático: lucha o huida."},
+{enunciado:"La dopamina:",opciones:["Neurotransmisor del sistema de recompensa","Solo del sueño","Solo digestivo","Solo respiratorio","Solo cardíaco"],correcta:0,solucion:"Placer, motivación, control motor. Parkinson: déficit."},
+{enunciado:"La serotonina:",opciones:["Regula estado de ánimo, sueño y apetito","Solo contracción muscular","Solo visión","Solo audición","Solo digestión"],correcta:0,solucion:"Mayoría en tracto gastrointestinal. Depresión asociada a déficit."},
+{enunciado:"El GABA:",opciones:["Principal neurotransmisor inhibitorio","Excitatorio","Solo en médula","Solo en corazón","No es neurotransmisor"],correcta:0,solucion:"Ácido gamma-aminobutírico. Reduce excitabilidad neuronal."},
+{enunciado:"El glutamato:",opciones:["Principal neurotransmisor excitatorio","Inhibitorio","Solo en hígado","Solo en riñón","No es neurotransmisor"],correcta:0,solucion:"Aprendizaje, memoria. Exceso: neurotoxicidad."},
+{enunciado:"La barrera hematoencefálica:",opciones:["Protege cerebro de toxinas y patógenos","No existe","Solo en médula","Solo en corazón","Es permeable a todo"],correcta:0,solucion:"Células endoteliales unidas estrechamente."},
+{enunciado:"El líquido cefalorraquídeo:",opciones:["Protege y nutre SNC","Solo transporta oxígeno","Solo elimina desechos","Es sangre","No tiene función"],correcta:0,solucion:"Amortigua, transporta nutrientes y desechos."},
+{enunciado:"La mielina es producida por:",opciones:["Oligodendrocitos (SNC) y células de Schwann (SNP)","Neuronas","Astrocitos","Microglía","Ependimocitos"],correcta:0,solucion:"Aísla axones. Esclerosis múltiple: desmielinización."},
+{enunciado:"Los astrocitos:",opciones:["Soporte, nutrición y barrera hematoencefálica","Producen mielina","Son fagocitos","Revestimiento de ventrículos","Son neuronas"],correcta:0,solucion:"Células gliales más abundantes."},
+{enunciado:"La microglía:",opciones:["Células inmunes del SNC","Producen mielina","Sostienen neuronas","Forman barrera","Revestimiento"],correcta:0,solucion:"Fagocitan desechos y patógenos en cerebro."},
+{enunciado:"El reflejo patelar:",opciones:["Arco reflejo monosináptico","Polisináptico","Voluntario","No existe","Cortical"],correcta:0,solucion:"Estímulo → neurona sensorial → motoneurona → contracción."},
+{enunciado:"El sistema límbico:",opciones:["Emociones, memoria, motivación","Solo visión","Solo audición","Solo movimiento","Solo digestión"],correcta:0,solucion:"Amígdala, hipocampo, hipotálamo."},
+{enunciado:"El hipocampo:",opciones:["Consolidación de memoria a largo plazo","Solo emociones","Solo hambre","Solo sed","Solo sueño"],correcta:0,solucion:"Parte del sistema límbico. Afectado en Alzheimer."},
+{enunciado:"La amígdala cerebral:",opciones:["Procesa miedo y emociones","Solo memoria","Solo lenguaje","Solo visión","Solo audición"],correcta:0,solucion:"Respuesta emocional, especialmente miedo."},
+{enunciado:"El área de Broca:",opciones:["Producción del lenguaje","Comprensión del lenguaje","Visión","Audición","Memoria"],correcta:0,solucion:"Lóbulo frontal izquierdo. Afasia de Broca: no puede hablar."},
+{enunciado:"El área de Wernicke:",opciones:["Comprensión del lenguaje","Producción del lenguaje","Visión","Audición","Memoria"],correcta:0,solucion:"Lóbulo temporal izquierdo. Afasia: no comprende."},
+{enunciado:"La corteza visual primaria está en:",opciones:["Lóbulo occipital","Lóbulo frontal","Lóbulo temporal","Lóbulo parietal","Cerebelo"],correcta:0,solucion:"Procesa información visual."},
+{enunciado:"La corteza auditiva primaria está en:",opciones:["Lóbulo temporal","Lóbulo occipital","Lóbulo frontal","Lóbulo parietal","Cerebelo"],correcta:0,solucion:"Procesa información sonora."},
+{enunciado:"El cerebelo:",opciones:["Coordina movimiento, equilibrio y postura","Solo pensamiento","Solo emociones","Solo memoria","Solo lenguaje"],correcta:0,solucion:"Recibe información sensorial y motora."},
+{enunciado:"El tronco encefálico:",opciones:["Controla funciones vitales (respiración, FC)","Solo pensamiento","Solo memoria","Solo lenguaje","Solo visión"],correcta:0,solucion:"Bulbo raquídeo, protuberancia, mesencéfalo."},
+{enunciado:"La médula espinal:",opciones:["Conduce impulsos y genera reflejos","Solo piensa","Solo memoriza","Solo ve","Solo oye"],correcta:0,solucion:"Vía de comunicación cerebro-cuerpo."},
+{enunciado:"El sistema endocrino:",opciones:["Glándulas que secretan hormonas a la sangre","Solo nervios","Solo músculos","Solo huesos","Solo piel"],correcta:0,solucion:"Hormonas: mensajeros químicos de acción lenta y duradera."},
+{enunciado:"La hipófisis:",opciones:["Glándula maestra controlada por hipotálamo","Solo tiroides","Solo páncreas","Solo suprarrenal","Solo gónadas"],correcta:0,solucion:"Adenohipófisis y neurohipófisis."},
+{enunciado:"La hormona luteinizante (LH):",opciones:["Estimula ovulación y testosterona","Solo crecimiento","Solo metabolismo","Solo calcio","Solo digestión"],correcta:0,solucion:"Gonadotropina. Pico LH desencadena ovulación."},
+{enunciado:"La hormona foliculoestimulante (FSH):",opciones:["Estimula desarrollo folicular y espermatogénesis","Solo ovulación","Solo testosterona","Solo progesterona","Solo estrógeno"],correcta:0,solucion:"Gonadotropina. Actúa sobre células de Sertoli."},
+{enunciado:"La prolactina:",opciones:["Estimula producción de leche materna","Solo crecimiento","Solo metabolismo","Solo tiroides","Solo calcio"],correcta:0,solucion:"Adenohipófisis. Suprime ovulación durante lactancia."},
+{enunciado:"La melatonina:",opciones:["Regula ciclo sueño-vigilia (glándula pineal)","Solo digestión","Solo crecimiento","Solo calcio","Solo insulina"],correcta:0,solucion:"Pineal. Secreción nocturna. Luz inhibe su producción."},
+// ===== UNIDAD 7: BIOTECNOLOGÍA Y APLICACIONES (326-360) =====
+{enunciado:"La clonación génica:",opciones:["Producción de múltiples copias de un gen","Crear organismos idénticos","Editar genes","Secuenciar ADN","Sintetizar proteínas"],correcta:0,solucion:"Inserción de gen en vector (plásmido) para replicación."},
+{enunciado:"Los plásmidos son:",opciones:["ADN circular extracromosómico bacteriano","Proteínas","Lípidos","Carbohidratos","Orgánulos"],correcta:0,solucion:"Vectores de clonación. Replicación independiente."},
+{enunciado:"Las enzimas de restricción:",opciones:["Cortan ADN en secuencias específicas","Sintetizan ADN","Unen ADN","Replican ADN","Traducen proteínas"],correcta:0,solucion:"Endonucleasas que reconocen palíndromos."},
+{enunciado:"La electroforesis en gel:",opciones:["Separa fragmentos de ADN por tamaño","Amplifica ADN","Secuencia ADN","Sintetiza proteínas","Corta ADN"],correcta:0,solucion:"ADN migra hacia polo positivo. Fragmentos pequeños más rápido."},
+{enunciado:"La secuenciación del ADN:",opciones:["Determina orden de nucleótidos","Amplifica ADN","Corta ADN","Separa proteínas","Clona genes"],correcta:0,solucion:"Método de Sanger o secuenciación masiva (NGS)."},
+{enunciado:"Los organismos transgénicos:",opciones:["Contienen genes de otra especie","Solo genes propios","No tienen ADN","Son clones","Son híbridos naturales"],correcta:0,solucion:"ADN recombinante insertado en genoma."},
+{enunciado:"La insulina recombinante:",opciones:["Producida por bacterias con gen humano","Extraída de cerdos","Sintética química","De plantas","No existe"],correcta:0,solucion:"Primer fármaco biotecnológico aprobado (1982)."},
+{enunciado:"La terapia génica:",opciones:["Introduce genes funcionales para tratar enfermedades","Usa antibióticos","Aplica quimioterapia","Usa radioterapia","Solo preventiva"],correcta:0,solucion:"Vectores virales o no virales entregan gen terapéutico."},
+{enunciado:"Los vectores virales en terapia génica:",opciones:["Virus modificados que entregan genes","Antibióticos","Plásmidos solos","Proteínas","Lípidos"],correcta:0,solucion:"Adenovirus, lentivirus, AAV. Sin capacidad patogénica."},
+{enunciado:"La reacción en cadena de la polimerasa (PCR):",opciones:["Amplifica exponencialmente ADN blanco","Corta ADN","Secuencia ADN","Traduce proteínas","Clona organismos"],correcta:0,solucion:"Ciclos de desnaturalización, hibridación y extensión."},
+{enunciado:"Los cebadores (primers) en PCR:",opciones:["Oligonucleótidos que flanquean región a amplificar","Enzimas","Proteínas","Lípidos","ADN completo"],correcta:0,solucion:"Secuencia corta complementaria al ADN molde."},
+{enunciado:"La transcriptasa inversa:",opciones:["Sintetiza ADN a partir de ARN","Sintetiza ARN de ADN","Corta ADN","Une ADN","Replica ADN"],correcta:0,solucion:"Retrovirus. Útil para RT-PCR y crear ADNc."},
+{enunciado:"El ADN complementario (ADNc):",opciones:["ADN sintetizado de ARNm maduro","ADN genómico","ARN","Proteína","Lípido"],correcta:0,solucion:"Sin intrones. Usado en clonación de genes eucariotas."},
+{enunciado:"La huella genética (DNA fingerprinting):",opciones:["Identifica individuos por patrones de ADN","Mide glucosa","Detecta proteínas","Analiza lípidos","Cultiva células"],correcta:0,solucion:"Microsatélites (STR). Forense y paternidad."},
+{enunciado:"Los microsatélites (STR):",opciones:["Repeticiones cortas en tándem, muy variables","Genes únicos","Proteínas repetidas","Lípidos","Carbohidratos"],correcta:0,solucion:"Polimórficos. Base de identificación forense."},
+{enunciado:"El Proyecto Genoma Humano:",opciones:["Secuenció todo el genoma humano (2003)","Clonó humanos","Creó vida artificial","Editó genes","Eliminó enfermedades"],correcta:0,solucion:"3,200 millones de pares de bases. ~20-25 mil genes."},
+{enunciado:"La bioinformática:",opciones:["Análisis computacional de datos biológicos","Solo cultivo celular","Solo microscopía","Solo disección","Solo química"],correcta:0,solucion:"Genómica, proteómica, alineamiento de secuencias."},
+{enunciado:"Los SNPs (polimorfismos de nucleótido simple):",opciones:["Variación de un solo nucleótido en el genoma","Proteínas alteradas","Cromosomas extra","Orgánulos nuevos","Células madre"],correcta:0,solucion:"Marcadores genéticos. Asociados a enfermedades y rasgos."},
+{enunciado:"La farmacogenómica:",opciones:["Estudia cómo genes afectan respuesta a fármacos","Solo dosis","Solo efectos adversos","Solo química","Solo placebos"],correcta:0,solucion:"Medicina personalizada según perfil genético."},
+{enunciado:"Las células madre adultas:",opciones:["Multipotentes (originan tipos celulares de su tejido)","Pluripotentes","Totipotentes","No se diferencian","Solo sanguíneas"],correcta:0,solucion:"Médula ósea: hematopoyéticas. Limitadas en diferenciación."},
+// ===== UNIDAD 8: ECOLOGÍA AVANZADA Y CONSERVACIÓN (361-390) =====
+{enunciado:"Un nicho ecológico es:",opciones:["Función de la especie en el ecosistema","Lugar donde vive","Número de individuos","Tamaño corporal","Tipo de alimentación solamente"],correcta:0,solucion:"Rol funcional: hábitos, alimentación, reproducción, interacciones."},
+{enunciado:"La competencia intraespecífica:",opciones:["Individuos de misma especie compiten por recursos","Distintas especies compiten","No hay competencia","Solo depredación","Solo mutualismo"],correcta:0,solucion:"Densidad-dependiente. Regula tamaño poblacional."},
+{enunciado:"El principio de exclusión competitiva:",opciones:["Dos especies con mismo nicho no coexisten","Siempre coexisten","No se afectan","Una siempre se extingue","No existe"],correcta:0,solucion:"Gause: nichos idénticos → una desplaza a la otra."},
+{enunciado:"Las especies clave:",opciones:["Efecto desproporcionado en ecosistema respecto a su abundancia","Más abundantes","Menos abundantes","Sin efecto","Solo productores"],correcta:0,solucion:"Estrella de mar (Pisaster). Su remoción altera comunidad."},
+{enunciado:"Los ingenieros ecosistémicos:",opciones:["Modifican físicamente el ambiente (castores)","Solo depredan","Solo parasitan","Solo compiten","No afectan"],correcta:0,solucion:"Crean, modifican o destruyen hábitat."},
+{enunciado:"La resiliencia ecosistémica:",opciones:["Capacidad de recuperarse tras perturbación","Solo resistencia","Solo estabilidad","Solo diversidad","Solo productividad"],correcta:0,solucion:"Volver al estado original después de disturbio."},
+{enunciado:"La resistencia ecosistémica:",opciones:["Capacidad de mantenerse estable durante perturbación","Solo recuperación","Solo diversidad","Solo productividad","Solo biomasa"],correcta:0,solucion:"Permanecer sin cambios ante estrés ambiental."},
+{enunciado:"Los puntos de inflexión ecológicos:",opciones:["Umbral donde ecosistema cambia irreversiblemente","Solo máximo","Solo mínimo","Solo promedio","No existen"],correcta:0,solucion:"Tipping points. Cambio de estado repentino."},
+{enunciado:"La fragmentación del hábitat:",opciones:["Divide ecosistemas reduciendo biodiversidad","Aumenta biodiversidad","No afecta","Solo beneficia","Es natural siempre"],correcta:0,solucion:"Carreteras, agricultura. Efecto borde. Aislamiento."},
+{enunciado:"Los corredores biológicos:",opciones:["Conectan fragmentos de hábitat permitiendo flujo génico","Aíslan poblaciones","No tienen función","Solo para turismo","Solo para agua"],correcta:0,solucion:"Mitigan fragmentación. Conservación."},
+{enunciado:"Las áreas protegidas:",opciones:["Conservan biodiversidad in situ","Solo zoológicos","Solo jardines botánicos","Solo bancos de semillas","Solo laboratorios"],correcta:0,solucion:"Parques nacionales, reservas. Protección de ecosistemas."},
+{enunciado:"La conservación ex situ:",opciones:["Zoológicos, bancos de semillas, jardines botánicos","Parques nacionales","Reservas naturales","Bosques","Océanos"],correcta:0,solucion:"Fuera del hábitat natural. Complementa conservación in situ."},
+{enunciado:"Las especies indicadoras:",opciones:["Reflejan salud del ecosistema (anfibios, líquenes)","Más abundantes","Cualquier especie","Solo depredadores","Solo productores"],correcta:0,solucion:"Sensibles a cambios ambientales."},
+{enunciado:"La acidificación oceánica:",opciones:["Disminución de pH por absorción de CO₂","Aumento de pH","No afecta","Solo temperatura","Solo salinidad"],correcta:0,solucion:"CO₂ + H₂O → H₂CO₃. Afecta corales y moluscos."},
+{enunciado:"El blanqueamiento de corales:",opciones:["Expulsión de algas simbióticas por estrés térmico","Coloración natural","Crecimiento","Reproducción","Alimentación"],correcta:0,solucion:"Zooxantelas expulsadas. Coral pierde color y muere."},
+{enunciado:"Las especies invasoras:",opciones:["Fuera de su rango nativo, causan daño ecológico","Siempre beneficiosas","Solo nativas","No afectan","Solo en jardines"],correcta:0,solucion:"Sin depredadores naturales. Desplazan especies locales."},
+{enunciado:"La restauración ecológica:",opciones:["Recuperar ecosistemas degradados","Solo plantar árboles","Solo limpiar agua","Solo proteger animales","No intervenir"],correcta:0,solucion:"Proceso activo de recuperación de estructura y función."},
+{enunciado:"La sobreexplotación:",opciones:["Extracción de recursos sobrepasando tasa de renovación","Uso sostenible","Conservación","Protección","Restauración"],correcta:0,solucion:"Pesca excesiva, deforestación. Agota recursos."},
+{enunciado:"El tráfico de especies:",opciones:["Comercio ilegal de flora y fauna silvestre","Comercio legal","Solo plantas","Solo insectos","No existe"],correcta:0,solucion:"Amenaza la biodiversidad. CITES regula comercio."},
+{enunciado:"El ecoturismo:",opciones:["Turismo responsable que conserva ambiente y beneficia comunidades","Turismo masivo","Solo hoteles","Solo playas","No tiene impacto"],correcta:0,solucion:"Sostenible. Educación ambiental y desarrollo local."},
+// ===== UNIDAD 8: ECOLOGÍA AVANZADA (continuación 391-400) =====
+{enunciado:"El Protocolo de Montreal (1987):",opciones:["Prohibió CFC para proteger capa de ozono","Reguló emisiones de CO₂","Protegió ballenas","Limitó pesca","Controló desechos nucleares"],correcta:0,solucion:"Acuerdo internacional exitoso. Capa de ozono recuperándose."},
+{enunciado:"El Acuerdo de París (2015):",opciones:["Limitar calentamiento global a menos de 2°C","Prohibir CFC","Proteger ozono","Controlar ballenas","Regular pesca"],correcta:0,solucion:"Compromisos nacionales de reducción de emisiones."},
+{enunciado:"La huella de carbono:",opciones:["Total de gases de efecto invernadero emitidos","Solo CO₂","Solo metano","Solo agua","Solo residuos"],correcta:0,solucion:"Medida de impacto individual o industrial sobre clima."},
+{enunciado:"La energía renovable:",opciones:["Solar, eólica, hidroeléctrica, geotérmica, biomasa","Petróleo","Carbón","Gas natural","Nuclear de fisión"],correcta:0,solucion:"Fuentes que se regeneran naturalmente."},
+{enunciado:"La economía circular:",opciones:["Reducir, reutilizar, reciclar recursos","Economía lineal","Solo producción","Solo consumo","Solo desecho"],correcta:0,solucion:"Minimiza residuos. Ciclo cerrado de materiales."},
+{enunciado:"Los microplásticos:",opciones:["Partículas <5mm que contaminan océanos y organismos","Plásticos grandes","Solo en ríos","Solo en tierra","No contaminan"],correcta:0,solucion:"Ingeridos por fauna marina. Entran en cadena trófica."},
+{enunciado:"La desertificación:",opciones:["Degradación de tierras en zonas áridas","Solo desiertos naturales","Solo inundaciones","Solo terremotos","Solo volcanes"],correcta:0,solucion:"Sobrepastoreo, deforestación, cambio climático."},
+{enunciado:"La deforestación:",opciones:["Pérdida de bosques por tala, agricultura, urbanización","Solo incendios naturales","Solo plagas","Solo viento","Solo nieve"],correcta:0,solucion:"Reduce biodiversidad, libera CO₂, afecta ciclo del agua."},
+{enunciado:"El efecto Allee:",opciones:["Crecimiento poblacional reducido a densidades bajas","Sobrepoblación","Crecimiento exponencial","Capacidad de carga","Extinción masiva"],correcta:0,solucion:"Dificultad para encontrar pareja a bajas densidades."},
+{enunciado:"La metapoblación:",opciones:["Conjunto de poblaciones locales conectadas por migración","Población única","Solo en islas","Solo en montañas","No existe"],correcta:0,solucion:"Equilibrio entre extinción local y recolonización."},
+// ===== UNIDAD 9: FISIOLOGÍA VEGETAL (401-440) =====
+{enunciado:"Las plantas son organismos:",opciones:["Autótrofos fotosintéticos","Heterótrofos","Quimiosintéticos","Parásitos obligados","Saprófitos"],correcta:0,solucion:"Producen su alimento mediante fotosíntesis."},
+{enunciado:"La clorofila absorbe principalmente luz:",opciones:["Roja y azul","Verde","Amarilla","Ultravioleta","Infrarroja"],correcta:0,solucion:"Refleja verde (por eso vemos hojas verdes)."},
+{enunciado:"Los estomas:",opciones:["Poros en hojas para intercambio gaseoso","Raíces","Flores","Frutos","Semillas"],correcta:0,solucion:"Células oclusivas regulan apertura. Entra CO₂, sale O₂ y H₂O."},
+{enunciado:"La transpiración vegetal:",opciones:["Pérdida de agua por estomas","Absorción de agua","Producción de oxígeno","Fijación de nitrógeno","Síntesis de glucosa"],correcta:0,solucion:"Crea gradiente que impulsa absorción de agua por raíces."},
+{enunciado:"El xilema transporta:",opciones:["Agua y minerales desde raíz a hojas","Savía elaborada","Hormonas","Solo oxígeno","Solo CO₂"],correcta:0,solucion:"Tejido conductor. Células muertas (traqueidas, vasos)."},
+{enunciado:"El floema transporta:",opciones:["Savía elaborada (azúcares) desde hojas a tejidos","Agua y minerales","Solo hormonas","Solo oxígeno","Solo CO₂"],correcta:0,solucion:"Tejido conductor vivo. Células cribosas."},
+{enunciado:"La raíz primaria:",opciones:["Ancla planta y absorbe agua y nutrientes","Realiza fotosíntesis","Produce flores","Almacena solo azúcares","No tiene función"],correcta:0,solucion:"Con pelos absorbentes que aumentan superficie."},
+{enunciado:"Las micorrizas:",opciones:["Asociación simbiótica hongo-raíz","Parasitismo","Solo en hojas","Solo en flores","No existen"],correcta:0,solucion:"Hongos aumentan absorción de agua y fósforo."},
+{enunciado:"La fijación biológica de nitrógeno:",opciones:["Bacterias en nódulos de leguminosas convierten N₂ en amonio","Fotosíntesis","Respiración","Transpiración","Germinación"],correcta:0,solucion:"Rhizobium. Simbiosis mutualista."},
+{enunciado:"Las hormonas vegetales (fitohormonas):",opciones:["Regulan crecimiento y desarrollo","Solo fotosíntesis","Solo respiración","Solo color","Solo sabor"],correcta:0,solucion:"Auxinas, giberelinas, citoquininas, etileno, ABA."},
+{enunciado:"Las auxinas:",opciones:["Promueven elongación celular y dominancia apical","Inhiben crecimiento","Maduran frutos","Cierran estomas","Germinan semillas"],correcta:0,solucion:"Fototropismo y gravitropismo."},
+{enunciado:"Las giberelinas:",opciones:["Estimulan crecimiento del tallo y germinación","Inhiben crecimiento","Cierran estomas","Maduran frutos","Defensa"],correcta:0,solucion:"Alargamiento de entrenudos. Superan enanismo."},
+{enunciado:"Las citoquininas:",opciones:["Promueven división celular y retrasan senescencia","Inhiben división","Cierran estomas","Maduran frutos","Defensa"],correcta:0,solucion:"En raíces. Transportadas por xilema."},
+{enunciado:"El etileno:",opciones:["Hormona gaseosa que madura frutos y senescencia","Solo crecimiento","Solo división","Solo fotosíntesis","Solo defensa"],correcta:0,solucion:"'Hormona del estrés'. Maduración climatérica."},
+{enunciado:"El ácido abscísico (ABA):",opciones:["Induce dormancia y cierre de estomas en sequía","Promueve crecimiento","Madura frutos","Germina semillas","Alarga tallos"],correcta:0,solucion:"Respuesta a estrés hídrico."},
+{enunciado:"El fototropismo:",opciones:["Crecimiento hacia la luz","Hacia la gravedad","Hacia el agua","Hacia el tacto","Sin dirección"],correcta:0,solucion:"Auxinas se redistribuyen al lado oscuro."},
+{enunciado:"El gravitropismo:",opciones:["Crecimiento en respuesta a gravedad","Hacia la luz","Hacia el agua","Hacia el tacto","Aleatorio"],correcta:0,solucion:"Raíz: positivo (hacia abajo). Tallo: negativo (hacia arriba)."},
+{enunciado:"La polinización:",opciones:["Transferencia de polen de antera a estigma","Fecundación","Germinación","Fotosíntesis","Respiración"],correcta:0,solucion:"Puede ser anemófila (viento), entomófila (insectos), etc."},
+{enunciado:"La doble fecundación en angiospermas:",opciones:["Forma cigoto y endospermo triploide","Solo cigoto","Solo endospermo","No ocurre","Solo en gimnospermas"],correcta:0,solucion:"Un núcleo espermático + oósfera = cigoto. Otro + núcleos polares = endospermo."},
+{enunciado:"El fruto:",opciones:["Ovario maduro que protege semillas","Raíz","Tallo","Hoja","Flor"],correcta:0,solucion:"Desarrollado tras fecundación."},
+{enunciado:"La germinación:",opciones:["Reinicio del crecimiento del embrión en semilla","Fotosíntesis","Respiración","Floración","Fructificación"],correcta:0,solucion:"Requiere agua, oxígeno y temperatura adecuada."},
+{enunciado:"Las plantas C3:",opciones:["Fijan CO₂ directamente en Ciclo de Calvin","Usan vía C4","Son CAM","No hacen fotosíntesis","Solo respiran"],correcta:0,solucion:"Mayoría de plantas. Fotorrespiración en calor."},
+{enunciado:"Las plantas C4:",opciones:["Separan espacialmente fijación de CO₂ y Ciclo de Calvin","Son C3","Son CAM","No hacen fotosíntesis","Solo acuáticas"],correcta:0,solucion:"Maíz, caña de azúcar. Más eficientes en calor."},
+{enunciado:"Las plantas CAM:",opciones:["Abren estomas de noche (cactus, suculentas)","Siempre abiertos","Nunca abren","Solo de día","No tienen estomas"],correcta:0,solucion:"Metabolismo ácido de crasuláceas. Ahorran agua."},
+{enunciado:"Los tropismos:",opciones:["Respuestas de crecimiento direccional","Movimientos rápidos","Solo en animales","No existen","Solo en raíces"],correcta:0,solucion:"Fototropismo, gravitropismo, tigmotropismo."},
+{enunciado:"Las nastias:",opciones:["Movimientos no direccionales (Mimosa púdica)","Crecimiento direccional","Solo en raíces","No existen","Solo fototropismo"],correcta:0,solucion:"Respuesta rápida independiente de dirección del estímulo."},
+{enunciado:"El fotoperíodo:",opciones:["Duración del día que afecta floración","Intensidad lumínica","Color de luz","Temperatura","Humedad"],correcta:0,solucion:"Plantas de día corto, día largo o neutras."},
+{enunciado:"Las plantas de día corto:",opciones:["Florecen cuando noche supera cierto umbral","Día largo","Neutras","No florecen","Siempre florecen"],correcta:0,solucion:"Crisantemos, poinsettias. Fitocromo detecta."},
+{enunciado:"El fitocromo:",opciones:["Fotorreceptor que detecta luz roja y roja lejana","Hormona","Enzima","Nutriente","Pigmento fotosintético"],correcta:0,solucion:"Regula germinación, floración, fotomorfogénesis."},
+{enunciado:"La partenocarpia:",opciones:["Desarrollo de frutos sin fecundación (banano)","Con semillas","Solo en cítricos","No existe","Solo en uvas"],correcta:0,solucion:"Frutos sin semillas. Inducido por auxinas."},
+// ===== UNIDAD 10: GENÉTICA MOLECULAR AVANZADA (441-480) =====
+{enunciado:"Los telómeros:",opciones:["Extremos de cromosomas que se acortan con cada división","Centro del cromosoma","Genes","Proteínas","Orgánulos"],correcta:0,solucion:"Secuencias TTAGGG. Relacionados con envejecimiento."},
+{enunciado:"La telomerasa:",opciones:["Alarga telómeros en células madre y germinales","Acorta telómeros","Corta ADN","Sintetiza proteínas","Degrada ARN"],correcta:0,solucion:"Ribonucleoproteína. Activa en cáncer."},
+{enunciado:"Los operones:",opciones:["Conjuntos de genes regulados coordinadamente en procariotas","Genes eucariotas","Proteínas","Lípidos","Orgánulos"],correcta:0,solucion:"Operón lac: gen regulador, promotor, operador, genes estructurales."},
+{enunciado:"El operón lac:",opciones:["Genes para metabolismo de lactosa en E. coli","Síntesis de triptófano","Reparación de ADN","División celular","Fotosíntesis"],correcta:0,solucion:"Inducible: lactosa induce su expresión."},
+{enunciado:"El operón trp:",opciones:["Genes para síntesis de triptófano","Degradación de lactosa","Fotosíntesis","Respiración","División"],correcta:0,solucion:"Reprimible: triptófano reprime su expresión."},
+{enunciado:"Los factores de transcripción:",opciones:["Proteínas que regulan expresión génica uniéndose a ADN","ARN","Lípidos","Carbohidratos","Enzimas digestivas"],correcta:0,solucion:"Activan o reprimen transcripción de genes específicos."},
+{enunciado:"Los enhancers (potenciadores):",opciones:["Secuencias de ADN que aumentan transcripción a distancia","Inhiben transcripción","Solo en procariotas","No existen","Solo en virus"],correcta:0,solucion:"Pueden estar lejos del gen que regulan."},
+{enunciado:"Los silenciadores:",opciones:["Secuencias que reprimen transcripción génica","Activan transcripción","Solo en procariotas","No existen","Solo en plantas"],correcta:0,solucion:"Proteínas represoras se unen a ellos."},
+{enunciado:"El splicing alternativo:",opciones:["Un mismo gen produce diferentes ARNm y proteínas","Solo un ARNm","No existe","Solo en bacterias","Solo en virus"],correcta:0,solucion:"Exones combinados de distintas formas."},
+{enunciado:"Los intrones:",opciones:["Secuencias no codificantes removidas del ARNm","Exones","Codificantes","Proteínas","Promotores"],correcta:0,solucion:"Eliminados durante maduración del ARNm."},
+{enunciado:"Los exones:",opciones:["Secuencias codificantes que permanecen en ARNm maduro","Intrones","No codificantes","Promotores","Operadores"],correcta:0,solucion:"Forman el ARN mensajero maduro."},
+{enunciado:"El código genético es:",opciones:["Degenerado (varios codones para un aminoácido)","No degenerado","Ambiguo","Único por especie","Solo para humanos"],correcta:0,solucion:"64 codones, 20 aminoácidos. Universal."},
+{enunciado:"Los ribosomas 80S:",opciones:["Eucariotas (subunidades 60S y 40S)","Procariotas","Mitocondriales","Cloroplastos","Virales"],correcta:0,solucion:"Sitio de traducción en células eucariotas."},
+{enunciado:"Los ribosomas 70S:",opciones:["Procariotas, mitocondrias y cloroplastos","Eucariotas","Solo núcleo","Solo virus","No existen"],correcta:0,solucion:"Evidencia de origen endosimbiótico."},
+{enunciado:"La mutación sin sentido:",opciones:["Genera codón de terminación prematuro","Cambia aminoácido","No cambia aminoácido","Duplica gen","Invierte secuencia"],correcta:0,solucion:"STOP prematuro: proteína truncada."},
+{enunciado:"La mutación de cambio de sentido:",opciones:["Cambia un aminoácido por otro","No cambia aminoácido","Genera STOP","Duplica","Invierte"],correcta:0,solucion:"Puede afectar función proteica."},
+{enunciado:"La mutación silenciosa:",opciones:["No cambia aminoácido por degeneración del código","Cambia aminoácido","Genera STOP","Duplica gen","Elimina gen"],correcta:0,solucion:"Mismo aminoácido. Sin efecto fenotípico."},
+{enunciado:"La mutación por corrimiento del marco de lectura:",opciones:["Inserción/deleción que no es múltiplo de 3","Sustitución","Silenciosa","Sin sentido","De cambio de sentido"],correcta:0,solucion:"Altera toda la proteína desde la mutación."},
+{enunciado:"Los agentes mutagénicos:",opciones:["Radiación UV, rayos X, químicos (benzopireno)","Solo agua","Solo oxígeno","Solo CO₂","Solo nutrientes"],correcta:0,solucion:"Aumentan tasa de mutación."},
+{enunciado:"La reparación por escisión de nucleótidos:",opciones:["Repara dímeros de timina inducidos por UV","Solo roturas doble hebra","Solo mismatch","No existe","Solo en ARN"],correcta:0,solucion:"Xeroderma pigmentoso: defecto en esta reparación."},
+// ===== UNIDAD 11: MICROBIOLOGÍA (481-520) =====
+{enunciado:"Las bacterias Gram positivas:",opciones:["Pared gruesa de peptidoglicano, se tiñen violeta","Pared delgada, membrana externa","Sin pared","Con clorofila","Con núcleo"],correcta:0,solucion:"Tinción de Gram: cristal violeta retenido."},
+{enunciado:"Las bacterias Gram negativas:",opciones:["Pared delgada, membrana externa con LPS, se tiñen rosa","Pared gruesa","Sin pared","Con clorofila","Con núcleo"],correcta:0,solucion:"Lipopolisacárido (endotoxina). Resistencia a antibióticos."},
+{enunciado:"Los antibióticos betalactámicos:",opciones:["Inhiben síntesis de pared celular (penicilina)","Inhiben síntesis proteica","Bloquean ADN","Inhiben ARN","Atacan membrana"],correcta:0,solucion:"Penicilina, amoxicilina. Inhiben transpeptidasa."},
+{enunciado:"Los antibióticos aminoglucósidos:",opciones:["Inhiben síntesis proteica uniéndose a ribosoma 70S","Pared celular","Síntesis de ADN","Membrana","ARN polimerasa"],correcta:0,solucion:"Estreptomicina, gentamicina. Bactericidas."},
+{enunciado:"Las tetraciclinas:",opciones:["Inhiben síntesis proteica (ribosoma 70S)","Pared celular","ADN","Membrana","ARN"],correcta:0,solucion:"Bacteriostáticos de amplio espectro."},
+{enunciado:"La conjugación bacteriana:",opciones:["Transferencia de ADN por pili sexual","Transformación","Transducción","Fisión binaria","Esporulación"],correcta:0,solucion:"Plásmido F. Resistencia a antibióticos."},
+{enunciado:"La transformación bacteriana:",opciones:["Captación de ADN libre del ambiente","Pili sexual","Virus","Fisión","Espora"],correcta:0,solucion:"Bacterias competentes captan ADN exógeno."},
+{enunciado:"La transducción bacteriana:",opciones:["Transferencia de ADN por bacteriófagos","Pili","ADN libre","Fisión","Espora"],correcta:0,solucion:"Fagos transportan ADN bacteriano entre células."},
+{enunciado:"Los plásmidos de resistencia:",opciones:["Contienen genes de resistencia a antibióticos","Solo replicación","Solo metabolismo","Solo color","No existen"],correcta:0,solucion:"Transmisibles entre bacterias."},
+{enunciado:"Las endosporas bacterianas:",opciones:["Estructuras de resistencia a calor, radiación, químicos","Reproducción","Nutrición","Movimiento","Comunicación"],correcta:0,solucion:"Clostridium, Bacillus. Sobreviven condiciones extremas."},
+{enunciado:"Los hongos son:",opciones:["Eucariotas heterótrofos con pared de quitina","Procariotas","Autótrofos","Sin pared","Con clorofila"],correcta:0,solucion:"Levaduras (unicelulares) y mohos (filamentosos)."},
+{enunciado:"Las levaduras:",opciones:["Hongos unicelulares (Saccharomyces cerevisiae)","Mohos","Bacterias","Algas","Virus"],correcta:0,solucion:"Fermentación. Modelo eucariota en investigación."},
+{enunciado:"Los antibióticos antifúngicos:",opciones:["Atacan ergosterol de membrana fúngica","Pared bacteriana","Ribosomas 70S","ADN bacteriano","Cápside viral"],correcta:0,solucion:"Anfotericina B, fluconazol."},
+{enunciado:"Los protozoos:",opciones:["Eucariotas unicelulares heterótrofos","Bacterias","Hongos","Algas","Virus"],correcta:0,solucion:"Amebas, paramecios, Plasmodium."},
+{enunciado:"La malaria es causada por:",opciones:["Plasmodium (protozoo transmitido por Anopheles)","Virus","Bacteria","Hongo","Prión"],correcta:0,solucion:"Invade glóbulos rojos. Fiebre, anemia."},
+{enunciado:"Los virus:",opciones:["Parásitos intracelulares obligados (no son células)","Bacterias","Hongos","Protozoos","Algas"],correcta:0,solucion:"Cápside proteica + material genético (ADN o ARN)."},
+{enunciado:"El ciclo lítico viral:",opciones:["Destruye célula huésped liberando nuevos viriones","Integración al genoma","Latencia","No produce viriones","Solo en plantas"],correcta:0,solucion:"Fase productiva con lisis celular."},
+{enunciado:"El ciclo lisogénico viral:",opciones:["Integra genoma viral como profago en bacteria","Siempre lítico","Solo en animales","No existe","Solo en plantas"],correcta:0,solucion:"Puede reactivarse a ciclo lítico."},
+{enunciado:"Los retrovirus:",opciones:["Transcriptasa inversa (ARN → ADN) (VIH)","Solo ADN","Solo ARN sin transcriptasa","Pared celular","Clorofila"],correcta:0,solucion:"Integran ADN proviral al genoma del huésped."},
+{enunciado:"Los priones:",opciones:["Proteínas mal plegadas que inducen mal plegamiento","Virus","Bacterias","Hongos","Protozoos"],correcta:0,solucion:"Encefalopatías espongiformes (Creutzfeldt-Jakob)."},
+// ===== UNIDAD 12: INMUNOLOGÍA AVANZADA (521-550) =====
+{enunciado:"Los linfocitos T citotóxicos (CD8+):",opciones:["Destruyen células infectadas o tumorales","Producen anticuerpos","Fagocitan bacterias","Liberan histamina","Son células presentadoras"],correcta:0,solucion:"Reconocen antígenos en MHC-I. Inducen apoptosis."},
+{enunciado:"Los linfocitos T helper (CD4+):",opciones:["Activan otras células inmunes (B, T citotóxicos)","Destruyen directamente","Fagocitan","Producen anticuerpos","Liberan histamina"],correcta:0,solucion:"Reconocen antígenos en MHC-II. VIH los destruye."},
+{enunciado:"El complejo mayor de histocompatibilidad (MHC):",opciones:["Presenta antígenos a linfocitos T","Produce anticuerpos","Fagocita","Coagula","Transporta oxígeno"],correcta:0,solucion:"MHC-I en todas las células. MHC-II en presentadoras."},
+{enunciado:"Las células presentadoras de antígeno:",opciones:["Células dendríticas, macrófagos, linfocitos B","Solo linfocitos T","Solo neutrófilos","Solo eosinófilos","Solo plaquetas"],correcta:0,solucion:"Capturan, procesan y presentan antígenos vía MHC-II."},
+{enunciado:"Las inmunoglobulinas (anticuerpos):",opciones:["IgG, IgA, IgM, IgE, IgD","Solo IgG","Solo IgM","Solo IgA","Solo IgE"],correcta:0,solucion:"IgG: más abundante. IgM: respuesta primaria. IgA: mucosas. IgE: alergias."},
+{enunciado:"La respuesta inmune primaria:",opciones:["Más lenta y de menor magnitud (IgM)","Más rápida e intensa","No existe","Solo IgG","Solo IgE"],correcta:0,solucion:"Primer contacto con antígeno. Memoria generada."},
+{enunciado:"La respuesta inmune secundaria:",opciones:["Más rápida e intensa (IgG) por células de memoria","Más lenta","No existe","Solo IgM","Solo IgE"],correcta:0,solucion:"Base de vacunación. Linfocitos de memoria."},
+{enunciado:"La selección clonal:",opciones:["Linfocito específico prolifera al encontrar su antígeno","Todos los linfocitos","Solo macrófagos","No existe","Solo en plantas"],correcta:0,solucion:"Teoría de Burnet. Expansión clonal."},
+{enunciado:"La tolerancia inmunológica:",opciones:["No responder a antígenos propios","Responder a todo","Solo a extraños","No existe","Solo en infecciones"],correcta:0,solucion:"Auto-tolerancia. Su falla causa autoinmunidad."},
+{enunciado:"Las enfermedades autoinmunes:",opciones:["Lupus, artritis reumatoide, diabetes tipo 1","Gripe","Resfrío","Cáncer","Fracturas"],correcta:0,solucion:"Sistema inmune ataca tejidos propios."},
+{enunciado:"La inmunodeficiencia:",opciones:["Disminución de la capacidad inmunológica","Aumento de defensas","Normalidad","Solo en ancianos","No existe"],correcta:0,solucion:"Primaria (genética) o secundaria (VIH, desnutrición)."},
+{enunciado:"El SIDA:",opciones:["Etapa avanzada de infección por VIH (CD4 <200/mm³)","Infección inicial","Solo tos","Solo fiebre","No es grave"],correcta:0,solucion:"Infecciones oportunistas por inmunodepresión severa."},
+{enunciado:"Las infecciones oportunistas en SIDA:",opciones:["Pneumocystis, tuberculosis, candidiasis, sarcoma de Kaposi","Solo gripe","Solo resfrío","Solo paperas","No existen"],correcta:0,solucion:"Aprovechan baja de defensas."},
+{enunciado:"Los antihistamínicos:",opciones:["Bloquean receptores de histamina en alergias","Antibióticos","Antivirales","Antifúngicos","Vacunas"],correcta:0,solucion:"Tratamiento sintomático de rinitis, urticaria."},
+{enunciado:"Los corticoides:",opciones:["Antiinflamatorios e inmunosupresores","Antibióticos","Antivirales","Solo analgésicos","Vitaminas"],correcta:0,solucion:"Cortisol sintético. Efectos adversos a largo plazo."},
+{enunciado:"La anafilaxia:",opciones:["Reacción alérgica grave sistémica (shock)","Alergia leve","No existe","Solo local","Solo en piel"],correcta:0,solucion:"Liberación masiva de histamina. Adrenalina como tratamiento."},
+{enunciado:"Las vacunas atenuadas:",opciones:["Virus/bacteria vivos debilitados (sarampión, paperas)","Inactivados","Solo proteínas","ARNm","ADN"],correcta:0,solucion:"Respuesta fuerte y duradera. Contraindicadas en inmunodeprimidos."},
+{enunciado:"Las vacunas inactivadas:",opciones:["Patógeno muerto (hepatitis A, polio Salk)","Vivos","Solo proteínas","ARNm","ADN"],correcta:0,solucion:"Más seguras. Requieren refuerzos."},
+{enunciado:"Las vacunas de subunidades:",opciones:["Fragmentos del patógeno (hepatitis B, VPH)","Virus completo","Bacteria viva","ARNm","ADN"],correcta:0,solucion:"Proteínas recombinantes. Muy seguras."},
+{enunciado:"Las vacunas de ARNm:",opciones:["ARNm que codifica proteína viral (COVID-19)","Virus vivo","Bacteria","ADN","Proteína completa"],correcta:0,solucion:"Pfizer-BioNTech, Moderna. No alteran ADN."},
+{enunciado:"Los adyuvantes en vacunas:",opciones:["Potencian respuesta inmune (sales de aluminio)","Antígenos","Antibióticos","Conservantes","Colorantes"],correcta:0,solucion:"Estimulan inflamación local controlada."},
+{enunciado:"La inmunidad de rebaño:",opciones:["Protección colectiva cuando alto % está inmunizado","Individual","No existe","Solo natural","Solo pasiva"],correcta:0,solucion:"Interrumpe cadena de transmisión."},
+{enunciado:"La inmunidad pasiva:",opciones:["Anticuerpos transferidos (materna, suero)","Activa por vacuna","Infección natural","No existe","Solo celular"],correcta:0,solucion:"Temporal. No genera memoria."},
+{enunciado:"Las citoquinas:",opciones:["Proteínas que comunican células inmunes","Anticuerpos","Hormonas tiroideas","Neurotransmisores","Enzimas digestivas"],correcta:0,solucion:"Interleucinas, interferones. Regulan respuesta."},
+{enunciado:"La tormenta de citoquinas:",opciones:["Respuesta inflamatoria excesiva y dañina","Defensa normal","No existe","Solo en alergias","Solo en bacterias"],correcta:0,solucion:"COVID-19 grave. Daño tisular por inflamación."},
+{enunciado:"Los interferones:",opciones:["Proteínas antivirales producidas por células infectadas","Antibióticos","Vacunas","Hormonas","Enzimas"],correcta:0,solucion:"Interfieren replicación viral. Activan células inmunes."},
+{enunciado:"El sistema del complemento:",opciones:["Proteínas que lisan bacterias y opsonizan","Solo anticuerpos","Solo células T","Solo macrófagos","No existe"],correcta:0,solucion:"Cascada enzimática. Forma complejo de ataque a membrana."},
+{enunciado:"La opsonización:",opciones:["Marcar patógenos para fagocitosis","Destruir directamente","Solo en virus","No existe","Solo en plantas"],correcta:0,solucion:"Anticuerpos o complemento recubren patógeno."},
+// ===== UNIDAD 13: NEUROCIENCIAS Y COMPORTAMIENTO (551-580) =====
+{enunciado:"La plasticidad neuronal:",opciones:["Capacidad de neuronas para modificar conexiones","Rigidez","No existe","Solo en niños","Solo en ancianos"],correcta:0,solucion:"Aprendizaje y memoria. Sinapsis se fortalecen o debilitan."},
+{enunciado:"La potenciación a largo plazo (LTP):",opciones:["Fortalecimiento duradero de sinapsis por estimulación repetida","Debilitamiento","No existe","Solo en médula","Solo en músculo"],correcta:0,solucion:"Base celular del aprendizaje. Hipocampo."},
+{enunciado:"La depresión a largo plazo (LTD):",opciones:["Debilitamiento duradero de sinapsis","Fortalecimiento","No existe","Solo en cerebro","Solo en cerebelo"],correcta:0,solucion:"Equilibra LTP. Importante en memoria."},
+{enunciado:"Los receptores NMDA:",opciones:["Receptores de glutamato clave en plasticidad","Dopamina","Serotonina","GABA","Acetilcolina"],correcta:0,solucion:"Detectan coincidencia pre y postsináptica."},
+{enunciado:"El sueño REM:",opciones:["Movimientos oculares rápidos, sueños vívidos","Sueño profundo","Sin sueños","Vigilia","Coma"],correcta:0,solucion:"Consolidación de memoria. Atonía muscular."},
+{enunciado:"El sueño no REM (profundo):",opciones:["Ondas lentas, reparación física","Sueños vívidos","Vigilia","Movimientos oculares","Parálisis"],correcta:0,solucion:"Etapa 3. Secreción de hormona de crecimiento."},
+{enunciado:"El ritmo circadiano:",opciones:["Ciclo biológico de ~24 horas (sueño-vigilia)","Solo diario","Solo mensual","Solo anual","No existe"],correcta:0,solucion:"Núcleo supraquiasmático. Melatonina."},
+{enunciado:"La adicción:",opciones:["Dependencia a sustancias o conductas por alteración de recompensa","Solo física","Solo psicológica","No existe","Solo a drogas"],correcta:0,solucion:"Dopamina en núcleo accumbens. Tolerancia y abstinencia."},
+{enunciado:"La neurodegeneración:",opciones:["Pérdida progresiva de neuronas (Alzheimer, Parkinson)","Crecimiento neuronal","No existe","Solo en jóvenes","Solo en médula"],correcta:0,solucion:"Alzheimer: placas β-amiloide y ovillos tau."},
+{enunciado:"La enfermedad de Alzheimer:",opciones:["Demencia por acumulación de β-amiloide y tau hiperfosforilada","Solo olvido normal","Infección","Trauma","Genética simple"],correcta:0,solucion:"Atrofia cerebral. Pérdida de memoria reciente."},
+{enunciado:"La enfermedad de Parkinson:",opciones:["Degeneración de neuronas dopaminérgicas en sustancia nigra","Solo temblor","Infecciosa","Curable","No existe"],correcta:0,solucion:"Temblor, rigidez, bradicinesia. Tratamiento: L-DOPA."},
+{enunciado:"Las sinapsis eléctricas:",opciones:["Uniones comunicantes (gap junctions) entre neuronas","Químicas","No existen","Solo en músculo","Solo en corazón"],correcta:0,solucion:"Flujo directo de iones. Más rápidas que químicas."},
+{enunciado:"La integración sináptica:",opciones:["Neurona suma señales excitatorias e inhibitorias","Solo excitación","Solo inhibición","No existe","Solo en reposo"],correcta:0,solucion:"PEPs y PIPs. Decisión de disparar potencial de acción."},
+{enunciado:"La neurogénesis:",opciones:["Formación de nuevas neuronas (hipocampo adulto)","No existe en adulto","Solo en embrión","Solo en médula","Solo en corteza"],correcta:0,solucion:"Limitada a regiones específicas. Estimulada por ejercicio."},
+{enunciado:"Las células gliales:",opciones:["Soporte, nutrición, defensa y mielinización de neuronas","Solo neuronas","No existen","Solo en sangre","Solo en hueso"],correcta:0,solucion:"Astrocitos, oligodendrocitos, microglía, Schwann."},
+// ===== UNIDAD 14: BIOLOGÍA CELULAR AVANZADA (581-610) =====
+{enunciado:"La matriz extracelular:",opciones:["Red de proteínas y polisacáridos entre células","Solo dentro de células","No existe","Solo en plantas","Solo en bacterias"],correcta:0,solucion:"Colágeno, fibronectina, proteoglicanos. Soporte y señalización."},
+{enunciado:"Las integrinas:",opciones:["Proteínas transmembrana que unen célula a matriz","Solo intracelulares","Solo en núcleo","No existen","Solo en plantas"],correcta:0,solucion:"Adhesión y comunicación bidireccional."},
+{enunciado:"La apoptosis vs necrosis:",opciones:["Apoptosis: programada, sin inflamación. Necrosis: traumática, inflamatoria","Son iguales","No existen","Solo una ocurre","Solo en plantas"],correcta:0,solucion:"Apoptosis: cuerpos apoptóticos fagocitados."},
+{enunciado:"Las caspasas:",opciones:["Proteasas que ejecutan apoptosis","Sintetizan proteínas","Replican ADN","Transportan iones","Bombean protones"],correcta:0,solucion:"Cascada de caspasas iniciadoras y ejecutoras."},
+{enunciado:"El ciclo celular:",opciones:["G1 → S → G2 → M → citocinesis","Solo división","Solo crecimiento","Aleatorio","No existe"],correcta:0,solucion:"Regulado por ciclinas y CDKs."},
+{enunciado:"Las ciclinas:",opciones:["Proteínas que regulan progresión del ciclo celular","Solo enzimas","Solo lípidos","Solo ADN","No existen"],correcta:0,solucion:"Activan quinasas dependientes de ciclinas (CDKs)."},
+{enunciado:"El punto de control G1/S:",opciones:["Verifica integridad del ADN antes de replicación","No existe","Solo en meiosis","Solo en procariotas","Es automático"],correcta:0,solucion:"p53, pRb. Previene replicación de ADN dañado."},
+{enunciado:"El punto de control G2/M:",opciones:["Verifica replicación completa del ADN antes de mitosis","No existe","Solo en G1","Solo en S","Es automático"],correcta:0,solucion:"Asegura que ADN esté completamente replicado."},
+{enunciado:"El punto de control de la metafase:",opciones:["Verifica unión de cromosomas al huso mitótico","No existe","Solo en interfase","Solo en G1","Es automático"],correcta:0,solucion:"Previene aneuploidía."},
+{enunciado:"El huso mitótico:",opciones:["Microtúbulos que separan cromosomas","Solo membrana","Solo ADN","Solo proteínas","No existe"],correcta:0,solucion:"Centrosomas, microtúbulos del cinetocoro."},
+{enunciado:"La meiosis I:",opciones:["Reduccional: separa cromosomas homólogos","Ecuacional","Igual a mitosis","No reduce","Solo en bacterias"],correcta:0,solucion:"De diploide a haploide. Crossing-over."},
+{enunciado:"La meiosis II:",opciones:["Ecuacional: separa cromátidas hermanas","Reduccional","Igual a mitosis I","No separa","Solo en plantas"],correcta:0,solucion:"Similar a mitosis. 4 células haploides."},
+{enunciado:"El complejo sinaptonémico:",opciones:["Estructura que une cromosomas homólogos en profase I","Solo en mitosis","No existe","Solo en bacterias","Solo en virus"],correcta:0,solucion:"Facilita crossing-over. Recombinación."},
+{enunciado:"La no disyunción:",opciones:["Error en separación de cromosomas en meiosis","Separación normal","No existe","Solo en mitosis","Solo en bacterias"],correcta:0,solucion:"Causa aneuploidías (Down, Turner, Klinefelter)."},
+{enunciado:"La espermatogénesis vs ovogénesis:",opciones:["4 espermatozoides vs 1 ovocito funcional","Iguales","Solo 1 cada uno","Solo en plantas","No existen"],correcta:0,solucion:"Espermatogénesis continua. Ovogénesis cíclica."},
+// ===== UNIDAD 15: APLICACIONES Y CIENCIA ACTUAL (611-650) =====
+{enunciado:"La edición génica con CRISPR:",opciones:["Cas9 corta ADN guiado por ARN","Solo proteínas","Solo lípidos","No funciona","Solo en plantas"],correcta:0,solucion:"Aplicaciones: terapia génica, agricultura, investigación."},
+{enunciado:"La clonación terapéutica:",opciones:["Células madre para reparar tejidos sin crear organismo","Reproductiva","No existe","Solo en animales","Prohibida"],correcta:0,solucion:"Transferencia nuclear para obtener células madre."},
+{enunciado:"Las células iPS (inducidas pluripotentes):",opciones:["Células adultas reprogramadas a pluripotentes","Embrionarias","No existen","Solo cancerosas","Solo de plantas"],correcta:0,solucion:"Yamanaka (2006). Factores Oct4, Sox2, Klf4, c-Myc."},
+{enunciado:"La medicina regenerativa:",opciones:["Repara o reemplaza tejidos dañados","Solo paliativa","No existe","Solo preventiva","Solo diagnóstica"],correcta:0,solucion:"Células madre, ingeniería de tejidos."},
+{enunciado:"Los organoides:",opciones:["Mini-órganos cultivados in vitro","Órganos reales","No existen","Solo en animales","Solo teoría"],correcta:0,solucion:"Cerebroides, intestinales. Investigación y trasplantes."},
+{enunciado:"La biología sintética:",opciones:["Diseña y construye sistemas biológicos nuevos","Solo estudia naturaleza","No existe","Solo ecología","Solo evolución"],correcta:0,solucion:"Circuitos génicos artificiales. Biocombustibles."},
+{enunciado:"El microbioma humano:",opciones:["Conjunto de microorganismos que habitan nuestro cuerpo","Solo patógenos","No existe","Solo en intestino","Solo en piel"],correcta:0,solucion:"Influye en digestión, inmunidad, estado de ánimo."},
+{enunciado:"La epigenética y ambiente:",opciones:["Dieta, estrés, toxinas modifican expresión génica","Solo genes","No existe","Solo herencia","Solo mutaciones"],correcta:0,solucion:"Metilación, acetilación de histonas. Reversible."},
+{enunciado:"El cáncer como enfermedad genética:",opciones:["Acumulación de mutaciones en oncogenes y supresores tumorales","Solo viral","Solo bacteriano","No genético","Solo ambiental"],correcta:0,solucion:"Progresión clonal. Metástasis."},
+{enunciado:"La inmunoterapia contra el cáncer:",opciones:["Estimula sistema inmune para atacar tumores","Quimioterapia","Radioterapia","Cirugía","Solo paliativa"],correcta:0,solucion:"Inhibidores de checkpoints (PD-1, CTLA-4). CAR-T."},
+{enunciado:"Los inhibidores de checkpoints inmunológicos:",opciones:["Anti-PD-1, anti-CTLA-4 liberan respuesta antitumoral","Antibióticos","Antivirales","Vacunas","Hormonas"],correcta:0,solucion:"Desbloquean frenos del sistema inmune."},
+{enunciado:"La terapia CAR-T:",opciones:["Linfocitos T modificados con receptor quimérico","Antibióticos","Hormonas","Vacunas","Solo paliativa"],correcta:0,solucion:"Células del paciente modificadas para atacar su cáncer."},
+{enunciado:"Las células madre hematopoyéticas:",opciones:["Originan todas las células sanguíneas","Solo neuronas","Solo músculo","Solo hueso","Solo piel"],correcta:0,solucion:"Médula ósea. Trasplante para leucemias."},
+{enunciado:"La anemia falciforme:",opciones:["Mutación puntual en hemoglobina (Glu→Val)","Solo por hierro","Infecciosa","No genética","Curable con dieta"],correcta:0,solucion:"HbS. Glóbulos falciformes. Protección contra malaria."},
+{enunciado:"La fibrosis quística:",opciones:["Mutación ΔF508 en CFTR. Moco espeso","Solo pulmonar","Curable","No genética","Solo en niños"],correcta:0,solucion:"Autosómica recesiva. Afecta pulmones y páncreas."},
+{enunciado:"La distrofia muscular de Duchenne:",opciones:["Mutación en distrofina (ligada al X)","Autosómica","Solo en mujeres","Curable","No genética"],correcta:0,solucion:"Debilidad muscular progresiva. Varones afectados."},
+{enunciado:"La hemofilia:",opciones:["Deficiencia de factor VIII o IX (ligada al X)","Solo plaquetas","Autosómica","Curable","No genética"],correcta:0,solucion:"Hemorragias. Varones afectados. Mujeres portadoras."},
+{enunciado:"El daltonismo:",opciones:["Defecto en conos (ligado al X)","Solo bastones","Autosómico","Curable","No genético"],correcta:0,solucion:"Rojo-verde más común. Varones más afectados."},
+{enunciado:"La secuenciación masiva (NGS):",opciones:["Secuencia millones de fragmentos simultáneamente","Sanger","Solo PCR","No existe","Solo manual"],correcta:0,solucion:"Genómica, transcriptómica. Diagnóstico molecular."},
+{enunciado:"El diagnóstico prenatal:",opciones:["Amniocentesis, vellosidades coriónicas, NIPT","Solo postnatal","No existe","Solo en adultos","Solo clínico"],correcta:0,solucion:"Detecta anomalías cromosómicas y genéticas."},
+{enunciado:"El asesoramiento genético:",opciones:["Informa sobre riesgos y opciones reproductivas","Solo tratamiento","No existe","Solo investigación","Solo paliativo"],correcta:0,solucion:"Profesional de salud guía a familias con enfermedades genéticas."},
+{enunciado:"La farmacogenómica:",opciones:["Adapta fármacos según perfil genético del paciente","Misma dosis para todos","No existe","Solo en animales","Solo teoría"],correcta:0,solucion:"Medicina personalizada. Evita reacciones adversas."},
+{enunciado:"La resistencia a antibióticos:",opciones:["Uso excesivo selecciona bacterias resistentes","Solo natural","No existe","Solo en hospitales","Solo en animales"],correcta:0,solucion:"Grave problema de salud pública. Nuevos antibióticos."},
+{enunciado:"Los bacteriófagos:",opciones:["Virus que infectan bacterias específicamente","Antibióticos","Vacunas","Hongos","Protozoos"],correcta:0,solucion:"Terapia fágica. Alternativa a antibióticos."},
+{enunciado:"El cambio climático y salud:",opciones:["Aumenta enfermedades transmitidas por vectores","No afecta","Solo frío","Solo calor","Solo lluvia"],correcta:0,solucion:"Dengue, malaria en nuevas áreas. Olas de calor."},
+{enunciado:"Las enfermedades zoonóticas:",opciones:["Transmitidas de animales a humanos (COVID-19, rabia)","Solo humanas","Solo animales","No existen","Solo plantas"],correcta:0,solucion:"60% de enfermedades infecciosas humanas son zoonóticas."},
+{enunciado:"Una sola salud (One Health):",opciones:["Enfoque integrado: salud humana, animal y ambiental","Solo humana","Solo animal","Solo ambiental","No existe"],correcta:0,solucion:"Interconexión. Previene pandemias."},
+{enunciado:"La bioética:",opciones:["Estudia dilemas éticos en biología y medicina","Solo leyes","No existe","Solo religión","Solo opinión"],correcta:0,solucion:"Consentimiento informado. Edición genética. Clonación."},
+{enunciado:"El consentimiento informado:",opciones:["Paciente acepta procedimiento tras entender riesgos","No necesario","Solo trámite","No existe","Solo investigación"],correcta:0,solucion:"Principio de autonomía en bioética."},
+{enunciado:"La investigación con animales:",opciones:["Principio de las 3R: Reemplazar, Reducir, Refinar","Sin regulación","No existe","Solo en pasado","Ilimitada"],correcta:0,solucion:"Comités de ética. Bienestar animal."},
+// ===== BLOQUE FINAL: 212 preguntas para completar 650 =====
+{enunciado:"La teoría celular establece que:",opciones:["Todo ser vivo está formado por células","Solo los animales tienen células","Las células surgen espontáneamente","Los virus son células","No existe relación entre células"],correcta:0,solucion:"Schleiden, Schwann y Virchow: unidad básica de la vida."},
+{enunciado:"El organelo encargado de la digestión celular es:",opciones:["Lisosoma","Mitocondria","Ribosoma","Cloroplasto","Núcleo"],correcta:0,solucion:"Contiene enzimas hidrolíticas que degradan macromoléculas."},
+{enunciado:"La fagocitosis es un tipo de:",opciones:["Endocitosis","Exocitosis","Difusión","Ósmosis","Transporte activo"],correcta:0,solucion:"Ingreso de partículas grandes mediante invaginación de membrana."},
+{enunciado:"El ATP se produce principalmente en:",opciones:["Mitocondrias","Ribosomas","Núcleo","Aparato de Golgi","Lisosomas"],correcta:0,solucion:"Cadena transportadora de electrones y fosforilación oxidativa."},
+{enunciado:"La fermentación alcohólica produce:",opciones:["Etanol y CO₂","Ácido láctico","Solo ATP","Oxígeno","Glucosa"],correcta:0,solucion:"Levaduras convierten piruvato en etanol y CO₂."},
+{enunciado:"El ciclo de Calvin ocurre en:",opciones:["Estroma del cloroplasto","Tilacoides","Membrana externa","Citoplasma","Matriz mitocondrial"],correcta:0,solucion:"Fija CO₂ usando ATP y NADPH de la fase luminosa."},
+{enunciado:"La meiosis produce variabilidad genética por:",opciones:["Crossing-over y distribución independiente","Mitosis","Fisión binaria","Gemación","Esporulación"],correcta:0,solucion:"Entrecruzamiento en profase I y segregación aleatoria de cromosomas."},
+{enunciado:"El síndrome de Turner tiene cariotipo:",opciones:["45, X0","47, XXY","47, XXX","45, XY","46, XX"],correcta:0,solucion:"Monosomía del cromosoma X. Mujeres con baja estatura."},
+{enunciado:"El síndrome de Klinefelter tiene cariotipo:",opciones:["47, XXY","45, X0","47, XXX","46, XY","48, XXYY"],correcta:0,solucion:"Varones con cromosoma X extra."},
+{enunciado:"La hemofilia B es por deficiencia de:",opciones:["Factor IX","Factor VIII","Factor X","Factor V","Fibrinógeno"],correcta:0,solucion:"También ligada al X. Menos frecuente que hemofilia A."},
+{enunciado:"El gen BRCA1 se asocia con:",opciones:["Cáncer de mama y ovario","Fibrosis quística","Hemofilia","Alzheimer","Parkinson"],correcta:0,solucion:"Gen supresor tumoral. Mutaciones aumentan riesgo."},
+{enunciado:"La prueba de Papanicolaou detecta:",opciones:["Cáncer cervicouterino","Cáncer de mama","Diabetes","Hipertensión","VIH"],correcta:0,solucion:"Citología cervical para detectar células anormales."},
+{enunciado:"El virus del papiloma humano se transmite por:",opciones:["Contacto sexual","Aire","Agua","Alimentos","Sangre exclusivamente"],correcta:0,solucion:"ETS más común. Vacuna disponible."},
+{enunciado:"La bacteria Helicobacter pylori causa:",opciones:["Úlceras gástricas","Tuberculosis","Neumonía","Meningitis","Tétanos"],correcta:0,solucion:"Coloniza mucosa estomacal. Tratamiento con antibióticos."},
+{enunciado:"El prión causa:",opciones:["Encefalopatía espongiforme","Gripe","Sarampión","Hepatitis","Dengue"],correcta:0,solucion:"Proteína mal plegada. Creutzfeldt-Jakob en humanos."},
+{enunciado:"La rabia es causada por:",opciones:["Virus (Rhabdovirus)","Bacteria","Hongo","Protozoo","Prión"],correcta:0,solucion:"Transmitido por mordedura de animales infectados."},
+{enunciado:"El dengue es transmitido por:",opciones:["Aedes aegypti","Anopheles","Triatoma","Culex","Simulium"],correcta:0,solucion:"Mosquito vector del virus del dengue."},
+{enunciado:"La enfermedad de Chagas es causada por:",opciones:["Trypanosoma cruzi","Plasmodium","Leishmania","Toxoplasma","Giardia"],correcta:0,solucion:"Protozoo transmitido por vinchucas."},
+{enunciado:"La toxoplasmosis es peligrosa en:",opciones:["Embarazadas e inmunodeprimidos","Adultos sanos","Niños vacunados","Ancianos","Deportistas"],correcta:0,solucion:"Toxoplasma gondii. Riesgo de transmisión congénita."},
+{enunciado:"La candidiasis es causada por:",opciones:["Candida albicans (hongo)","Bacteria","Virus","Protozoo","Prión"],correcta:0,solucion:"Infección oportunista. Afecta mucosas."},
+{enunciado:"El pie de atleta es causado por:",opciones:["Hongos dermatofitos","Bacterias","Virus","Protozoos","Ácaros"],correcta:0,solucion:"Infección fúngica superficial (tiña pedis)."},
+{enunciado:"La sarna es causada por:",opciones:["Ácaro Sarcoptes scabiei","Bacteria","Virus","Hongo","Protozoo"],correcta:0,solucion:"Parásito que excava túneles en la piel."},
+{enunciado:"La leptospirosis se transmite por:",opciones:["Orina de roedores","Picadura de mosquito","Aire","Contacto sexual","Transfusión"],correcta:0,solucion:"Bacteria Leptospira. Asociada a aguas contaminadas."},
+{enunciado:"El hantavirus se transmite por:",opciones:["Inhalación de excrementos de roedores","Picadura de mosquito","Agua contaminada","Alimentos","Contacto sexual"],correcta:0,solucion:"Síndrome pulmonar por hantavirus. Roedores silvestres."},
+{enunciado:"La bacteria Clostridium tetani causa:",opciones:["Tétanos","Botulismo","Gangrena","Difteria","Tuberculosis"],correcta:0,solucion:"Esporas en suelo. Heridas contaminadas."},
+{enunciado:"El botulismo es causado por:",opciones:["Clostridium botulinum","Streptococcus","E. coli","Salmonella","Shigella"],correcta:0,solucion:"Toxina botulínica. Conservas mal esterilizadas."},
+{enunciado:"La salmonelosis se transmite por:",opciones:["Alimentos contaminados","Aire","Picadura","Contacto sexual","Transfusión"],correcta:0,solucion:"Bacteria Salmonella. Huevos y aves crudas."},
+{enunciado:"El cólera es causado por:",opciones:["Vibrio cholerae","E. coli","Salmonella","Shigella","Campylobacter"],correcta:0,solucion:"Agua contaminada. Diarrea severa."},
+{enunciado:"La tuberculosis se diagnostica con:",opciones:["Baciloscopía (Ziehl-Neelsen)","Hemograma","Glicemia","Orina completa","Radiografía solamente"],correcta:0,solucion:"Tinción ácido-alcohol resistente."},
+{enunciado:"La prueba ELISA detecta:",opciones:["Anticuerpos o antígenos","ADN","ARN","Proteínas totales","Lípidos"],correcta:0,solucion:"Ensayo inmunoenzimático. VIH, hepatitis."},
+{enunciado:"El Western Blot es una prueba:",opciones:["Confirmatoria para VIH","De screening","De glucosa","De embarazo","De colesterol"],correcta:0,solucion:"Detecta proteínas específicas. Más específico que ELISA."},
+{enunciado:"La carga viral mide:",opciones:["Cantidad de virus en sangre","Anticuerpos","Glóbulos blancos","Plaquetas","Hemoglobina"],correcta:0,solucion:"Por PCR cuantitativa. Monitoreo de VIH y hepatitis."},
+{enunciado:"El recuento de CD4 indica:",opciones:["Estado inmunológico","Carga viral","Glicemia","Función renal","Función hepática"],correcta:0,solucion:"Linfocitos T helper. Bajo en SIDA."},
+{enunciado:"La prueba de tuberculina (PPD):",opciones:["Evalúa exposición a tuberculosis","Mide glucosa","Detecta VIH","Mide colesterol","Evalúa embarazo"],correcta:0,solucion:"Reacción de hipersensibilidad retardada."},
+{enunciado:"El hemograma completo mide:",opciones:["Glóbulos rojos, blancos y plaquetas","Solo glucosa","Solo colesterol","Solo proteínas","Solo enzimas"],correcta:0,solucion:"Conteo y morfología de células sanguíneas."},
+{enunciado:"La anemia se define como:",opciones:["Disminución de hemoglobina","Aumento de glóbulos blancos","Disminución de plaquetas","Aumento de colesterol","Disminución de glucosa"],correcta:0,solucion:"Hb bajo valores normales según edad y sexo."},
+{enunciado:"La anemia ferropénica es por:",opciones:["Deficiencia de hierro","Falta de vitamina B12","Falta de ácido fólico","Genética","Infección"],correcta:0,solucion:"Microcítica hipocrómica. Causa más común."},
+{enunciado:"La anemia perniciosa es por:",opciones:["Falta de factor intrínseco (B12)","Falta de hierro","Infección","Hemorragia","Genética exclusivamente"],correcta:0,solucion:"Macrocítica. Autoinmune."},
+{enunciado:"La leucemia es:",opciones:["Cáncer de glóbulos blancos","Anemia","Infección","Trombosis","Hemorragia"],correcta:0,solucion:"Proliferación anormal de leucocitos en médula ósea."},
+{enunciado:"El linfoma afecta:",opciones:["Ganglios linfáticos","Médula ósea exclusivamente","Hígado","Riñón","Pulmón"],correcta:0,solucion:"Hodgkin y no Hodgkin. Células linfoides."},
+{enunciado:"La trombocitopenia es:",opciones:["Disminución de plaquetas","Aumento de glóbulos rojos","Disminución de leucocitos","Aumento de hemoglobina","Disminución de glucosa"],correcta:0,solucion:"Riesgo de hemorragia. Causas: dengue, autoinmune."},
+{enunciado:"La hemofilia afecta:",opciones:["Coagulación sanguínea","Glóbulos rojos","Plaquetas","Glóbulos blancos","Hemoglobina"],correcta:0,solucion:"Deficiencia de factores VIII o IX."},
+{enunciado:"La trombosis es:",opciones:["Formación de coágulo en vaso sanguíneo","Hemorragia","Infección","Inflamación","Anemia"],correcta:0,solucion:"Puede causar infarto, ACV o embolia pulmonar."},
+{enunciado:"El infarto al miocardio es:",opciones:["Necrosis del músculo cardíaco por falta de oxígeno","Infección cardíaca","Inflamación del pericardio","Arritmia","Soplo"],correcta:0,solucion:"Obstrucción de arterias coronarias."},
+{enunciado:"El ACV isquémico es:",opciones:["Obstrucción de vaso cerebral","Rotura de vaso cerebral","Infección cerebral","Tumor cerebral","Migraña"],correcta:0,solucion:"Falta de riego sanguíneo al cerebro."},
+{enunciado:"La hipertensión arterial es:",opciones:["Presión arterial elevada crónica","Presión baja","Arritmia","Soplo","Anemia"],correcta:0,solucion:"≥140/90 mmHg. Factor de riesgo cardiovascular."},
+{enunciado:"La aterosclerosis es:",opciones:["Acumulación de placas en arterias","Dilatación de venas","Infección arterial","Rotura cardíaca","Arritmia"],correcta:0,solucion:"Colesterol, calcio y células inflamatorias."},
+{enunciado:"El colesterol HDL es:",opciones:["Colesterol 'bueno'","Colesterol 'malo'","Triglicéridos","Glucosa","Proteína"],correcta:0,solucion:"Transporta colesterol al hígado para eliminación."},
+{enunciado:"El colesterol LDL es:",opciones:["Colesterol 'malo'","Colesterol 'bueno'","Triglicéridos","Glucosa","Proteína"],correcta:0,solucion:"Deposita colesterol en arterias."},
+{enunciado:"La insulina es producida por:",opciones:["Células beta pancreáticas","Hígado","Riñón","Tiroides","Hipófisis"],correcta:0,solucion:"Islotes de Langerhans. Disminuye glucemia."},
+{enunciado:"El glucagón es producido por:",opciones:["Células alfa pancreáticas","Células beta","Hígado","Riñón","Tiroides"],correcta:0,solucion:"Aumenta glucemia. Antagonista de insulina."},
+{enunciado:"La nefrona es la unidad funcional del:",opciones:["Riñón","Pulmón","Hígado","Corazón","Cerebro"],correcta:0,solucion:"Filtra sangre y forma orina."},
+{enunciado:"La tasa de filtración glomerular mide:",opciones:["Función renal","Función hepática","Función cardíaca","Función pulmonar","Función tiroidea"],correcta:0,solucion:"Volumen filtrado por minuto. Indicador de salud renal."},
+{enunciado:"La creatinina sérica indica:",opciones:["Función renal","Función hepática","Glicemia","Colesterol","Proteínas"],correcta:0,solucion:"Producto de desecho muscular. Elevada en insuficiencia renal."},
+{enunciado:"La diálisis:",opciones:["Filtra sangre artificialmente","Cura los riñones","Estimula la micción","Produce orina","Aumenta la presión"],correcta:0,solucion:"Reemplaza función renal en insuficiencia."},
+{enunciado:"El trasplante renal:",opciones:["Reemplaza riñón enfermo","Cura sin cirugía","Es temporal","No requiere donante","Es experimental"],correcta:0,solucion:"Tratamiento definitivo para insuficiencia renal terminal."},
+{enunciado:"El hígado produce:",opciones:["Bilis","Orina","Insulina","Glucagón","Adrenalina"],correcta:0,solucion:"Bilis emulsiona grasas en intestino."},
+{enunciado:"La cirrosis hepática es:",opciones:["Fibrosis del hígado","Inflamación aguda","Infección viral exclusivamente","Cáncer","Cálculos"],correcta:0,solucion:"Estadio final de daño hepático crónico. Alcohol, hepatitis."},
+{enunciado:"La hepatitis B se transmite por:",opciones:["Sangre y fluidos corporales","Aire","Agua","Alimentos","Picadura"],correcta:0,solucion:"Virus ADN. Existe vacuna."},
+{enunciado:"La hepatitis C:",opciones:["Tiene tratamiento antiviral curativo","Tiene vacuna","Es bacteriana","Se transmite por aire","Es benigna siempre"],correcta:0,solucion:"Virus ARN. Antivirales de acción directa."},
+{enunciado:"El páncreas endocrino produce:",opciones:["Insulina y glucagón","Bilis","Jugo pancreático","Ácido clorhídrico","Pepsina"],correcta:0,solucion:"Islotes de Langerhans: células alfa y beta."},
+{enunciado:"La pancreatitis es:",opciones:["Inflamación del páncreas","Cáncer pancreático","Diabetes","Cirrosis","Hepatitis"],correcta:0,solucion:"Puede ser aguda o crónica. Alcohol y cálculos biliares."},
+{enunciado:"El bocio es:",opciones:["Agrandamiento de la tiroides","Cáncer tiroideo","Hipotiroidismo exclusivamente","Hipertiroidismo exclusivamente","Inflamación"],correcta:0,solucion:"Frecuentemente por deficiencia de yodo."},
+{enunciado:"La enfermedad de Graves:",opciones:["Hipertiroidismo autoinmune","Hipotiroidismo","Bocio simple","Cáncer tiroideo","Tiroiditis"],correcta:0,solucion:"Anticuerpos estimulan receptor de TSH."},
+{enunciado:"La tiroiditis de Hashimoto:",opciones:["Hipotiroidismo autoinmune","Hipertiroidismo","Bocio","Cáncer","Infección"],correcta:0,solucion:"Destrucción autoinmune de la tiroides."},
+{enunciado:"La enfermedad de Addison:",opciones:["Insuficiencia suprarrenal","Exceso de cortisol","Hipertiroidismo","Diabetes","Obesidad"],correcta:0,solucion:"Déficit de cortisol y aldosterona."},
+{enunciado:"El síndrome de Cushing:",opciones:["Exceso de cortisol","Falta de cortisol","Hipotiroidismo","Diabetes","Anemia"],correcta:0,solucion:"Cara de luna, obesidad central, hipertensión."},
+{enunciado:"La acromegalia es por:",opciones:["Exceso de hormona de crecimiento","Falta de GH","Hipotiroidismo","Diabetes","Obesidad"],correcta:0,solucion:"Tumor hipofisiario productor de GH."},
+{enunciado:"El enanismo hipofisiario:",opciones:["Déficit de hormona de crecimiento","Exceso de GH","Hipotiroidismo","Diabetes","Desnutrición"],correcta:0,solucion:"Baja estatura proporcionada. Tratable con GH recombinante."},
+{enunciado:"La pubertad precoz es:",opciones:["Desarrollo sexual antes de edad normal","Retraso puberal","Esterilidad","Menopausia temprana","Andropausia"],correcta:0,solucion:"Activación temprana del eje hipotálamo-hipófisis-gónadas."},
+{enunciado:"La menopausia se caracteriza por:",opciones:["Cese de la función ovárica","Inicio de la pubertad","Embarazo","Lactancia","Ovulación"],correcta:0,solucion:"Disminución de estrógenos. ~45-55 años."},
+{enunciado:"La osteoporosis es:",opciones:["Pérdida de densidad ósea","Exceso de hueso","Infección ósea","Cáncer óseo","Fractura"],correcta:0,solucion:"Común en mujeres posmenopáusicas. Riesgo de fracturas."},
+{enunciado:"La artritis reumatoide es:",opciones:["Enfermedad autoinmune articular","Infección articular","Desgaste por edad","Gota","Osteoporosis"],correcta:0,solucion:"Inflamación crónica de articulaciones."},
+{enunciado:"La gota es por:",opciones:["Acumulación de ácido úrico","Calcio bajo","Infección","Autoinmunidad","Trauma"],correcta:0,solucion:"Cristales de urato en articulaciones."},
+{enunciado:"La fibromialgia se caracteriza por:",opciones:["Dolor crónico generalizado","Inflamación articular","Infección","Cáncer","Fracturas"],correcta:0,solucion:"Sin causa orgánica clara. Afecta más a mujeres."},
+{enunciado:"El Alzheimer afecta principalmente:",opciones:["Memoria y funciones cognitivas","Movimiento","Visión","Audición","Digestión"],correcta:0,solucion:"Placas β-amiloide y ovillos neurofibrilares."},
+{enunciado:"El Parkinson afecta:",opciones:["Movimiento (temblor, rigidez)","Memoria exclusivamente","Visión","Audición","Digestión"],correcta:0,solucion:"Degeneración de neuronas dopaminérgicas."},
+{enunciado:"La esclerosis múltiple:",opciones:["Desmielinización del SNC","Infección cerebral","Tumor cerebral","ACV","Migraña"],correcta:0,solucion:"Autoinmune. Brotes y remisiones."},
+{enunciado:"La epilepsia se caracteriza por:",opciones:["Crisis convulsivas recurrentes","Pérdida de memoria","Temblor","Rigidez","Demencia"],correcta:0,solucion:"Descargas neuronales anormales."},
+{enunciado:"La esquizofrenia es:",opciones:["Trastorno psiquiátrico con psicosis","Trastorno de ansiedad","Depresión","Bipolaridad","Fobia"],correcta:0,solucion:"Alucinaciones, delirios. Componente genético."},
+{enunciado:"El trastorno bipolar:",opciones:["Alternancia de manía y depresión","Solo depresión","Solo ansiedad","Psicosis exclusiva","Demencia"],correcta:0,solucion:"Episodios maníacos y depresivos."},
+{enunciado:"La depresión mayor:",opciones:["Trastorno del ánimo persistente","Euforia constante","Ansiedad exclusiva","Psicosis","Demencia"],correcta:0,solucion:"Tristeza, anhedonia. Tratable con terapia y fármacos."},
+{enunciado:"Los ISRS son fármacos para:",opciones:["Depresión y ansiedad","Diabetes","Hipertensión","Asma","Cáncer"],correcta:0,solucion:"Inhibidores selectivos de recaptación de serotonina."},
+{enunciado:"La serotonina es un:",opciones:["Neurotransmisor","Antibiótico","Analgésico","Anestésico","Antiinflamatorio"],correcta:0,solucion:"Regula estado de ánimo, sueño y apetito."},
+{enunciado:"Las benzodiacepinas son:",opciones:["Ansiolíticos","Antidepresivos","Antipsicóticos","Antibióticos","Analgésicos"],correcta:0,solucion:"Potencian GABA. Riesgo de dependencia."},
+{enunciado:"La anestesia general:",opciones:["Deprime el SNC reversiblemente","Estimula el SNC","Solo duerme","No tiene riesgos","Es local"],correcta:0,solucion:"Pérdida de conciencia, analgesia y relajación muscular."},
+{enunciado:"La lidocaína es un:",opciones:["Anestésico local","Anestésico general","Antibiótico","Antidepresivo","Ansiolítico"],correcta:0,solucion:"Bloquea canales de sodio en nervios periféricos."},
+{enunciado:"La morfina actúa sobre:",opciones:["Receptores opioides","Receptores de dopamina","Canales de calcio","GABA","Serotonina"],correcta:0,solucion:"Analgésico potente. Riesgo de adicción."},
+{enunciado:"El paracetamol es:",opciones:["Analgésico y antipirético","Antiinflamatorio","Antibiótico","Antidepresivo","Ansiolítico"],correcta:0,solucion:"Inhibe COX en SNC. No antiinflamatorio."},
+{enunciado:"El ibuprofeno es:",opciones:["AINE (antiinflamatorio)","Paracetamol","Antibiótico","Antidepresivo","Ansiolítico"],correcta:0,solucion:"Inhibe COX-1 y COX-2. Antiinflamatorio, analgésico."},
+{enunciado:"Los corticoides se usan para:",opciones:["Inflamación y alergias","Infecciones bacterianas","Diabetes","Hipertensión","Anemia"],correcta:0,solucion:"Inmunosupresores y antiinflamatorios potentes."},
+{enunciado:"La adrenalina se usa en:",opciones:["Anafilaxia y paro cardíaco","Diabetes","Hipertensión","Asma leve","Cefalea"],correcta:0,solucion:"Vasoconstrictor, broncodilatador, inotrópico."},
+{enunciado:"La atropina:",opciones:["Antagonista muscarínico (anticolinérgico)","Agonista colinérgico","Antibiótico","Analgésico","Sedante"],correcta:0,solucion:"Aumenta FC, dilata pupilas. Antídoto organofosforados."},
+{enunciado:"El salbutamol es:",opciones:["Broncodilatador (agonista β2)","Antibiótico","Analgésico","Antidepresivo","Antihipertensivo"],correcta:0,solucion:"Tratamiento de asma y EPOC."},
+{enunciado:"La metformina se usa para:",opciones:["Diabetes tipo 2","Diabetes tipo 1","Hipertensión","Asma","Cáncer"],correcta:0,solucion:"Reduce producción hepática de glucosa. Primera línea."},
+{enunciado:"La insulina exógena es necesaria en:",opciones:["Diabetes tipo 1","Diabetes tipo 2 leve","Prediabetes","Obesidad","Hipertensión"],correcta:0,solucion:"Destrucción de células beta. Insulinodependiente."},
+{enunciado:"Los antihipertensivos IECA:",opciones:["Inhiben enzima convertidora de angiotensina","Bloquean canales de calcio","Son diuréticos","Son betabloqueantes","Son alfabloqueantes"],correcta:0,solucion:"Enalapril, captopril. Terminan en '-pril'."},
+{enunciado:"Los betabloqueantes:",opciones:["Disminuyen FC y presión arterial","Aumentan FC","Dilatan bronquios","Aumentan glucemia","Son diuréticos"],correcta:0,solucion:"Atenolol, propranolol. Terminan en '-lol'."},
+{enunciado:"Las estatinas:",opciones:["Reducen colesterol LDL","Aumentan colesterol","Son antibióticos","Son analgésicos","Son antidepresivos"],correcta:0,solucion:"Atorvastatina, rosuvastatina. Inhiben HMG-CoA reductasa."},
+{enunciado:"El omeprazol es:",opciones:["Inhibidor de bomba de protones","Antiácido","Antibiótico","Analgésico","Antidepresivo"],correcta:0,solucion:"Reduce secreción de ácido gástrico. Úlceras, reflujo."},
+{enunciado:"Los probióticos contienen:",opciones:["Microorganismos vivos beneficiosos","Antibióticos","Analgésicos","Vitaminas exclusivamente","Minerales exclusivamente"],correcta:0,solucion:"Lactobacillus, Bifidobacterium. Salud intestinal."},
+{enunciado:"La vitamina A es importante para:",opciones:["Visión","Coagulación","Absorción de calcio","Metabolismo energético","Síntesis de colágeno"],correcta:0,solucion:"Retinal en ciclo visual. Deficiencia: ceguera nocturna."},
+{enunciado:"La vitamina E es:",opciones:["Antioxidante liposoluble","Hidrosoluble","Coagulante","Antibiótico","Hormona"],correcta:0,solucion:"Protege membranas celulares del daño oxidativo."},
+{enunciado:"El magnesio es importante para:",opciones:["Función muscular y nerviosa","Coagulación","Visión","Metabolismo de glucosa exclusivamente","Síntesis de colágeno"],correcta:0,solucion:"Cofactor enzimático. Déficit: calambres, arritmias."},
+{enunciado:"El zinc:",opciones:["Fortalece sistema inmune","Reduce defensas","Es tóxico siempre","No tiene función","Causa anemia"],correcta:0,solucion:"Cofactor de muchas enzimas. Cicatrización."},
+{enunciado:"El selenio:",opciones:["Antioxidante (glutatión peroxidasa)","Prooxidante","Sin función","Tóxico siempre","Antibiótico"],correcta:0,solucion:"Oligoelemento esencial. Función tiroidea."},
+{enunciado:"La desnutrición calórico-proteica:",opciones:["Marasmo y kwashiorkor","Solo obesidad","Solo sobrepeso","Anemia ferropénica","Bocio"],correcta:0,solucion:"Deficiencia de proteínas y calorías en niños."},
+{enunciado:"La obesidad infantil:",opciones:["Factor de riesgo para diabetes y cardiovascular","Sin consecuencias","Beneficiosa","Solo estética","Protectora"],correcta:0,solucion:"Creciente problema de salud pública."},
+{enunciado:"El índice de masa corporal (IMC):",opciones:["Peso(kg)/talla²(m)","Peso×talla","Peso/talla","Talla/peso","Peso+talla"],correcta:0,solucion:">30: obesidad. 25-30: sobrepeso."},
+{enunciado:"La circunferencia abdominal elevada:",opciones:["Riesgo cardiovascular","Sin riesgo","Protector","Indica desnutrición","Normal siempre"],correcta:0,solucion:"Grasa visceral. Síndrome metabólico."},
+{enunciado:"El síndrome metabólico incluye:",opciones:["Obesidad, HTA, dislipidemia, hiperglicemia","Solo obesidad","Solo diabetes","Solo hipertensión","Solo colesterol alto"],correcta:0,solucion:"Conjunto de factores de riesgo cardiovascular."},
+{enunciado:"La actividad física regular:",opciones:["Reduce riesgo cardiovascular","Aumenta riesgo","No tiene efecto","Solo estético","Es perjudicial"],correcta:0,solucion:"Mínimo 150 minutos/semana de ejercicio moderado."},
+{enunciado:"El tabaquismo es factor de riesgo para:",opciones:["Cáncer pulmonar, EPOC, cardiovascular","Solo tos","Solo mal aliento","Ninguna enfermedad","Solo estrés"],correcta:0,solucion:"Principal causa prevenible de muerte."},
+{enunciado:"El alcoholismo crónico causa:",opciones:["Cirrosis hepática","Diabetes","Asma","Artritis","Osteoporosis"],correcta:0,solucion:"Daño hepático, neurológico y cardiovascular."},
+{enunciado:"La radiación UV causa:",opciones:["Cáncer de piel","Diabetes","Hipertensión","Asma","Artritis"],correcta:0,solucion:"Melanoma. Protector solar previene."},
+{enunciado:"El asbesto causa:",opciones:["Mesotelioma pleural","Diabetes","Hipertensión","Asma","Artritis"],correcta:0,solucion:"Cáncer relacionado con exposición a asbestos."},
+{enunciado:"El benceno es:",opciones:["Carcinógeno (leucemia)","Vitaminico","Nutriente","Antioxidante","Antibiótico"],correcta:0,solucion:"Compuesto químico industrial. Afecta médula ósea."},
+{enunciado:"La contaminación atmosférica:",opciones:["Aumenta enfermedades respiratorias","Mejora la salud","No afecta","Solo ensucia","Es beneficiosa"],correcta:0,solucion:"Material particulado PM2.5 y PM10."},
+{enunciado:"El radón es:",opciones:["Gas radiactivo natural (cáncer pulmonar)","Gas noble inerte","Oxígeno","Nitrógeno","Vapor de agua"],correcta:0,solucion:"Segunda causa de cáncer pulmonar después del tabaco."},
+{enunciado:"La legionelosis es causada por:",opciones:["Legionella pneumophila (agua contaminada)","Virus","Hongo","Protozoo","Prión"],correcta:0,solucion:"Neumonía por aerosoles de agua contaminada."},
+{enunciado:"La fiebre tifoidea:",opciones:["Salmonella typhi","Virus","Hongo","Protozoo","Prión"],correcta:0,solucion:"Agua y alimentos contaminados. Fiebre alta."},
+{enunciado:"La brucelosis se transmite por:",opciones:["Productos lácteos no pasteurizados","Aire","Picadura","Contacto sexual","Transfusión"],correcta:0,solucion:"Bacteria Brucella. Fiebre ondulante."},
+{enunciado:"La peste bubónica:",opciones:["Yersinia pestis (pulgas de roedores)","Virus","Hongo","Protozoo","Prión"],correcta:0,solucion:"Históricamente 'peste negra'. Antibióticos efectivos."},
+{enunciado:"El ántrax es causado por:",opciones:["Bacillus anthracis","Virus","Hongo","Protozoo","Prión"],correcta:0,solucion:"Bacteria formadora de esporas. Bioterrorismo."},
+{enunciado:"La viruela:",opciones:["Erradicada por vacunación","Aún endémica","No tiene vacuna","Es bacteriana","Es fúngica"],correcta:0,solucion:"Primera enfermedad erradicada (1980)."},
+{enunciado:"La poliomielitis:",opciones:["Casi erradicada por vacunación","Erradicada","Sin vacuna","Bacteriana","Fúngica"],correcta:0,solucion:"Vacuna Salk (inactivada) y Sabin (atenuada)."},
+{enunciado:"El sarampión:",opciones:["Altamente contagioso (virus)","Bacteriano","Erradicado","Sin vacuna","Benigno siempre"],correcta:0,solucion:"Vacuna triple vírica. Brotes por antivacunas."},
+{enunciado:"La rubeola:",opciones:["Peligrosa en embarazo (teratogénica)","Benigna siempre","Bacteriana","Sin vacuna","Erradicada"],correcta:0,solucion:"Vacuna SRP. Síndrome de rubeola congénita."},
+{enunciado:"La varicela:",opciones:["Virus varicela-zóster (queda latente)","Bacteriana","Sin vacuna","Erradicada","Solo en adultos"],correcta:0,solucion:"Puede reactivarse como herpes zóster."},
+{enunciado:"El herpes zóster:",opciones:["Reactivación del virus varicela","Primoinfección","Bacteriano","Sin tratamiento","Erradicado"],correcta:0,solucion:"Dolor neuropático. Vacuna disponible."},
+{enunciado:"La mononucleosis infecciosa:",opciones:["Virus Epstein-Barr","Bacteria","Hongo","Protozoo","Prión"],correcta:0,solucion:"'Enfermedad del beso'. Afecta adolescentes."},
+{enunciado:"El citomegalovirus:",opciones:["Peligroso en inmunodeprimidos y embarazo","Benigno siempre","Bacteriano","Erradicado","Sin importancia"],correcta:0,solucion:"Infección congénita. Retinitis en SIDA."},
+{enunciado:"La enfermedad de Lyme:",opciones:["Borrelia (transmitida por garrapatas)","Virus","Hongo","Protozoo","Prión"],correcta:0,solucion:"Eritema migrans. Afecta articulaciones y SNC."},
+{enunciado:"La fiebre amarilla:",opciones:["Virus transmitido por mosquito","Bacteria","Hongo","Protozoo","Prión"],correcta:0,solucion:"Vacuna efectiva. Endémica en África y Sudamérica."},
+{enunciado:"La hepatitis A:",opciones:["Transmisión fecal-oral (agua/alimentos)","Sanguínea","Sexual","Aérea","Por vectores"],correcta:0,solucion:"Vacuna disponible. Autolimitada."},
+{enunciado:"La hepatitis D:",opciones:["Requiere coinfección con hepatitis B","Independiente","Es bacteriana","Tiene vacuna propia","Es benigna"],correcta:0,solucion:"Virus defectivo. Agrava hepatitis B."},
+{enunciado:"La hepatitis E:",opciones:["Similar a hepatitis A (fecal-oral)","Similar a hepatitis B","Similar a hepatitis C","Bacteriana","Erradicada"],correcta:0,solucion:"Peligrosa en embarazadas. Brotes en Asia y África."},
+{enunciado:"El rotavirus causa:",opciones:["Diarrea grave en niños","Neumonía","Meningitis","Hepatitis","Otitis"],correcta:0,solucion:"Vacuna oral disponible."},
+{enunciado:"El virus sincicial respiratorio:",opciones:["Bronquiolitis en lactantes","Neumonía bacteriana","Meningitis","Hepatitis","Otitis"],correcta:0,solucion:"Principal causa de hospitalización en <2 años."},
+{enunciado:"La gripe (influenza):",opciones:["Virus con vacuna anual","Bacteria","Erradicada","Sin vacuna","Benigna siempre"],correcta:0,solucion:"Cepas A y B. Cambios antigénicos requieren actualización."},
+{enunciado:"El COVID-19 es causado por:",opciones:["SARS-CoV-2","Influenza","Adenovirus","Rinovirus","VRS"],correcta:0,solucion:"Coronavirus. Pandemia 2020."},
+{enunciado:"La inmunidad híbrida:",opciones:["Infección natural + vacunación","Solo vacunación","Solo infección","Pasiva","No existe"],correcta:0,solucion:"Respuesta inmune más amplia y duradera."},
+{enunciado:"La evasión inmune viral:",opciones:["Mutaciones que evaden anticuerpos","Refuerzo inmune","No existe","Solo en bacterias","Es beneficiosa"],correcta:0,solucion:"Variantes del SARS-CoV-2. Influenza."},
+{enunciado:"Las vacunas bivalentes:",opciones:["Protegen contra dos cepas/variantes","Solo una cepa","No existen","Son bacterianas","Son obsoletas"],correcta:0,solucion:"COVID-19: cepa original + ómicron."},
+{enunciado:"El ARN mensajero en vacunas:",opciones:["No modifica el ADN humano","Modifica ADN","Es peligroso","No funciona","Es bacteria"],correcta:0,solucion:"Se degrada rápidamente. No entra al núcleo."},
+{enunciado:"La respuesta celular T:",opciones:["Destruye células infectadas","Produce anticuerpos","Solo fagocita","No existe","Es pasiva"],correcta:0,solucion:"Linfocitos T citotóxicos CD8+."},
+{enunciado:"La inmunosenescencia:",opciones:["Deterioro inmune por envejecimiento","Refuerzo inmune","No existe","Solo en niños","Es beneficiosa"],correcta:0,solucion:"Mayor susceptibilidad a infecciones en ancianos."},
+{enunciado:"El calendario de vacunación chileno:",opciones:["Gratuito y obligatorio para niños","Solo privado","No existe","Solo para adultos","Solo para COVID"],correcta:0,solucion:"PNI: Programa Nacional de Inmunizaciones."},
+{enunciado:"La vacuna BCG:",opciones:["Previene tuberculosis grave infantil","Previene gripe","Previene hepatitis","Previene polio","Previene sarampión"],correcta:0,solucion:"Bacilo Calmette-Guérin. Al nacer."},
+{enunciado:"La vacuna pentavalente incluye:",opciones:["Difteria, tétanos, tos convulsiva, hepatitis B, Hib","Solo difteria","Solo tétanos","Solo polio","Solo sarampión"],correcta:0,solucion:"5 antígenos en una inyección."},
+{enunciado:"La vacuna antitetánica:",opciones:["Refuerzo cada 10 años","Dosis única","No necesita refuerzo","Solo en niños","No existe"],correcta:0,solucion:"Toxoide tetánico. Heridas contaminadas."},
+{enunciado:"La inmunoglobulina anti-Rh:",opciones:["Previene eritroblastosis fetal","Trata infecciones","Es vacuna","Es antibiótico","Es analgésico"],correcta:0,solucion:"Madre Rh- con hijo Rh+. Semana 28 y postparto."},
+{enunciado:"El diagnóstico molecular:",opciones:["Detecta ADN/ARN de patógenos","Solo cultivo","Solo serología","Solo microscopía","No existe"],correcta:0,solucion:"PCR. Alta sensibilidad y especificidad."},
+{enunciado:"La secuenciación genómica:",opciones:["Determina orden de nucleótidos","Mide proteínas","Mide lípidos","Mide glucosa","No existe"],correcta:0,solucion:"Vigilancia de variantes virales."},
+{enunciado:"La edición génica somática:",opciones:["No se hereda a descendencia","Se hereda siempre","No existe","Es obligatoria","Es ilegal"],correcta:0,solucion:"Modifica células no reproductivas."},
+{enunciado:"La edición génica germinal:",opciones:["Modifica óvulos/espermatozoides (heredable)","Somática","No existe","Es obligatoria","Es rutinaria"],correcta:0,solucion:"Dilema bioético. No permitida en mayoría de países."},
+{enunciado:"Los bebés de diseño:",opciones:["Selección genética con fines no médicos","Vacunación","Alimentación","Educación","Deporte"],correcta:0,solucion:"Controversia bioética. No permitido."},
+{enunciado:"El consentimiento informado:",opciones:["Requisito ético en investigación","Opcional","No existe","Solo en animales","Solo en plantas"],correcta:0,solucion:"Participante entiende riesgos y beneficios."},
+{enunciado:"El comité de ética:",opciones:["Evalúa protocolos de investigación","No existe","Solo en teoría","Es opcional","Solo para animales"],correcta:0,solucion:"Protege derechos de participantes."},
+{enunciado:"La declaración de Helsinki:",opciones:["Principios éticos para investigación médica","Tratado comercial","Ley chilena","Norma ISO","Guía culinaria"],correcta:0,solucion:"Asociación Médica Mundial. Actualizada periódicamente."},
+{enunciado:"El principio de no maleficencia:",opciones:["No hacer daño","Hacer el bien","Justicia","Autonomía","Beneficencia"],correcta:0,solucion:"Primum non nocere. Principio bioético."},
+{enunciado:"El principio de beneficencia:",opciones:["Hacer el bien al paciente","No hacer daño","Autonomía","Justicia","Equidad"],correcta:0,solucion:"Actuar en beneficio del paciente."},
+{enunciado:"El principio de autonomía:",opciones:["Respetar decisiones del paciente","Imponer tratamiento","Paternalismo","No informar","Obligar"],correcta:0,solucion:"Paciente decide sobre su salud."},
+{enunciado:"El principio de justicia:",opciones:["Distribución equitativa de recursos","Solo para ricos","Discriminación","Injusticia","Privilegio"],correcta:0,solucion:"Todos merecen igual acceso a salud."},
+{enunciado:"La eutanasia:",opciones:["Muerte asistida en enfermedad terminal","Obligatoria","Legal en todas partes","Sin debate","Solo en animales"],correcta:0,solucion:"Legal en pocos países. Debate bioético."},
+{enunciado:"El aborto terapéutico:",opciones:["Permitido en Chile en 3 causales","Prohibido siempre","Sin restricciones","No existe","Solo electivo"],correcta:0,solucion:"Riesgo materno, inviabilidad fetal, violación."},
+{enunciado:"La donación de órganos en Chile:",opciones:["Ley de donante universal","Solo familiar","Prohibida","No existe","Obligatoria"],correcta:0,solucion:"Todos son donantes salvo oposición expresa."},
+{enunciado:"El trasplante de médula ósea:",opciones:["Trata leucemias y linfomas","Solo estético","No existe","Es experimental","Solo en animales"],correcta:0,solucion:"Células madre hematopoyéticas."},
+{enunciado:"La sangre de cordón umbilical:",opciones:["Fuente de células madre","Desecho","No sirve","Es peligrosa","No se conserva"],correcta:0,solucion:"Bancos públicos y privados."},
+{enunciado:"La hormona que regula el ciclo menstrual es:",opciones:["Estrógeno y progesterona","Insulina","Adrenalina","Tiroxina","Glucagón"],correcta:0,solucion:"Estrógeno (fase folicular) y progesterona (fase lútea)."},
+{enunciado:"El órgano encargado de filtrar la sangre es:",opciones:["Riñón","Pulmón","Corazón","Hígado","Estómago"],correcta:0,solucion:"Los riñones filtran ~180 litros de sangre diarios."},
+{enunciado:"La capa de ozono se encuentra en:",opciones:["Estratosfera","Troposfera","Mesosfera","Termosfera","Exosfera"],correcta:0,solucion:"Ozono estratosférico absorbe radiación UV."},
+{enunciado:"El gas más abundante en la atmósfera terrestre es:",opciones:["Nitrógeno (N₂)","Oxígeno (O₂)","Dióxido de carbono (CO₂)","Argón","Vapor de agua"],correcta:0,solucion:"78% nitrógeno, 21% oxígeno."},
+{enunciado:"La fotosíntesis produce:",opciones:["Glucosa y oxígeno","CO₂ y agua","Solo oxígeno","Solo glucosa","Nitrógeno"],correcta:0,solucion:"6CO₂+6H₂O→C₆H₁₂O₆+6O₂."},
+{enunciado:"La fermentación produce:",opciones:["ATP sin oxígeno","ATP con oxígeno","Solo CO₂","Solo agua","Glucosa"],correcta:0,solucion:"Fermentación: vía anaeróbica que regenera NAD+."},
+{enunciado:"El ADN está formado por:",opciones:["Nucleótidos","Aminoácidos","Monosacáridos","Ácidos grasos","Glicerol"],correcta:0,solucion:"Cada nucleótido: base nitrogenada, azúcar, fosfato."},
+{enunciado:"La mitosis produce células:",opciones:["Diploides idénticas","Haploides distintas","Gametos","Esporas","Células sexuales"],correcta:0,solucion:"Mitosis: 2n→2n. Células hijas idénticas."},
+{enunciado:"La pared celular vegetal contiene:",opciones:["Celulosa","Peptidoglicano","Quitina","Colágeno","Queratina"],correcta:0,solucion:"Celulosa: polisacárido estructural vegetal."},
+{enunciado:"Los cloroplastos contienen:",opciones:["Clorofila","Hemoglobina","Melanina","Queratina","Colágeno"],correcta:0,solucion:"Clorofila capta energía lumínica."},
+{enunciado:"El músculo cardíaco es:",opciones:["Involuntario y estriado","Voluntario y liso","Involuntario y liso","Voluntario y estriado","Solo voluntario"],correcta:0,solucion:"Miocardio: estriado pero involuntario."},
+{enunciado:"La sinapsis es:",opciones:["Comunicación entre neuronas","División celular","Respiración","Digestión","Circulación"],correcta:0,solucion:"Espacio entre neurona presináptica y postsináptica."},
+{enunciado:"Los huesos almacenan:",opciones:["Calcio y fósforo","Glucosa","Proteínas","Lípidos","Vitaminas"],correcta:0,solucion:"Matriz ósea: hidroxiapatita (calcio+fosfato)."},
+{enunciado:"La médula ósea produce:",opciones:["Células sanguíneas","Orina","Bilis","Sudor","Lágrimas"],correcta:0,solucion:"Hematopoyesis: glóbulos rojos, blancos, plaquetas."},
+{enunciado:"La principal función del intestino grueso es:",opciones:["Absorber agua y formar heces","Digerir proteínas","Absorber grasas","Producir bilis","Secretar insulina"],correcta:0,solucion:"Compacta desechos y absorbe agua y electrolitos."},
+{enunciado:"La flora bacteriana intestinal:",opciones:["Ayuda a la digestión y sintetiza vitaminas","Solo causa enfermedades","No tiene función","Es dañina siempre","Produce insulina"],correcta:0,solucion:"Microbiota: vitamina K, B12, ácidos grasos de cadena corta."},
+{enunciado:"El páncreas es una glándula:",opciones:["Mixta (endocrina y exocrina)","Solo endocrina","Solo exocrina","No es glándula","Linfática"],correcta:0,solucion:"Endocrina: insulina. Exocrina: jugo pancreático."},
+{enunciado:"La tiroides regula:",opciones:["Metabolismo","Presión arterial","Digestión","Visión","Audición"],correcta:0,solucion:"T3 y T4 aumentan metabolismo basal."},
+{enunciado:"Las neuronas se comunican mediante:",opciones:["Neurotransmisores","Hormonas","Enzimas","Anticuerpos","Vitaminas"],correcta:0,solucion:"Sinapsis química: liberación de neurotransmisores."},
+{enunciado:"El cerebelo controla:",opciones:["Equilibrio y coordinación","Lenguaje","Memoria","Emociones","Visión"],correcta:0,solucion:"Coordinación motora fina y equilibrio."},
+{enunciado:"La médula espinal transmite:",opciones:["Impulsos nerviosos","Sangre","Hormonas","Enzimas","Anticuerpos"],correcta:0,solucion:"Vía de comunicación cerebro-cuerpo."},
+{enunciado:"Los glóbulos rojos transportan:",opciones:["Oxígeno","Grasas","Proteínas","Vitaminas","Hormonas"],correcta:0,solucion:"Hemoglobina transporta O₂ y CO₂."},
+{enunciado:"Los glóbulos blancos:",opciones:["Defienden contra infecciones","Transportan oxígeno","Coagulan sangre","Transportan nutrientes","Producen insulina"],correcta:0,solucion:"Leucocitos: sistema inmune."},
+{enunciado:"Las plaquetas participan en:",opciones:["Coagulación sanguínea","Transporte de oxígeno","Defensa inmune","Digestión","Respiración"],correcta:0,solucion:"Trombocitos: tapón plaquetario y coagulación."},
+{enunciado:"La hemoglobina contiene:",opciones:["Hierro","Calcio","Yodo","Sodio","Potasio"],correcta:0,solucion:"Grupo hemo con Fe²⁺ que une O₂."},
+{enunciado:"La digestión comienza en:",opciones:["Boca","Estómago","Intestino delgado","Esófago","Hígado"],correcta:0,solucion:"Amilasa salival inicia digestión de carbohidratos."},
+{enunciado:"El jugo gástrico contiene:",opciones:["Ácido clorhídrico","Bilis","Jugo pancreático","Saliva","Líquido cefalorraquídeo"],correcta:0,solucion:"HCl activa pepsinógeno y destruye bacterias."},
+{enunciado:"La absorción de agua ocurre principalmente en:",opciones:["Intestino grueso","Estómago","Esófago","Boca","Duodeno"],correcta:0,solucion:"Colon absorbe agua y electrolitos."},
+{enunciado:"La vitamina D se sintetiza en:",opciones:["Piel por acción UV","Hígado","Riñón","Intestino","Pulmón"],correcta:0,solucion:"7-dehidrocolesterol + UV → vitamina D3."},
+{enunciado:"El calcio es esencial para:",opciones:["Contracción muscular y huesos","Visión","Digestión","Respiración","Audición"],correcta:0,solucion:"Contracción, coagulación, huesos, neurotransmisión."},
+{enunciado:"La adrenalina se libera en:",opciones:["Situaciones de estrés","Sueño","Digestión","Reposo","Ayuno"],correcta:0,solucion:"Respuesta de lucha o huida."},
+{enunciado:"La insulina:",opciones:["Reduce la glucemia","Aumenta la glucemia","No afecta la glucosa","Reduce calcio","Aumenta colesterol"],correcta:0,solucion:"Facilita entrada de glucosa a células."},
+{enunciado:"El SIDA es causado por:",opciones:["VIH","VPH","VHB","Influenza","Rinovirus"],correcta:0,solucion:"Virus de Inmunodeficiencia Humana."},
+{enunciado:"Las vacunas estimulan:",opciones:["Producción de anticuerpos y memoria","Digestión","Crecimiento óseo","Visión","Audición"],correcta:0,solucion:"Respuesta inmune adaptativa con memoria."},
+{enunciado:"Los antibióticos atacan:",opciones:["Bacterias","Virus","Hongos exclusivamente","Células humanas","Priones"],correcta:0,solucion:"Efectivos solo contra bacterias."},
+{enunciado:"La fiebre es:",opciones:["Mecanismo de defensa del cuerpo","Enfermedad","Síntoma exclusivo de infección","Siempre peligrosa","Contagiosa"],correcta:0,solucion:"Eleva temperatura para inhibir patógenos."},
+{enunciado:"El cáncer se caracteriza por:",opciones:["División celular descontrolada","Falta de división","Muerte celular programada","Infección viral","Inflamación"],correcta:0,solucion:"Células que ignoran señales de regulación."},
+{enunciado:"La meiosis produce:",opciones:["Gametos","Células somáticas","Neuronas","Músculo","Hueso"],correcta:0,solucion:"Células haploides para reproducción sexual."},
+{enunciado:"El crossing-over ocurre en:",opciones:["Profase I meiótica","Profase mitótica","Interfase","Anafase","Telofase"],correcta:0,solucion:"Intercambio entre cromosomas homólogos."},
+{enunciado:"El genotipo es:",opciones:["Constitución genética de un organismo","Apariencia física","Comportamiento","Tamaño","Color"],correcta:0,solucion:"Conjunto de genes (AA, Aa, aa)."},
+{enunciado:"El fenotipo es:",opciones:["Expresión observable del genotipo","Secuencia de ADN","Cromosomas","Alelos","Mutaciones"],correcta:0,solucion:"Características visibles o medibles."},
+{enunciado:"La evolución es:",opciones:["Cambio en frecuencias alélicas a lo largo del tiempo","Creación de nuevas especies instantánea","Sin cambios","Solo en animales","Solo en plantas"],correcta:0,solucion:"Poblaciones cambian a través de generaciones."},
+{enunciado:"Darwin propuso:",opciones:["Selección natural","Herencia de caracteres adquiridos","Generación espontánea","Fijismo","Creacionismo"],correcta:0,solucion:"Variación + selección = evolución."}
+];
+
+// ============ SISTEMA DE 10 INTENTOS ============
+function estimarPuntajePAES(pct){
+  if(pct>=98)return 1000;
+  if(pct>=95)return Math.round(950+(pct-95)*10);
+  if(pct>=85)return Math.round(800+(pct-85)*15);
+  if(pct>=75)return Math.round(700+(pct-75)*10);
+  if(pct>=60)return Math.round(600+(pct-60)*6.67);
+  if(pct>=45)return Math.round(500+(pct-45)*6.67);
+  if(pct>=30)return Math.round(400+(pct-30)*6.67);
+  if(pct>=15)return Math.round(250+(pct-15)*10);
+  return Math.round(100+(pct/15)*150);
+}
+
+let preguntasExamen=[], respuestas=new Array(65).fill(null), indice=0, finalizado=false, intentoActual=0;
+
+function barajar(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function barajarOpciones(pregunta){
+  const letras = ['A','B','C','D','E'];
+  const opcionesConIndice = pregunta.opciones.map((op, i) => ({texto: op, indiceOriginal: i}));
+  for(let i = opcionesConIndice.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [opcionesConIndice[i], opcionesConIndice[j]] = [opcionesConIndice[j], opcionesConIndice[i]];
+  }
+  const nuevaCorrecta = opcionesConIndice.findIndex(op => op.indiceOriginal === pregunta.correcta);
+  return {
+    opciones: opcionesConIndice.map(op => op.texto),
+    correcta: nuevaCorrecta
+  };
+}
+
+function iniciarExamen(){
+  const prev=JSON.parse(localStorage.getItem('v3s_bio_650')||'[]');
+  if(prev.length>=10){
+    if(confirm('⚠️ Ya usaste los 10 intentos. ¿Reiniciar historial para 10 más?')){
+      localStorage.setItem('v3s_bio_650','[]');
+    }else return;
+  }
+  const usadas=new Set(prev.flat());
+  let disp=bancoBio.filter((_,i)=>!usadas.has(i));
+  if(disp.length<65){
+    alert('🔄 Banco agotado. Reiniciando historial automáticamente.');
+    localStorage.setItem('v3s_bio_650','[]');
+    disp=[...bancoBio];
+  }
+  const sel=barajar([...disp]).slice(0,65);
+  prev.push(sel.map(p=>bancoBio.indexOf(p)));
+  localStorage.setItem('v3s_bio_650',JSON.stringify(prev));
+  preguntasExamen = sel.map(p => {
+  const barajada = barajarOpciones(p);
+  return {
+    enunciado: p.enunciado,
+    opciones: barajada.opciones,
+    correcta: barajada.correcta,
+    solucion: p.solucion
+  };
+});
+respuestas=new Array(65).fill(null);indice=0;finalizado=false;intentoActual=prev.length;renderizar();
+}
+
+function seleccionar(idx){if(!finalizado){respuestas[indice]=idx;renderizar();}}
+function navegar(d){const n=indice+d;if(n>=0&&n<65){indice=n;renderizar();}}
+function finalizar(){finalizado=true;renderizar();}
+function volverInicio(){preguntasExamen=[];respuestas=new Array(65).fill(null);indice=0;finalizado=false;renderizar();}
+function calcular(){let c=0;preguntasExamen.forEach((p,i)=>{if(respuestas[i]===p.correcta)c++;});return{correctas:c,total:65};}
+
+function renderizar(){
+  const app=document.getElementById('contenidoDinamico');
+  const prev=JSON.parse(localStorage.getItem('v3s_bio_650')||'[]');
+  const usados=prev.length;
+  if(!preguntasExamen.length){
+    app.innerHTML=`<div style="text-align:center;"><p class="intentos-info">🎯 Intentos: <strong>${usados}</strong> de <strong>10</strong></p><p style="margin:1.2rem 0;font-size:1.05rem;">📚 <strong>650 preguntas únicas</strong> · 10 intentos sin repetición<br>🧬 Célula · Genética · Evolución · Ecología · Fisiología · Inmunología</p><button onclick="window.iniciarExamen()" style="font-size:1.15rem;padding:0.9rem 2.8rem;background:#2d5a2d;color:white;border-color:#1a3c1a;cursor:pointer;">▶ Iniciar intento ${usados+1}</button>${usados>=10?'<p style="color:#c0392b;margin-top:1rem;">⚠️ Límite alcanzado.</p>':''}${usados>0&&usados<10?`<p style="color:#5a7a5a;margin-top:0.8rem;">Te quedan <strong>${10-usados}</strong> intento(s).</p>`:''}</div>`;
+    return;
+  }
+  if(finalizado){
+    const{correctas}=calcular();
+    const pct=Math.round((correctas/65)*100);
+    const puntaje=estimarPuntajePAES(pct);
+    let nivel='',cn='';
+    if(puntaje>=800){nivel='🏅 Dominio excepcional de Biología';cn='#27ae60';}
+    else if(puntaje>=650){nivel='📘 Buen conocimiento científico';cn='#2c3e50';}
+    else if(puntaje>=500){nivel='📗 En desarrollo';cn='#f39c12';}
+    else{nivel='📕 Necesita reforzar contenidos';cn='#c0392b';}
+    app.innerHTML=`<div class="resultado-final"><h2>📋 Resultado Biología · Intento ${intentoActual} de 10</h2><p class="puntaje-etiqueta">PUNTAJE PAES ESTIMADO</p><p class="puntaje-paes">${puntaje}</p><p>de 1000 puntos máximos</p><div class="barra-puntaje"><div class="barra-puntaje-lleno" style="width:${((puntaje-100)/900)*100}%;"></div></div><p>${correctas}/65 (${pct}%)</p><p style="color:${cn};font-weight:600;">${nivel}</p><div style="max-height:350px;overflow-y:auto;text-align:left;margin:1.2rem 0;">${preguntasExamen.map((p,i)=>{const u=respuestas[i];const ok=u===p.correcta;const lu=u!==null?String.fromCharCode(65+u):'—';const lc=String.fromCharCode(65+p.correcta);return`<div class="solucion-item" style="background:${ok?'#d8f0d8':'#f0ddd8'};border-left:3px solid ${ok?'#4caf50':'#e5735a'};"><strong>${i+1}.</strong> ${p.enunciado.substring(0,60)}...<br>🔹 Tu: <strong>${lu}</strong> | ✅: <strong>${lc}</strong><br>📘 ${p.solucion}</div>`;}).join('')}</div><button onclick="window.volverInicio()">↩️ Volver al inicio</button></div>`;
+    return;
+  }
+  const p=preguntasExamen[indice];
+  const letras=['A','B','C','D','E'];
+  const resp=respuestas.filter(r=>r!==null).length;
+  app.innerHTML=`<p class="intentos-info">📝 Intento ${intentoActual} de 10 · Respondidas: ${resp}/65</p><div class="barra-progreso"><div class="progreso-lleno" style="width:${((indice+1)/65)*100}%;"></div></div><div class="pregunta-box"><div class="numero-pregunta">Pregunta ${indice+1} de 65</div><div class="enunciado">${p.enunciado}</div><div class="opciones">${p.opciones.map((op,i)=>`<div class="opcion ${respuestas[indice]===i?'seleccionada':''}" onclick="window.seleccionar(${i})"><span class="letra">${letras[i]}</span> <span style="flex:1;">${op}</span>${respuestas[indice]===i?'<span style="color:#2d5a2d;">✓</span>':''}</div>`).join('')}</div></div><div class="navegacion"><button ${indice===0?'disabled':''} onclick="window.navegar(-1)">← Anterior</button><span style="font-weight:600;">${indice+1}/65</span><button ${indice===64?'disabled':''} onclick="window.navegar(1)">Siguiente →</button></div><div style="text-align:right;margin-top:1.5rem;"><button class="btn-finalizar" onclick="window.finalizar()">✅ Finalizar intento</button></div>`;
+}
+
+window.iniciarExamen=iniciarExamen;
+window.seleccionar=seleccionar;
+window.navegar=navegar;
+window.finalizar=finalizar;
+window.volverInicio=volverInicio;
+renderizar();
+})();
+</script>
+</body>
+</html>
