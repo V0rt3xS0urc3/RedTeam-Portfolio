@@ -105,7 +105,7 @@ const CATS=[
 
 
 
-// ==================== 1. LINUX (62 prácticas + 18 labs + 25 troubleshooting) ====================
+// ==================== 1. LINUX (prácticas + labs + troubleshooting) ====================
 {id:'linux',name:'Linux Fundamentals',icon:'🐧',
 misiones:[
 {id:'l1',cmd:'pwd',title:'📍 pwd',desc:'Directorio actual',xp:25,ex:'Print Working Directory - Muestra la ruta absoluta del directorio actual.',h:['pwd']},
@@ -170,33 +170,51 @@ misiones:[
 {id:'l60', cmd:'lsblk', title:'💾 lsblk', desc:'Discos y particiones', xp:30, ex:'Lsblk - Lista dispositivos de bloque.', h:['lsblk']},
 {id:'l61', cmd:'du -sh * | sort -rh | head -10', title:'📊 du -sh', desc:'Tamaño de archivos/directorios', xp:35, ex:'Du - Disk Usage.', h:['du -sh * | sort -rh | head -10']},
 {id:'l62', cmd:'nc -zv google.com 80', title:'🔌 nc -zv', desc:'Netcat - Probar puerto', xp:35, ex:'Netcat - Herramienta de red multipropósito.', h:['nc -zv google.com 80']},
+// NUEVAS PRÁCTICAS LINUX
+{id:'l63', cmd:'whereis nginx', title:'🔍 whereis', desc:'Localizar binarios, fuentes y páginas man', xp:25, ex:'Muestra la ruta del binario, fuentes y páginas man del comando.', h:['whereis nginx']},
+{id:'l64', cmd:'lspci | grep -i vga', title:'🖥️ lspci', desc:'Listar dispositivos PCI', xp:30, ex:'Muestra todos los dispositivos PCI conectados al sistema.', h:['lspci | grep -i vga']},
+{id:'l65', cmd:'lsusb', title:'🔌 lsusb', desc:'Listar dispositivos USB', xp:25, ex:'Muestra todos los dispositivos USB conectados al sistema.', h:['lsusb']},
+{id:'l66', cmd:'lsmod | head -20', title:'🧩 lsmod', desc:'Listar módulos del kernel cargados', xp:30, ex:'Muestra los módulos del kernel actualmente cargados.', h:['lsmod | head -20']},
+{id:'l67', cmd:'sudo lshw -short | head -20', title:'💻 lshw', desc:'Listar hardware del sistema', xp:35, ex:'Muestra un resumen detallado de todo el hardware.', h:['sudo lshw -short | head -20']},
+{id:'l68', cmd:'umount /mnt/usb', title:'📤 umount', desc:'Desmontar sistema de archivos', xp:30, ex:'Desmonta un sistema de archivos montado previamente.', h:['umount /mnt/usb']},
+{id:'l69', cmd:'sudo blkid', title:'🆔 blkid', desc:'Ver UUIDs de discos', xp:35, ex:'Muestra los identificadores UUID de todos los discos y particiones.', h:['sudo blkid']},
+{id:'l70', cmd:'sudo fsck -n /dev/sda1', title:'🔧 fsck', desc:'Verificar sistema de archivos', xp:40, ex:'Verifica la integridad de un sistema de archivos sin reparar.', h:['sudo fsck -n /dev/sda1']},
+{id:'l71', cmd:'networkctl status', title:'🌐 networkctl', desc:'Estado de systemd-networkd', xp:30, ex:'Muestra el estado de las interfaces gestionadas por systemd-networkd.', h:['networkctl status']},
+{id:'l72', cmd:'nmcli connection show', title:'📶 nmcli', desc:'Gestionar NetworkManager', xp:35, ex:'Muestra las conexiones de red configuradas en NetworkManager.', h:['nmcli connection show']},
+{id:'l73', cmd:'resolvectl status', title:'🔍 resolvectl', desc:'Estado de systemd-resolved', xp:35, ex:'Muestra el estado del resolvedor DNS de systemd.', h:['resolvectl status']},
 
 // TROUBLESHOOTING LINUX
-{id:'l41',cmd:'which comando_inexistente || echo "No encontrado"',title:'🔧 TS: comando no encontrado',desc:'Verificar si comando existe',xp:30,ex:'which te dice si un comando está instalado y en qué ruta.',h:['which comando']},
-{id:'l42',cmd:'echo $PATH',title:'🔧 TS: PATH',desc:'Verificar variable PATH',xp:30,ex:'Si un comando no se encuentra, puede que no esté en el PATH.',h:['echo $PATH']},
-{id:'l43',cmd:'ls -la ~/.bashrc ~/.profile',title:'🔧 TS: alias perdidos',desc:'Verificar archivos configuración',xp:35,ex:'Alias y configuraciones se cargan desde estos archivos al iniciar sesión.',h:['ls -la ~/.bashrc']},
-{id:'l44',cmd:'cat /etc/passwd | grep $USER',title:'🔧 TS: shell incorrecta',desc:'Verificar shell del usuario',xp:35,ex:'Si la shell es /bin/false o /usr/sbin/nologin, no podés iniciar sesión.',h:['grep $USER /etc/passwd']},
-{id:'l45',cmd:'ls -la /tmp',title:'🔧 TS: permisos /tmp',desc:'Verificar permisos directorio temporal',xp:35,ex:'/tmp debe tener sticky bit (drwxrwxrwt). Sin él, usuarios no pueden crear archivos.',h:['ls -la /tmp']},
-{id:'l46',cmd:'type ls cd pwd grep',title:'🔧 TS: type command',desc:'Verificar tipo de comandos',xp:30,ex:'type te dice si un comando es built-in, alias o binario externo.',h:['type ls']},
-{id:'l47',cmd:'df -h .',title:'🔧 TS: espacio en directorio',desc:'Verificar espacio donde estás',xp:35,ex:'A veces el sistema tiene espacio pero la partición donde trabajás está llena.',h:['df -h .']},
-{id:'l48',cmd:'du -sh * | sort -rh | head -10',title:'🔧 TS: archivos grandes',desc:'Top 10 archivos/directorios',xp:40,ex:'Encuentra rápidamente qué está consumiendo espacio en el directorio actual.',h:['du -sh * | sort -rh']},
-{id:'l49',cmd:'lsof /var/log/syslog',title:'🔧 TS: archivo en uso',desc:'Ver qué proceso usa un archivo',xp:40,ex:'Si no podés eliminar un archivo, lsof te dice qué proceso lo tiene abierto.',h:['lsof /var/log/syslog']},
-{id:'l50',cmd:'cat /etc/hostname && hostname',title:'🔧 TS: hostname',desc:'Verificar nombre del equipo',xp:30,ex:'Algunos servicios requieren que el hostname esté correctamente configurado.',h:['cat /etc/hostname']},
-{id:'l51',cmd:'cat /etc/resolv.conf',title:'🔧 TS: DNS config',desc:'Verificar configuración DNS',xp:40,ex:'Si no resuelve nombres de dominio, revisá que los DNS estén configurados.',h:['cat /etc/resolv.conf']},
-{id:'l52',cmd:'ping -c 3 8.8.8.8',title:'🔧 TS: ¿hay internet?',desc:'Test conectividad básica',xp:30,ex:'Si ping a 8.8.8.8 funciona pero no a google.com, es problema de DNS.',h:['ping -c 3 8.8.8.8']},
-{id:'l53',cmd:'ls -la /dev/null /dev/zero /dev/random',title:'🔧 TS: dispositivos especiales',desc:'Verificar /dev files',xp:40,ex:'Si /dev/null no existe o tiene permisos extraños, muchos scripts fallarán.',h:['ls -la /dev/null']},
-{id:'l54',cmd:'cat /proc/loadavg && uptime',title:'🔧 TS: carga del sistema',desc:'Verificar load average',xp:40,ex:'Load average > número de CPUs indica que el sistema está sobrecargado.',h:['cat /proc/loadavg']},
-{id:'l55',cmd:'dmesg | tail -20',title:'🔧 TS: mensajes kernel',desc:'Últimos mensajes del kernel',xp:40,ex:'Errores de hardware, drivers o kernel aparecen en dmesg.',h:['dmesg | tail -20']},
-{id:'l56', cmd:'chmod +x script.sh && ./script.sh || echo "Permission denied"', title:'🔧 Permission Denied al ejecutar', desc:'Diagnóstico de permisos de ejecución', xp:35, ex:'Permisos de ejecución + script falla.', h:['chmod +x script.sh']},
-{id:'l57', cmd:'which comando_inexistente 2>/dev/null || echo "No existe"', title:'🔧 Command not found vs No such file', desc:'Diferencia entre comando y archivo', xp:35, ex:'Which para comandos, ls para archivos.', h:['which comando']},
-{id:'l58', cmd:'ulimit -n', title:'🔧 Too many open files', desc:'Límite de archivos abiertos', xp:40, ex:'Ulimit - Muestra y cambia límites del sistema.', h:['ulimit -n']},
-{id:'l59', cmd:'df -h && df -i', title:'🔧 Disk full vs Inodes full', desc:'Dos formas de llenar un disco', xp:40, ex:'DF - Espacio e inodos.', h:['df -h && df -i']},
-{id:'l60', cmd:'mount | grep "ro,"', title:'🔧 Read-only filesystem', desc:'Sistema de archivos en solo lectura', xp:40, ex:'Mount - Verifica opciones de montaje.', h:['mount | grep "ro,"']},
-{id:'l61', cmd:'cat /dev/zero | head -c 1 | tee >/dev/null 2>&1 || echo "Broken pipe"', title:'🔧 Broken pipe', desc:'Error en pipes', xp:35, ex:'Broken pipe - El lector cerró antes de tiempo.', h:['cat /dev/zero | head -c 1']},
-{id:'l62', cmd:'netstat -tulpn | grep :80', title:'🔧 Address already in use', desc:'Puerto ocupado', xp:40, ex:'Netstat - Ver qué proceso usa el puerto.', h:['netstat -tulpn | grep :80']},
-{id:'l63', cmd:'ping -c 4 google.com 2>&1 || echo "Connection refused/timed out"', title:'🔧 Connection refused vs timed out', desc:'Dos errores de red distintos', xp:40, ex:'Refused = puerto cerrado. Timed out = sin respuesta.', h:['ping -c 4 google.com']},
-{id:'l64', cmd:'cat /proc/self/status | grep Cap', title:'🔧 Operation not permitted', desc:'Capacidades de Linux', xp:40, ex:'Capabilities - Permisos especiales de procesos.', h:['cat /proc/self/status | grep Cap']},
-{id:'l65', cmd:'find /var/log -type f -size +1G 2>/dev/null', title:'🔧 No space left on device', desc:'Diagnóstico completo de disco lleno', xp:40, ex:'Find - Archivos que ocupan espacio.', h:['find /var/log -type f -size +1G']}
+{id:'l74',cmd:'which comando_inexistente || echo "No encontrado"',title:'🔧 TS: comando no encontrado',desc:'Verificar si comando existe',xp:30,ex:'which te dice si un comando está instalado y en qué ruta.',h:['which comando']},
+{id:'l75',cmd:'echo $PATH',title:'🔧 TS: PATH',desc:'Verificar variable PATH',xp:30,ex:'Si un comando no se encuentra, puede que no esté en el PATH.',h:['echo $PATH']},
+{id:'l76',cmd:'ls -la ~/.bashrc ~/.profile',title:'🔧 TS: alias perdidos',desc:'Verificar archivos configuración',xp:35,ex:'Alias y configuraciones se cargan desde estos archivos al iniciar sesión.',h:['ls -la ~/.bashrc']},
+{id:'l77',cmd:'cat /etc/passwd | grep $USER',title:'🔧 TS: shell incorrecta',desc:'Verificar shell del usuario',xp:35,ex:'Si la shell es /bin/false o /usr/sbin/nologin, no podés iniciar sesión.',h:['grep $USER /etc/passwd']},
+{id:'l78',cmd:'ls -la /tmp',title:'🔧 TS: permisos /tmp',desc:'Verificar permisos directorio temporal',xp:35,ex:'/tmp debe tener sticky bit (drwxrwxrwt). Sin él, usuarios no pueden crear archivos.',h:['ls -la /tmp']},
+{id:'l79',cmd:'type ls cd pwd grep',title:'🔧 TS: type command',desc:'Verificar tipo de comandos',xp:30,ex:'type te dice si un comando es built-in, alias o binario externo.',h:['type ls']},
+{id:'l80',cmd:'df -h .',title:'🔧 TS: espacio en directorio',desc:'Verificar espacio donde estás',xp:35,ex:'A veces el sistema tiene espacio pero la partición donde trabajás está llena.',h:['df -h .']},
+{id:'l81',cmd:'du -sh * | sort -rh | head -10',title:'🔧 TS: archivos grandes',desc:'Top 10 archivos/directorios',xp:40,ex:'Encuentra rápidamente qué está consumiendo espacio en el directorio actual.',h:['du -sh * | sort -rh']},
+{id:'l82',cmd:'lsof /var/log/syslog',title:'🔧 TS: archivo en uso',desc:'Ver qué proceso usa un archivo',xp:40,ex:'Si no podés eliminar un archivo, lsof te dice qué proceso lo tiene abierto.',h:['lsof /var/log/syslog']},
+{id:'l83',cmd:'cat /etc/hostname && hostname',title:'🔧 TS: hostname',desc:'Verificar nombre del equipo',xp:30,ex:'Algunos servicios requieren que el hostname esté correctamente configurado.',h:['cat /etc/hostname']},
+{id:'l84',cmd:'cat /etc/resolv.conf',title:'🔧 TS: DNS config',desc:'Verificar configuración DNS',xp:40,ex:'Si no resuelve nombres de dominio, revisá que los DNS estén configurados.',h:['cat /etc/resolv.conf']},
+{id:'l85',cmd:'ping -c 3 8.8.8.8',title:'🔧 TS: ¿hay internet?',desc:'Test conectividad básica',xp:30,ex:'Si ping a 8.8.8.8 funciona pero no a google.com, es problema de DNS.',h:['ping -c 3 8.8.8.8']},
+{id:'l86',cmd:'ls -la /dev/null /dev/zero /dev/random',title:'🔧 TS: dispositivos especiales',desc:'Verificar /dev files',xp:40,ex:'Si /dev/null no existe o tiene permisos extraños, muchos scripts fallarán.',h:['ls -la /dev/null']},
+{id:'l87',cmd:'cat /proc/loadavg && uptime',title:'🔧 TS: carga del sistema',desc:'Verificar load average',xp:40,ex:'Load average > número de CPUs indica que el sistema está sobrecargado.',h:['cat /proc/loadavg']},
+{id:'l88',cmd:'dmesg | tail -20',title:'🔧 TS: mensajes kernel',desc:'Últimos mensajes del kernel',xp:40,ex:'Errores de hardware, drivers o kernel aparecen en dmesg.',h:['dmesg | tail -20']},
+{id:'l89', cmd:'chmod +x script.sh && ./script.sh || echo "Permission denied"', title:'🔧 Permission Denied al ejecutar', desc:'Diagnóstico de permisos de ejecución', xp:35, ex:'Permisos de ejecución + script falla.', h:['chmod +x script.sh']},
+{id:'l90', cmd:'which comando_inexistente 2>/dev/null || echo "No existe"', title:'🔧 Command not found vs No such file', desc:'Diferencia entre comando y archivo', xp:35, ex:'Which para comandos, ls para archivos.', h:['which comando']},
+{id:'l91', cmd:'ulimit -n', title:'🔧 Too many open files', desc:'Límite de archivos abiertos', xp:40, ex:'Ulimit - Muestra y cambia límites del sistema.', h:['ulimit -n']},
+{id:'l92', cmd:'df -h && df -i', title:'🔧 Disk full vs Inodes full', desc:'Dos formas de llenar un disco', xp:40, ex:'DF - Espacio e inodos.', h:['df -h && df -i']},
+{id:'l93', cmd:'mount | grep "ro,"', title:'🔧 Read-only filesystem', desc:'Sistema de archivos en solo lectura', xp:40, ex:'Mount - Verifica opciones de montaje.', h:['mount | grep "ro,"']},
+{id:'l94', cmd:'cat /dev/zero | head -c 1 | tee >/dev/null 2>&1 || echo "Broken pipe"', title:'🔧 Broken pipe', desc:'Error en pipes', xp:35, ex:'Broken pipe - El lector cerró antes de tiempo.', h:['cat /dev/zero | head -c 1']},
+{id:'l95', cmd:'netstat -tulpn | grep :80', title:'🔧 Address already in use', desc:'Puerto ocupado', xp:40, ex:'Netstat - Ver qué proceso usa el puerto.', h:['netstat -tulpn | grep :80']},
+{id:'l96', cmd:'ping -c 4 google.com 2>&1 || echo "Connection refused/timed out"', title:'🔧 Connection refused vs timed out', desc:'Dos errores de red distintos', xp:40, ex:'Refused = puerto cerrado. Timed out = sin respuesta.', h:['ping -c 4 google.com']},
+{id:'l97', cmd:'cat /proc/self/status | grep Cap', title:'🔧 Operation not permitted', desc:'Capacidades de Linux', xp:40, ex:'Capabilities - Permisos especiales de procesos.', h:['cat /proc/self/status | grep Cap']},
+{id:'l98', cmd:'find /var/log -type f -size +1G 2>/dev/null', title:'🔧 No space left on device', desc:'Diagnóstico completo de disco lleno', xp:40, ex:'Find - Archivos que ocupan espacio.', h:['find /var/log -type f -size +1G']},
+// NUEVOS TROUBLESHOOTING LINUX
+{id:'ts99', cmd:'sudo fsck -n /dev/sda1 2>&1 | grep -i "error"', title:'🔧 Filesystem Errors', desc:'Errores en sistema de archivos', xp:40, ex:'Verifica si el sistema de archivos tiene errores que necesitan reparación.', h:['sudo fsck -n /dev/sda1']},
+{id:'ts100', cmd:'sudo blkid 2>&1 | grep -i "not found"', title:'🔧 UUID Not Found', desc:'Disco sin UUID válido', xp:35, ex:'Verifica si el disco tiene un UUID válido para montaje automático.', h:['sudo blkid']},
+{id:'ts101', cmd:'umount /mnt/usb 2>&1 | grep -i "target is busy"', title:'🔧 Target is Busy', desc:'No se puede desmontar porque está en uso', xp:35, ex:'El sistema de archivos está siendo usado por un proceso activo.', h:['umount /mnt/usb']},
+{id:'ts102', cmd:'lsmod | grep -i "missing"', title:'🔧 Missing Kernel Module', desc:'Módulo del kernel no cargado', xp:35, ex:'Verifica si un módulo del kernel necesario está cargado.', h:['lsmod | grep -i "missing"']},
+{id:'ts103', cmd:'networkctl status 2>&1 | grep -i "unmanaged"', title:'🔧 Network Unmanaged', desc:'Interfaz de red no gestionada', xp:35, ex:'La interfaz no está siendo gestionada por systemd-networkd.', h:['networkctl status']},
 ],
 
 // LABORATORIOS LINUX
@@ -235,10 +253,33 @@ labs:[
 {id:'s2', cmd:'echo "Contenido agregado" >> prueba.txt', desc:'Agregar contenido', hint:'echo'},
 {id:'s3', cmd:'cat prueba.txt', desc:'Ver contenido', hint:'cat'},
 {id:'s4', cmd:'vim prueba.txt', desc:'Abrir con vim', hint:'vim'},
-{id:'s5', cmd:'cat prueba.txt', desc:'Verificar cambios', hint:'cat'}]}
+{id:'s5', cmd:'cat prueba.txt', desc:'Verificar cambios', hint:'cat'}
+]},
+// NUEVOS LABS LINUX
+{id:'lab19', title:'🔴 Linux: Hardware y Kernel', desc:'Auditar hardware, módulos y drivers del kernel', dif:'Senior', xp:350, steps:[
+{id:'s1', cmd:'lscpu', desc:'Ver información de la CPU', hint:'lscpu'},
+{id:'s2', cmd:'lspci | grep -E "VGA|Network"', desc:'Ver tarjeta gráfica y de red', hint:'lspci'},
+{id:'s3', cmd:'lsusb', desc:'Ver dispositivos USB', hint:'lsusb'},
+{id:'s4', cmd:'lsmod | head -20', desc:'Ver módulos del kernel cargados', hint:'lsmod'},
+{id:'s5', cmd:'sudo lshw -short', desc:'Ver resumen completo de hardware', hint:'sudo lshw -short'}
+]},
+{id:'lab20', title:'🔴 Linux: Sistema de Archivos y Discos', desc:'Montar, desmontar, verificar y auditar discos', dif:'Senior', xp:400, steps:[
+{id:'s1', cmd:'lsblk -f', desc:'Ver discos y particiones con formato', hint:'lsblk -f'},
+{id:'s2', cmd:'sudo blkid', desc:'Ver UUIDs de discos', hint:'sudo blkid'},
+{id:'s3', cmd:'sudo mount /dev/sdb1 /mnt/usb', desc:'Montar disco USB', hint:'sudo mount'},
+{id:'s4', cmd:'mount | grep sdb1', desc:'Verificar montaje', hint:'mount | grep'},
+{id:'s5', cmd:'sudo umount /mnt/usb', desc:'Desmontar disco USB', hint:'sudo umount'}
+]},
+{id:'lab21', title:'🟣 Linux: NetworkManager y Resolved', desc:'Gestionar redes y DNS con herramientas modernas', dif:'Experto', xp:450, steps:[
+{id:'s1', cmd:'nmcli connection show', desc:'Ver conexiones de red', hint:'nmcli connection show'},
+{id:'s2', cmd:'nmcli device status', desc:'Ver estado de dispositivos', hint:'nmcli device status'},
+{id:'s3', cmd:'resolvectl status', desc:'Ver estado de DNS', hint:'resolvectl status'},
+{id:'s4', cmd:'networkctl status', desc:'Ver estado de systemd-networkd', hint:'networkctl status'},
+{id:'s5', cmd:'resolvectl query google.com', desc:'Resolver dominio con systemd-resolved', hint:'resolvectl query google.com'}
+]},
 ],next:'sysadmin'},
 
-// ==================== SYADMIN LINUX (90 prácticas + 18 labs + 35 troubleshooting) ====================
+// ==================== 2. SYADMIN LINUX ( prácticas +  labs +  troubleshooting) ====================
 
 {id:'sysadmin',name:'🐧 SysAdmin Linux',icon:'🐧',
 misiones:[
@@ -413,7 +454,7 @@ labs:[
 {id:'s5', cmd:'logrotate -f /etc/logrotate.d/test', desc:'Forzar rotación', hint:'logrotate -f'}]}
 ],next:'git'},
 
-// ==================== 2. GIT (62 prácticas + 16 labs + 26 troubleshooting) ====================
+// ==================== 3. GIT ( prácticas +  labs +  troubleshooting) ====================
 {id:'git',name:'Git Version Control',icon:'📝',
 misiones:[
 
@@ -575,7 +616,7 @@ labs:[
 ],next:'docker'},
 
 
-// ==================== 3. DOCKER (103 prácticas + 17 labs + 37 troubleshooting) ====================
+// ==================== 4. DOCKER ( prácticas +  labs +  troubleshooting) ====================
 {id:'docker',name:'Docker Containers',icon:'🐳',
 misiones:[
 
@@ -721,7 +762,7 @@ labs:[
 {id:'s5', cmd:'docker buildx build --platform linux/amd64,linux/arm64 -t app:multi .', desc:'Build multi-platform', hint:'buildx build'}]}
 ],next:'network'},
 
-// ==================== 4. REDES (20 prácticas + 15 labs + 10 troubleshooting) ====================
+// ==================== 5. REDES ( prácticas +  labs +  troubleshooting) ====================
 {id:'network',name:'Redes y Conectividad',icon:'🌐',
 misiones:[
 
@@ -947,7 +988,7 @@ labs:[
 {id:'s5', cmd:'iptables -L -n -v && ufw status', desc:'Verificar reglas de firewall', hint:'iptables -L -n -v && ufw status'}]}
 ],next:'k8s'},
 
-// ==================== 5. KUBERNETES (25 prácticas + 15 labs + 12 troubleshooting) ====================
+// ==================== 6. KUBERNETES ( prácticas +  labs +  troubleshooting) ====================
 {id:'k8s',name:'Kubernetes',icon:'☸️',
 misiones:[
 
@@ -1063,9 +1104,114 @@ labs:[
 {id:'s3', cmd:'kubectl apply -f - <<EOF\napiVersion: rbac.authorization.k8s.io/v1\nkind: RoleBinding\nmetadata:\n  name: read-pods\n  namespace: default\nsubjects:\n- kind: ServiceAccount\n  name: dev-user\n  namespace: default\nroleRef:\n  kind: Role\n  name: pod-reader\n  apiGroup: rbac.authorization.k8s.io\nEOF', desc:'Crear RoleBinding', hint:'kubectl apply -f'},
 {id:'s4', cmd:'kubectl auth can-i get pods --as=system:serviceaccount:default:dev-user', desc:'Verificar permisos', hint:'kubectl auth can-i'},
 {id:'s5', cmd:'kubectl delete serviceaccount dev-user && kubectl delete role pod-reader && kubectl delete rolebinding read-pods', desc:'Limpiar recursos', hint:'kubectl delete'}]}
+],next:'servicemesh'},
+
+// ==================== 7. SERVICE MESH (ISTIO / LINKERD) ====================
+{id:'servicemesh',name:'Service Mesh (Istio / Linkerd)',icon:'🔗',
+misiones:[
+
+// PRACTICAS SERVICE MESH
+{id:'sm1', cmd:'istioctl version', title:'📌 Istio Version', desc:'Ver versión de Istio', xp:25, ex:'Muestra la versión de Istio instalada.', h:['istioctl version']},
+{id:'sm2', cmd:'istioctl install --set profile=demo', title:'📦 Istio Install', desc:'Instalar Istio en cluster', xp:45, ex:'Instala Istio con el perfil demo.', h:['istioctl install --set profile=demo']},
+{id:'sm3', cmd:'kubectl label namespace default istio-injection=enabled', title:'🏷️ Istio Injection', desc:'Habilitar sidecar injection', xp:35, ex:'Habilita la inyección automática de sidecars de Istio.', h:['kubectl label namespace default istio-injection=enabled']},
+{id:'sm4', cmd:'kubectl get pods -n istio-system', title:'☸️ Istio Pods', desc:'Ver pods de Istio', xp:30, ex:'Lista los pods del sistema Istio.', h:['kubectl get pods -n istio-system']},
+{id:'sm5', cmd:'kubectl get svc -n istio-system', title:'📋 Istio Services', desc:'Ver servicios de Istio', xp:30, ex:'Lista los servicios de Istio.', h:['kubectl get svc -n istio-system']},
+{id:'sm6', cmd:'istioctl analyze', title:'🔍 Istio Analyze', desc:'Analizar configuración de Istio', xp:40, ex:'Analiza la configuración de Istio en busca de problemas.', h:['istioctl analyze']},
+{id:'sm7', cmd:'istioctl proxy-status', title:'📊 Istio Proxy Status', desc:'Estado de proxies', xp:35, ex:'Muestra el estado de todos los proxies de Istio.', h:['istioctl proxy-status']},
+{id:'sm8', cmd:'istioctl proxy-config cluster deployment/myapp', title:'🔍 Istio Proxy Config', desc:'Ver configuración de proxy', xp:40, ex:'Muestra la configuración de un proxy específico.', h:['istioctl proxy-config cluster deployment/myapp']},
+{id:'sm9', cmd:'kubectl apply -f gateway.yaml', title:'🚪 Istio Gateway', desc:'Crear Gateway', xp:40, ex:'Crea un Gateway para exponer servicios.', h:['kubectl apply -f gateway.yaml']},
+{id:'sm10', cmd:'kubectl apply -f virtualservice.yaml', title:'🔀 Istio VirtualService', desc:'Crear VirtualService', xp:40, ex:'Crea un VirtualService para enrutamiento.', h:['kubectl apply -f virtualservice.yaml']},
+{id:'sm11', cmd:'kubectl apply -f destinationrule.yaml', title:'🎯 Istio DestinationRule', desc:'Crear DestinationRule', xp:40, ex:'Crea una DestinationRule para políticas.', h:['kubectl apply -f destinationrule.yaml']},
+{id:'sm12', cmd:'kubectl get virtualservices', title:'📋 Istio VirtualServices', desc:'Listar VirtualServices', xp:30, ex:'Lista todos los VirtualServices.', h:['kubectl get virtualservices']},
+{id:'sm13', cmd:'kubectl get destinationrules', title:'📋 Istio DestinationRules', desc:'Listar DestinationRules', xp:30, ex:'Lista todas las DestinationRules.', h:['kubectl get destinationrules']},
+{id:'sm14', cmd:'kubectl get gateways', title:'📋 Istio Gateways', desc:'Listar Gateways', xp:30, ex:'Lista todos los Gateways.', h:['kubectl get gateways']},
+{id:'sm15', cmd:'kubectl apply -f authorizationpolicy.yaml', title:'🔐 Istio AuthorizationPolicy', desc:'Crear política de autorización', xp:45, ex:'Crea una AuthorizationPolicy para seguridad.', h:['kubectl apply -f authorizationpolicy.yaml']},
+{id:'sm16', cmd:'kubectl apply -f peerauthentication.yaml', title:'🔐 Istio PeerAuthentication', desc:'Crear política de autenticación', xp:45, ex:'Crea una PeerAuthentication para mTLS.', h:['kubectl apply -f peerauthentication.yaml']},
+{id:'sm17', cmd:'kubectl get authorizationpolicies', title:'📋 Istio AuthPolicies', desc:'Listar políticas de autorización', xp:30, ex:'Lista todas las AuthorizationPolicies.', h:['kubectl get authorizationpolicies']},
+{id:'sm18', cmd:'kubectl get peerauthentications', title:'📋 Istio PeerAuths', desc:'Listar políticas de autenticación', xp:30, ex:'Lista todas las PeerAuthentications.', h:['kubectl get peerauthentications']},
+{id:'sm19', cmd:'linkerd version', title:'📌 Linkerd Version', desc:'Ver versión de Linkerd', xp:25, ex:'Muestra la versión de Linkerd.', h:['linkerd version']},
+{id:'sm20', cmd:'linkerd install | kubectl apply -f -', title:'📦 Linkerd Install', desc:'Instalar Linkerd en cluster', xp:45, ex:'Instala Linkerd en el cluster Kubernetes.', h:['linkerd install | kubectl apply -f -']},
+{id:'sm21', cmd:'linkerd check', title:'✅ Linkerd Check', desc:'Verificar instalación de Linkerd', xp:35, ex:'Verifica que Linkerd esté correctamente instalado.', h:['linkerd check']},
+{id:'sm22', cmd:'linkerd dashboard', title:'📊 Linkerd Dashboard', desc:'Abrir dashboard de Linkerd', xp:30, ex:'Abre el dashboard de Linkerd en el navegador.', h:['linkerd dashboard']},
+{id:'sm23', cmd:'linkerd viz install | kubectl apply -f -', title:'📊 Linkerd Viz', desc:'Instalar Linkerd Viz', xp:40, ex:'Instala el módulo de visualización de Linkerd.', h:['linkerd viz install | kubectl apply -f -']},
+{id:'sm24', cmd:'linkerd inject deployment.yaml | kubectl apply -f -', title:'💉 Linkerd Inject', desc:'Inyectar sidecar de Linkerd', xp:40, ex:'Inyecta el sidecar de Linkerd en un deployment.', h:['linkerd inject deployment.yaml | kubectl apply -f -']},
+{id:'sm25', cmd:'linkerd top', title:'📊 Linkerd Top', desc:'Ver tráfico en tiempo real', xp:40, ex:'Muestra el tráfico en tiempo real de la malla.', h:['linkerd top']},
+{id:'sm26', cmd:'linkerd stat deployment', title:'📊 Linkerd Stat', desc:'Ver estadísticas de deployment', xp:35, ex:'Muestra estadísticas de un deployment.', h:['linkerd stat deployment']},
+{id:'sm27', cmd:'linkerd edges deployment', title:'🔗 Linkerd Edges', desc:'Ver conexiones entre servicios', xp:40, ex:'Muestra las conexiones entre servicios en la malla.', h:['linkerd edges deployment']},
+{id:'sm28', cmd:'linkerd tap deployment/myapp', title:'🔍 Linkerd Tap', desc:'Inspeccionar tráfico en vivo', xp:45, ex:'Inspecciona el tráfico en vivo de un servicio.', h:['linkerd tap deployment/myapp']},
+{id:'sm29', cmd:'linkerd jaeger install | kubectl apply -f -', title:'🔍 Linkerd Jaeger', desc:'Instalar Jaeger para tracing', xp:45, ex:'Instala Jaeger para tracing distribuido.', h:['linkerd jaeger install | kubectl apply -f -']},
+{id:'sm30', cmd:'linkerd uninstall | kubectl delete -f -', title:'🗑️ Linkerd Uninstall', desc:'Desinstalar Linkerd', xp:40, ex:'Desinstala Linkerd del cluster.', h:['linkerd uninstall | kubectl delete -f -']},
+{id:'sm31', cmd:'istioctl analyze 2>&1 | grep -i "error"', title:'🔧 Istio Analyze Error', desc:'Error en análisis de Istio', xp:40, ex:'El análisis de Istio encontró errores.', h:['istioctl analyze']},
+{id:'sm32', cmd:'kubectl get pods -n istio-system 2>&1 | grep -i "not ready"', title:'🔧 Istio Pods Not Ready', desc:'Pods de Istio no están listos', xp:40, ex:'Algunos pods de Istio no están en estado Ready.', h:['kubectl get pods -n istio-system']},
+{id:'sm33', cmd:'kubectl describe pod -n istio-system -l app=istio-ingressgateway | grep -i "error"', title:'🔧 Istio Ingress Error', desc:'Error en Ingress Gateway de Istio', xp:45, ex:'El Ingress Gateway tiene errores.', h:['kubectl describe pod -n istio-system -l app=istio-ingressgateway']},
+{id:'sm34', cmd:'istioctl proxy-status 2>&1 | grep -i "sync"', title:'🔧 Istio Proxy Sync', desc:'Problemas de sincronización de proxy', xp:45, ex:'Los proxies de Istio no están sincronizados.', h:['istioctl proxy-status']},
+{id:'sm35', cmd:'linkerd check 2>&1 | grep -i "failed"', title:'🔧 Linkerd Check Failed', desc:'Linkerd no está funcionando correctamente', xp:40, ex:'La verificación de Linkerd falló.', h:['linkerd check']},
+{id:'sm36', cmd:'linkerd check --proxy 2>&1 | grep -i "failed"', title:'🔧 Linkerd Proxy Check', desc:'Proxies de Linkerd con problemas', xp:40, ex:'Los proxies de Linkerd tienen problemas.', h:['linkerd check --proxy']},
+{id:'sm37', cmd:'kubectl logs -n linkerd -l app=linkerd-destination | grep -i error', title:'🔧 Linkerd Destination Error', desc:'Errores en Linkerd Destination', xp:40, ex:'El servicio de destino de Linkerd tiene errores.', h:['kubectl logs -n linkerd -l app=linkerd-destination | grep -i error']},
+{id:'sm38', cmd:'kubectl get pods -n linkerd 2>&1 | grep -i "not ready"', title:'🔧 Linkerd Pods Not Ready', desc:'Pods de Linkerd no están listos', xp:40, ex:'Algunos pods de Linkerd no están en estado Ready.', h:['kubectl get pods -n linkerd']},
+{id:'sm39', cmd:'linkerd stat deployment 2>&1 | grep -i "no traffic"', title:'🔧 Linkerd No Traffic', desc:'No hay tráfico en la malla', xp:35, ex:'No se está generando tráfico en la malla.', h:['linkerd stat deployment']},
+{id:'sm40', cmd:'kubectl logs -n istio-system -l app=istiod | grep -i error', title:'🔧 Istiod Errors', desc:'Errores en Istiod (control plane)', xp:45, ex:'El control plane de Istio tiene errores.', h:['kubectl logs -n istio-system -l app=istiod | grep -i error']}
+],
+labs:[
+{id:'labSM1', title:'🔗 Service Mesh: Istio Instalación', desc:'Instalar Istio en cluster', dif:'Senior', xp:450, steps:[
+{id:'s1', cmd:'istioctl version', desc:'Verificar Istio', hint:'istioctl version'},
+{id:'s2', cmd:'istioctl install --set profile=demo', desc:'Instalar Istio', hint:'istioctl install'},
+{id:'s3', cmd:'kubectl label namespace default istio-injection=enabled', desc:'Habilitar sidecar injection', hint:'kubectl label'},
+{id:'s4', cmd:'kubectl get pods -n istio-system', desc:'Ver pods Istio', hint:'kubectl get pods'},
+{id:'s5', cmd:'istioctl analyze', desc:'Analizar configuración', hint:'istioctl analyze'}
+]},
+{id:'labSM2', title:'🔗 Service Mesh: Istio Gateway', desc:'Exponer servicios con Istio Gateway', dif:'Senior', xp:450, steps:[
+{id:'s1', cmd:'kubectl apply -f gateway.yaml', desc:'Crear Gateway', hint:'kubectl apply gateway'},
+{id:'s2', cmd:'kubectl apply -f virtualservice.yaml', desc:'Crear VirtualService', hint:'kubectl apply virtualservice'},
+{id:'s3', cmd:'kubectl get gateways', desc:'Ver Gateways', hint:'kubectl get gateways'},
+{id:'s4', cmd:'kubectl get virtualservices', desc:'Ver VirtualServices', hint:'kubectl get virtualservices'},
+{id:'s5', cmd:'curl -H "Host: myapp.example.com" http://localhost', desc:'Probar Gateway', hint:'curl gateway'}
+]},
+{id:'labSM3', title:'🔗 Service Mesh: Istio Security', desc:'Configurar mTLS y autorización', dif:'Senior', xp:500, steps:[
+{id:'s1', cmd:'kubectl apply -f peerauthentication.yaml', desc:'Crear PeerAuthentication', hint:'kubectl apply peerauthentication'},
+{id:'s2', cmd:'kubectl apply -f authorizationpolicy.yaml', desc:'Crear AuthorizationPolicy', hint:'kubectl apply authorizationpolicy'},
+{id:'s3', cmd:'kubectl get peerauthentications', desc:'Ver PeerAuthentications', hint:'kubectl get peerauthentications'},
+{id:'s4', cmd:'kubectl get authorizationpolicies', desc:'Ver AuthorizationPolicies', hint:'kubectl get authorizationpolicies'},
+{id:'s5', cmd:'istioctl proxy-config cluster deployment/myapp', desc:'Ver configuración de proxy', hint:'istioctl proxy-config'}
+]},
+{id:'labSM4', title:'🔗 Service Mesh: Linkerd Instalación', desc:'Instalar Linkerd en cluster', dif:'Senior', xp:450, steps:[
+{id:'s1', cmd:'linkerd version', desc:'Verificar Linkerd', hint:'linkerd version'},
+{id:'s2', cmd:'linkerd install | kubectl apply -f -', desc:'Instalar Linkerd', hint:'linkerd install'},
+{id:'s3', cmd:'linkerd check', desc:'Verificar instalación', hint:'linkerd check'},
+{id:'s4', cmd:'linkerd viz install | kubectl apply -f -', desc:'Instalar Linkerd Viz', hint:'linkerd viz install'},
+{id:'s5', cmd:'linkerd dashboard', desc:'Abrir dashboard', hint:'linkerd dashboard'}
+]},
+{id:'labSM5', title:'🔗 Service Mesh: Linkerd Observability', desc:'Monitoreo con Linkerd', dif:'Senior', xp:500, steps:[
+{id:'s1', cmd:'linkerd inject deployment.yaml | kubectl apply -f -', desc:'Inyectar sidecar', hint:'linkerd inject'},
+{id:'s2', cmd:'linkerd stat deployment', desc:'Ver estadísticas', hint:'linkerd stat'},
+{id:'s3', cmd:'linkerd top', desc:'Ver tráfico en tiempo real', hint:'linkerd top'},
+{id:'s4', cmd:'linkerd edges deployment', desc:'Ver conexiones', hint:'linkerd edges'},
+{id:'s5', cmd:'linkerd tap deployment/myapp', desc:'Inspeccionar tráfico', hint:'linkerd tap'}
+]},
+{id:'labSM6', title:'🔴 Service Mesh: Istio vs Linkerd', desc:'Comparar Istio y Linkerd', dif:'Senior', xp:550, steps:[
+{id:'s1', cmd:'istioctl analyze', desc:'Analizar Istio', hint:'istioctl analyze'},
+{id:'s2', cmd:'linkerd check', desc:'Verificar Linkerd', hint:'linkerd check'},
+{id:'s3', cmd:'kubectl get pods -n istio-system', desc:'Pods Istio', hint:'kubectl get pods istio'},
+{id:'s4', cmd:'kubectl get pods -n linkerd', desc:'Pods Linkerd', hint:'kubectl get pods linkerd'},
+{id:'s5', cmd:'istioctl proxy-status && linkerd stat deployment', desc:'Comparar estado de proxies', hint:'proxy-status+stat'}
+]},
+{id:'labSM7', title:'🔴 Service Mesh: Traffic Management', desc:'Enrutamiento y balanceo de carga', dif:'Experto', xp:600, steps:[
+{id:'s1', cmd:'kubectl apply -f destinationrule.yaml', desc:'Crear DestinationRule', hint:'kubectl apply destinationrule'},
+{id:'s2', cmd:'kubectl apply -f virtualservice-weight.yaml', desc:'Crear VirtualService con weight', hint:'kubectl apply virtualservice-weight'},
+{id:'s3', cmd:'kubectl get destinationrules', desc:'Ver DestinationRules', hint:'kubectl get destinationrules'},
+{id:'s4', cmd:'for i in {1..10}; do curl -s http://myapp.example.com | grep version; done', desc:'Probar enrutamiento', hint:'curl test'},
+{id:'s5', cmd:'kubectl delete -f virtualservice-weight.yaml', desc:'Limpiar', hint:'kubectl delete'}
+]},
+{id:'labSM8', title:'🟣 Service Mesh: Master Challenge', desc:'Service Mesh completo', dif:'Experto', xp:700, steps:[
+{id:'s1', cmd:'istioctl install --set profile=demo && linkerd install | kubectl apply -f -', desc:'Instalar Istio y Linkerd', hint:'istio+linkerd'},
+{id:'s2', cmd:'kubectl label namespace default istio-injection=enabled && linkerd inject deployment.yaml | kubectl apply -f -', desc:'Configurar sidecars', hint:'injection+inject'},
+{id:'s3', cmd:'kubectl apply -f gateway.yaml && kubectl apply -f virtualservice.yaml', desc:'Configurar Istio Gateway', hint:'istio gateway'},
+{id:'s4', cmd:'istioctl analyze && linkerd check', desc:'Verificar ambos', hint:'analyze+check'},
+{id:'s5', cmd:'istioctl proxy-status && linkerd stat deployment', desc:'Ver estado final', hint:'proxy-status+stat'}
+]}
 ],next:'aws'},
 
-// ==================== 6. AWS (20 prácticas + 15 labs + 10 troubleshooting) ====================
+// ==================== 8. AWS ( prácticas +  labs +  troubleshooting) ====================
 {id:'aws',name:'AWS Cloud',icon:'☁️',
 misiones:[
 
@@ -1181,7 +1327,7 @@ labs:[
 {id:'s5', cmd:'aws ec2 delete-subnet --subnet-id subnet-12345 && aws ec2 delete-vpc --vpc-id vpc-12345', desc:'Eliminar Subnet y VPC', hint:'aws ec2 delete-subnet'}]}
 ],next:'terraform'},
 
-// ==================== 7. TERRAFORM (15 prácticas + 15 labs + 8 troubleshooting) ====================
+// ==================== 9. TERRAFORM ( prácticas +  labs +  troubleshooting) ====================
 {id:'terraform',name:'Terraform IaC',icon:'🏗️',
 misiones:[
 
@@ -1286,7 +1432,7 @@ labs:[
 {id:'s5', cmd:'terraform destroy -auto-approve -var-file=test.tfvars', desc:'Destruir recursos de test', hint:'terraform destroy -auto-approve -var-file=test.tfvars'}]}
 ],next:'ansible'},
 
-// ==================== 8. ANSIBLE (15 prácticas + 15 labs + 8 troubleshooting) ====================
+// ==================== 10. ANSIBLE ( prácticas +  labs +  troubleshooting) ====================
 {id:'ansible',name:'Ansible Automation',icon:'🤖',
 misiones:[
 
@@ -1401,7 +1547,7 @@ labs:[
 {id:'s5', cmd:'ansible-playbook playbook.yml --skip-tags=restart', desc:'Ejecutar sin ejecutar handlers', hint:'ansible-playbook playbook.yml --skip-tags=restart'}]}
 ],next:'cicd'},
 
-// ==================== 9. CI/CD (15 prácticas + 15 labs + 8 troubleshooting) ====================
+// ==================== 11. CI/CD ( prácticas +  labs +  troubleshooting) ====================
 {id:'cicd',name:'CI/CD Pipelines',icon:'🔄',
 misiones:[
 
@@ -1509,9 +1655,109 @@ labs:[
 {id:'s3', cmd:'gh workflow run deploy.yml -f environment=staging', desc:'Deploy a Staging', hint:'gh workflow run deploy.yml -f environment=staging'},
 {id:'s4', cmd:'gh run watch', desc:'Monitorear deploy a Staging', hint:'gh run watch'},
 {id:'s5', cmd:'gh workflow run deploy.yml -f environment=prod', desc:'Deploy a Producción', hint:'gh workflow run deploy.yml -f environment=prod'}]}
+],next:'gitops'},
+
+// ==================== 12. GITOPS (ARGOCD / FLUX) ====================
+{id:'gitops',name:'GitOps (ArgoCD / Flux)',icon:'🚀',
+misiones:[
+
+// PRACTICAS GITOPS
+{id:'go1', cmd:'argocd version', title:'📌 ArgoCD Version', desc:'Ver versión de ArgoCD', xp:25, ex:'Muestra la versión de ArgoCD instalada.', h:['argocd version']},
+{id:'go2', cmd:'argocd app list', title:'📋 ArgoCD Apps', desc:'Listar aplicaciones', xp:30, ex:'Lista todas las aplicaciones gestionadas por ArgoCD.', h:['argocd app list']},
+{id:'go3', cmd:'argocd app get myapp', title:'🔍 ArgoCD App Detail', desc:'Ver detalle de aplicación', xp:35, ex:'Muestra el estado detallado de una aplicación.', h:['argocd app get myapp']},
+{id:'go4', cmd:'argocd app sync myapp', title:'🔄 ArgoCD Sync', desc:'Sincronizar aplicación', xp:40, ex:'Sincroniza una aplicación con el estado definido en Git.', h:['argocd app sync myapp']},
+{id:'go5', cmd:'argocd app create myapp --repo https://github.com/user/repo --path ./app --dest-server https://kubernetes.default.svc --dest-namespace default', title:'📦 ArgoCD Create', desc:'Crear aplicación en ArgoCD', xp:45, ex:'Crea una aplicación en ArgoCD desde un repositorio Git.', h:['argocd app create myapp']},
+{id:'go6', cmd:'argocd app delete myapp', title:'🗑️ ArgoCD Delete', desc:'Eliminar aplicación', xp:35, ex:'Elimina una aplicación de ArgoCD.', h:['argocd app delete myapp']},
+{id:'go7', cmd:'argocd app rollback myapp 1', title:'⏪ ArgoCD Rollback', desc:'Revertir aplicación a versión anterior', xp:40, ex:'Revierte una aplicación a una versión anterior.', h:['argocd app rollback myapp 1']},
+{id:'go8', cmd:'argocd app diff myapp', title:'🔍 ArgoCD Diff', desc:'Ver diferencias entre estado y live', xp:40, ex:'Muestra las diferencias entre el estado deseado y el actual.', h:['argocd app diff myapp']},
+{id:'go9', cmd:'argocd app history myapp', title:'📜 ArgoCD History', desc:'Ver historial de despliegues', xp:35, ex:'Muestra el historial de sincronizaciones de una aplicación.', h:['argocd app history myapp']},
+{id:'go10', cmd:'argocd account list', title:'👤 ArgoCD Accounts', desc:'Listar cuentas', xp:30, ex:'Lista todas las cuentas de ArgoCD.', h:['argocd account list']},
+{id:'go11', cmd:'argocd account update-password', title:'🔑 ArgoCD Password', desc:'Actualizar contraseña', xp:30, ex:'Actualiza la contraseña de la cuenta de ArgoCD.', h:['argocd account update-password']},
+{id:'go12', cmd:'argocd cluster list', title:'☸️ ArgoCD Clusters', desc:'Listar clusters', xp:35, ex:'Lista todos los clusters registrados en ArgoCD.', h:['argocd cluster list']},
+{id:'go13', cmd:'argocd cluster add my-cluster', title:'➕ ArgoCD Add Cluster', desc:'Agregar cluster a ArgoCD', xp:45, ex:'Registra un cluster en ArgoCD.', h:['argocd cluster add my-cluster']},
+{id:'go14', cmd:'argocd repo list', title:'📁 ArgoCD Repos', desc:'Listar repositorios', xp:30, ex:'Lista todos los repositorios registrados en ArgoCD.', h:['argocd repo list']},
+{id:'go15', cmd:'argocd repo add https://github.com/user/repo --username user --password pass', title:'➕ ArgoCD Add Repo', desc:'Agregar repositorio', xp:40, ex:'Registra un repositorio en ArgoCD.', h:['argocd repo add https://github.com/user/repo']},
+{id:'go16', cmd:'flux bootstrap git --url=https://github.com/user/repo --branch=main --path=./clusters/prod', title:'🚀 Flux Bootstrap', desc:'Inicializar Flux en cluster', xp:50, ex:'Bootstrap Flux en un cluster Kubernetes.', h:['flux bootstrap git --url=https://github.com/user/repo']},
+{id:'go17', cmd:'flux get sources git', title:'📁 Flux Sources', desc:'Listar fuentes Git', xp:30, ex:'Lista todas las fuentes Git en Flux.', h:['flux get sources git']},
+{id:'go18', cmd:'flux get kustomizations', title:'📋 Flux Kustomizations', desc:'Listar Kustomizations', xp:30, ex:'Lista todas las Kustomizations en Flux.', h:['flux get kustomizations']},
+{id:'go19', cmd:'flux get helmreleases', title:'📦 Flux HelmReleases', desc:'Listar HelmReleases', xp:30, ex:'Lista todas los HelmReleases en Flux.', h:['flux get helmreleases']},
+{id:'go20', cmd:'flux reconcile source git myrepo', title:'🔄 Flux Reconcile', desc:'Reconciliar fuente Git', xp:40, ex:'Fuerza la reconciliación de una fuente Git.', h:['flux reconcile source git myrepo']},
+{id:'go21', cmd:'flux reconcile kustomization myapp', title:'🔄 Flux Reconcile Kustomization', desc:'Reconciliar Kustomization', xp:40, ex:'Fuerza la reconciliación de una Kustomization.', h:['flux reconcile kustomization myapp']},
+{id:'go22', cmd:'flux suspend kustomization myapp', title:'⏸️ Flux Suspend', desc:'Suspender Kustomization', xp:35, ex:'Suspende la reconciliación de una Kustomization.', h:['flux suspend kustomization myapp']},
+{id:'go23', cmd:'flux resume kustomization myapp', title:'▶️ Flux Resume', desc:'Reanudar Kustomization', xp:35, ex:'Reanuda la reconciliación de una Kustomization.', h:['flux resume kustomization myapp']},
+{id:'go24', cmd:'flux logs --level=debug', title:'📋 Flux Logs', desc:'Ver logs de Flux en debug', xp:40, ex:'Muestra los logs de Flux con nivel debug.', h:['flux logs --level=debug']},
+{id:'go25', cmd:'flux check', title:'✅ Flux Check', desc:'Verificar instalación de Flux', xp:35, ex:'Verifica que Flux esté correctamente instalado.', h:['flux check']},
+{id:'go26', cmd:'argocd app list 2>&1 | grep -i "connection refused"', title:'🔧 ArgoCD Connection Refused', desc:'ArgoCD no está corriendo', xp:40, ex:'El servicio de ArgoCD no está activo.', h:['argocd app list']},
+{id:'go27', cmd:'argocd app sync myapp 2>&1 | grep -i "failed"', title:'🔧 ArgoCD Sync Failed', desc:'Fallo al sincronizar aplicación', xp:45, ex:'La sincronización de la aplicación falló.', h:['argocd app sync myapp']},
+{id:'go28', cmd:'argocd app get myapp 2>&1 | grep -i "OutOfSync"', title:'🔧 ArgoCD OutOfSync', desc:'Aplicación desincronizada', xp:40, ex:'El estado actual no coincide con el estado deseado.', h:['argocd app get myapp']},
+{id:'go29', cmd:'argocd app get myapp 2>&1 | grep -i "Degraded"', title:'🔧 ArgoCD Degraded', desc:'Aplicación en estado degradado', xp:40, ex:'La aplicación tiene errores.', h:['argocd app get myapp']},
+{id:'go30', cmd:'flux check 2>&1 | grep -i "failed"', title:'🔧 Flux Check Failed', desc:'Flux no está funcionando correctamente', xp:40, ex:'La verificación de Flux falló.', h:['flux check']},
+{id:'go31', cmd:'flux get sources git 2>&1 | grep -i "not found"', title:'🔧 Flux Source Not Found', desc:'Fuente Git no encontrada', xp:35, ex:'La fuente Git especificada no existe.', h:['flux get sources git']},
+{id:'go32', cmd:'flux get kustomizations 2>&1 | grep -i "failed"', title:'🔧 Flux Kustomization Failed', desc:'Kustomization falló', xp:40, ex:'La Kustomization no se pudo aplicar correctamente.', h:['flux get kustomizations']},
+{id:'go33', cmd:'tail -50 /var/log/argocd/argocd-server.log | grep -i error', title:'🔧 ArgoCD Server Errors', desc:'Errores en logs de ArgoCD', xp:40, ex:'Busca errores en los logs de ArgoCD.', h:['tail -50 /var/log/argocd/argocd-server.log | grep -i error']},
+{id:'go34', cmd:'kubectl logs -n argocd -l app.kubernetes.io/name=argocd-server | grep -i error', title:'🔧 ArgoCD Pod Errors', desc:'Errores en pods de ArgoCD', xp:40, ex:'Busca errores en los logs de los pods de ArgoCD.', h:['kubectl logs -n argocd -l app.kubernetes.io/name=argocd-server | grep -i error']},
+{id:'go35', cmd:'flux logs --level=error | tail -20', title:'🔧 Flux Errors', desc:'Errores en logs de Flux', xp:40, ex:'Busca errores en los logs de Flux.', h:['flux logs --level=error | tail -20']}
+],
+labs:[
+{id:'labGO1', title:'🚀 GitOps: ArgoCD Instalación', desc:'Instalar y configurar ArgoCD', dif:'Senior', xp:450, steps:[
+{id:'s1', cmd:'argocd version', desc:'Verificar ArgoCD', hint:'argocd version'},
+{id:'s2', cmd:'argocd app list', desc:'Listar aplicaciones', hint:'argocd app list'},
+{id:'s3', cmd:'argocd repo list', desc:'Listar repositorios', hint:'argocd repo list'},
+{id:'s4', cmd:'argocd cluster list', desc:'Listar clusters', hint:'argocd cluster list'},
+{id:'s5', cmd:'argocd account list', desc:'Listar cuentas', hint:'argocd account list'}
+]},
+{id:'labGO2', title:'🚀 GitOps: ArgoCD App Creation', desc:'Crear aplicación en ArgoCD', dif:'Senior', xp:450, steps:[
+{id:'s1', cmd:'argocd app create myapp --repo https://github.com/user/repo --path ./app --dest-server https://kubernetes.default.svc --dest-namespace default', desc:'Crear aplicación', hint:'argocd app create'},
+{id:'s2', cmd:'argocd app list', desc:'Verificar creación', hint:'argocd app list'},
+{id:'s3', cmd:'argocd app get myapp', desc:'Ver detalles', hint:'argocd app get'},
+{id:'s4', cmd:'argocd app sync myapp', desc:'Sincronizar aplicación', hint:'argocd app sync'},
+{id:'s5', cmd:'argocd app delete myapp', desc:'Eliminar aplicación', hint:'argocd app delete'}
+]},
+{id:'labGO3', title:'🚀 GitOps: ArgoCD Sync & Rollback', desc:'Sincronizar y revertir aplicaciones', dif:'Senior', xp:500, steps:[
+{id:'s1', cmd:'argocd app sync myapp', desc:'Sincronizar', hint:'argocd app sync'},
+{id:'s2', cmd:'argocd app history myapp', desc:'Ver historial', hint:'argocd app history'},
+{id:'s3', cmd:'argocd app diff myapp', desc:'Ver diferencias', hint:'argocd app diff'},
+{id:'s4', cmd:'argocd app rollback myapp 1', desc:'Rollback a versión anterior', hint:'argocd app rollback'},
+{id:'s5', cmd:'argocd app get myapp', desc:'Verificar estado', hint:'argocd app get'}
+]},
+{id:'labGO4', title:'🚀 GitOps: Flux Bootstrap', desc:'Inicializar Flux en cluster', dif:'Senior', xp:500, steps:[
+{id:'s1', cmd:'flux bootstrap git --url=https://github.com/user/repo --branch=main --path=./clusters/prod', desc:'Bootstrap Flux', hint:'flux bootstrap'},
+{id:'s2', cmd:'flux get sources git', desc:'Ver fuentes', hint:'flux get sources git'},
+{id:'s3', cmd:'flux get kustomizations', desc:'Ver Kustomizations', hint:'flux get kustomizations'},
+{id:'s4', cmd:'flux check', desc:'Verificar instalación', hint:'flux check'},
+{id:'s5', cmd:'flux get helmreleases', desc:'Ver HelmReleases', hint:'flux get helmreleases'}
+]},
+{id:'labGO5', title:'🚀 GitOps: Flux Reconcile', desc:'Reconciliar recursos con Flux', dif:'Senior', xp:500, steps:[
+{id:'s1', cmd:'flux reconcile source git myrepo', desc:'Reconciliar fuente', hint:'flux reconcile source git'},
+{id:'s2', cmd:'flux reconcile kustomization myapp', desc:'Reconciliar Kustomization', hint:'flux reconcile kustomization'},
+{id:'s3', cmd:'flux suspend kustomization myapp', desc:'Suspender Kustomization', hint:'flux suspend'},
+{id:'s4', cmd:'flux resume kustomization myapp', desc:'Reanudar Kustomization', hint:'flux resume'},
+{id:'s5', cmd:'flux logs --level=debug', desc:'Ver logs en debug', hint:'flux logs --level=debug'}
+]},
+{id:'labGO6', title:'🔴 GitOps: ArgoCD vs Flux', desc:'Comparar ArgoCD y Flux', dif:'Senior', xp:550, steps:[
+{id:'s1', cmd:'argocd app list', desc:'Ver aplicaciones ArgoCD', hint:'argocd app list'},
+{id:'s2', cmd:'flux get kustomizations', desc:'Ver Kustomizations Flux', hint:'flux get kustomizations'},
+{id:'s3', cmd:'argocd app diff myapp', desc:'Diff en ArgoCD', hint:'argocd app diff'},
+{id:'s4', cmd:'flux logs --level=info', desc:'Logs de Flux', hint:'flux logs'},
+{id:'s5', cmd:'argocd app history myapp', desc:'Historial ArgoCD', hint:'argocd app history'}
+]},
+{id:'labGO7', title:'🔴 GitOps: Multi-Cluster', desc:'Gestionar múltiples clusters con GitOps', dif:'Experto', xp:600, steps:[
+{id:'s1', cmd:'argocd cluster list', desc:'Listar clusters ArgoCD', hint:'argocd cluster list'},
+{id:'s2', cmd:'argocd cluster add cluster-2', desc:'Agregar segundo cluster', hint:'argocd cluster add'},
+{id:'s3', cmd:'argocd app create myapp --cluster cluster-2 --repo https://github.com/user/repo --path ./app --dest-namespace default', desc:'Crear app en segundo cluster', hint:'argocd app create'},
+{id:'s4', cmd:'argocd app sync myapp', desc:'Sincronizar app', hint:'argocd app sync'},
+{id:'s5', cmd:'argocd app list --cluster cluster-2', desc:'Ver apps en segundo cluster', hint:'argocd app list --cluster'}
+]},
+{id:'labGO8', title:'🟣 GitOps: Master Challenge', desc:'GitOps completo con ArgoCD y Flux', dif:'Experto', xp:700, steps:[
+{id:'s1', cmd:'argocd version && flux check', desc:'Verificar instalaciones', hint:'argocd+flux'},
+{id:'s2', cmd:'argocd repo add https://github.com/user/repo --username user --password pass', desc:'Agregar repo a ArgoCD', hint:'argocd repo add'},
+{id:'s3', cmd:'argocd app create myapp --repo https://github.com/user/repo --path ./app --dest-server https://kubernetes.default.svc --dest-namespace default', desc:'Crear app ArgoCD', hint:'argocd app create'},
+{id:'s4', cmd:'flux bootstrap git --url=https://github.com/user/repo --branch=main --path=./clusters/prod', desc:'Bootstrap Flux', hint:'flux bootstrap'},
+{id:'s5', cmd:'argocd app sync myapp && flux reconcile kustomization myapp', desc:'Sincronizar ambos', hint:'sync+reconcile'}
+]}
 ],next:'monitoring'},
 
-// ==================== 10. MONITORING (15 prácticas + 32 labs + 19 troubleshooting) ====================
+// ==================== 13. MONITORING ( prácticas +  labs +  troubleshooting) ====================
 {id:'monitoring',name:'Monitoring & Observability',icon:'📊',
 misiones:[
 
@@ -1623,9 +1869,114 @@ labs:[
 {id:'s3', cmd:'curl "http://localhost:3100/loki/api/v1/query_range?query={job=\\"test\\"}"', desc:'Consultar logs en Loki', hint:'curl query logs'},
 {id:'s4', cmd:'curl "http://localhost:3100/loki/api/v1/labels"', desc:'Ver labels disponibles', hint:'curl labels'},
 {id:'s5', cmd:'curl -X POST http://localhost:3100/loki/api/v1/delete -d "{\\"query\\":\\"{job=\\"test\\"}\\",\\"start\\":\\"2026-07-27T00:00:00Z\\",\\"end\\":\\"2026-07-27T23:59:59Z\\"}"', desc:'Eliminar logs', hint:'curl delete logs'}]}
+],next:'elk'},
+
+// ==================== 14. ELK / OPENSEARCH (LOGGING) ====================
+{id:'elk',name:'ELK / OpenSearch (Logging)',icon:'🔍',
+misiones:[
+
+// PRACTICAS ELK
+{id:'elk1', cmd:'curl -X GET "http://localhost:9200/_cluster/health"', title:'🔍 Elasticsearch Health', desc:'Verificar salud del cluster', xp:35, ex:'Muestra el estado del cluster Elasticsearch.', h:['curl -X GET "http://localhost:9200/_cluster/health"']},
+{id:'elk2', cmd:'curl -X GET "http://localhost:9200/_cat/indices?v"', title:'📋 Elasticsearch Indices', desc:'Listar índices', xp:30, ex:'Lista todos los índices en Elasticsearch.', h:['curl -X GET "http://localhost:9200/_cat/indices?v"']},
+{id:'elk3', cmd:'curl -X GET "http://localhost:9200/_cat/nodes?v"', title:'🖥️ Elasticsearch Nodes', desc:'Listar nodos', xp:30, ex:'Lista todos los nodos del cluster.', h:['curl -X GET "http://localhost:9200/_cat/nodes?v"']},
+{id:'elk4', cmd:'curl -X GET "http://localhost:9200/logs-*/_search?q=ERROR"', title:'🔍 Elasticsearch Search', desc:'Buscar logs por patrón', xp:40, ex:'Busca logs con la palabra ERROR.', h:['curl -X GET "http://localhost:9200/logs-*/_search?q=ERROR"']},
+{id:'elk5', cmd:'curl -X POST "http://localhost:9200/logs-2026.07.28/_doc" -H "Content-Type: application/json" -d \'{"message":"Test log","level":"INFO","timestamp":"2026-07-28T10:00:00Z"}\'', title:'📤 Elasticsearch Index', desc:'Indexar documento', xp:40, ex:'Indexa un documento de log en Elasticsearch.', h:['curl -X POST "http://localhost:9200/logs-2026.07.28/_doc"']},
+{id:'elk6', cmd:'curl -X DELETE "http://localhost:9200/logs-2026.07.28"', title:'🗑️ Elasticsearch Delete Index', desc:'Eliminar índice', xp:35, ex:'Elimina un índice de Elasticsearch.', h:['curl -X DELETE "http://localhost:9200/logs-2026.07.28"']},
+{id:'elk7', cmd:'curl -X GET "http://localhost:5601/api/status"', title:'📊 Kibana Status', desc:'Verificar estado de Kibana', xp:30, ex:'Muestra el estado de Kibana.', h:['curl -X GET "http://localhost:5601/api/status"']},
+{id:'elk8', cmd:'curl -X GET "http://localhost:5601/api/saved_objects/_find?type=visualization"', title:'📊 Kibana Visualizations', desc:'Listar visualizaciones', xp:35, ex:'Lista todas las visualizaciones en Kibana.', h:['curl -X GET "http://localhost:5601/api/saved_objects/_find?type=visualization"']},
+{id:'elk9', cmd:'curl -X POST "http://localhost:5601/api/saved_objects/dashboard" -H "Content-Type: application/json" -d \'{"attributes":{"title":"Logs Dashboard"}}\'', title:'📈 Kibana Dashboard', desc:'Crear dashboard en Kibana', xp:45, ex:'Crea un dashboard en Kibana.', h:['curl -X POST "http://localhost:5601/api/saved_objects/dashboard"']},
+{id:'elk10', cmd:'curl -X GET "http://localhost:5601/api/saved_objects/_find?type=dashboard"', title:'📋 Kibana Dashboards', desc:'Listar dashboards', xp:30, ex:'Lista todos los dashboards en Kibana.', h:['curl -X GET "http://localhost:5601/api/saved_objects/_find?type=dashboard"']},
+{id:'elk11', cmd:'curl -X GET "http://localhost:9200/_cat/plugins?v"', title:'🔌 Elasticsearch Plugins', desc:'Listar plugins', xp:30, ex:'Lista todos los plugins instalados.', h:['curl -X GET "http://localhost:9200/_cat/plugins?v"']},
+{id:'elk12', cmd:'curl -X PUT "http://localhost:9200/_index_template/logs-template" -H "Content-Type: application/json" -d \'{"index_patterns":["logs-*"],"template":{"settings":{"number_of_shards":1}}}\'', title:'📋 Elasticsearch Template', desc:'Crear template de índice', xp:45, ex:'Crea un template para índices de logs.', h:['curl -X PUT "http://localhost:9200/_index_template/logs-template"']},
+{id:'elk13', cmd:'curl -X GET "http://localhost:9200/_index_template"', title:'📋 Elasticsearch Templates', desc:'Listar templates', xp:30, ex:'Lista todos los templates de índices.', h:['curl -X GET "http://localhost:9200/_index_template"']},
+{id:'elk14', cmd:'curl -X POST "http://localhost:9200/_aliases" -H "Content-Type: application/json" -d \'{"actions":[{"add":{"index":"logs-2026.07.28","alias":"logs-current"}}]}\'', title:'🔗 Elasticsearch Alias', desc:'Crear alias para índice', xp:40, ex:'Crea un alias para un índice.', h:['curl -X POST "http://localhost:9200/_aliases"']},
+{id:'elk15', cmd:'curl -X GET "http://localhost:9200/_cat/aliases?v"', title:'📋 Elasticsearch Aliases', desc:'Listar alias', xp:30, ex:'Lista todos los alias.', h:['curl -X GET "http://localhost:9200/_cat/aliases?v"']},
+{id:'elk16', cmd:'curl -X POST "http://localhost:9200/logs-2026.07.28/_delete_by_query" -H "Content-Type: application/json" -d \'{"query":{"match":{"level":"DEBUG"}}}\'', title:'🗑️ Elasticsearch Delete by Query', desc:'Eliminar documentos por consulta', xp:45, ex:'Elimina logs de nivel DEBUG.', h:['curl -X POST "http://localhost:9200/logs-2026.07.28/_delete_by_query"']},
+{id:'elk17', cmd:'curl -X GET "http://localhost:9200/_cat/shards?v"', title:'📊 Elasticsearch Shards', desc:'Ver distribución de shards', xp:35, ex:'Muestra la distribución de shards en el cluster.', h:['curl -X GET "http://localhost:9200/_cat/shards?v"']},
+{id:'elk18', cmd:'curl -X GET "http://localhost:9200/_cluster/stats"', title:'📊 Elasticsearch Cluster Stats', desc:'Estadísticas del cluster', xp:35, ex:'Muestra estadísticas detalladas del cluster.', h:['curl -X GET "http://localhost:9200/_cluster/stats"']},
+{id:'elk19', cmd:'curl -X POST "http://localhost:5601/api/saved_objects/index-pattern" -H "Content-Type: application/json" -d \'{"attributes":{"title":"logs-*","timeFieldName":"@timestamp"}}\'', title:'📋 Kibana Index Pattern', desc:'Crear index pattern', xp:40, ex:'Crea un index pattern en Kibana.', h:['curl -X POST "http://localhost:5601/api/saved_objects/index-pattern"']},
+{id:'elk20', cmd:'curl -X GET "http://localhost:5601/api/saved_objects/_find?type=index-pattern"', title:'📋 Kibana Index Patterns', desc:'Listar index patterns', xp:30, ex:'Lista todos los index patterns.', h:['curl -X GET "http://localhost:5601/api/saved_objects/_find?type=index-pattern"']},
+{id:'elk21', cmd:'filebeat test config', title:'✅ Filebeat Config Test', desc:'Validar configuración de Filebeat', xp:35, ex:'Valida la configuración de Filebeat.', h:['filebeat test config']},
+{id:'elk22', cmd:'filebeat setup --index-management', title:'⚙️ Filebeat Setup', desc:'Configurar índices en Elasticsearch', xp:40, ex:'Configura los índices de Filebeat en Elasticsearch.', h:['filebeat setup --index-management']},
+{id:'elk23', cmd:'filebeat test output', title:'✅ Filebeat Output Test', desc:'Probar salida de Filebeat', xp:35, ex:'Prueba la conexión a Elasticsearch.', h:['filebeat test output']},
+{id:'elk24', cmd:'filebeat modules list', title:'📋 Filebeat Modules', desc:'Listar módulos de Filebeat', xp:30, ex:'Lista todos los módulos de Filebeat.', h:['filebeat modules list']},
+{id:'elk25', cmd:'filebeat modules enable system', title:'🔧 Filebeat Enable Module', desc:'Habilitar módulo de sistema', xp:35, ex:'Habilita el módulo de logs del sistema.', h:['filebeat modules enable system']},
+{id:'elk26', cmd:'metricbeat modules list', title:'📋 Metricbeat Modules', desc:'Listar módulos de Metricbeat', xp:30, ex:'Lista todos los módulos de Metricbeat.', h:['metricbeat modules list']},
+{id:'elk27', cmd:'metricbeat modules enable docker', title:'🔧 Metricbeat Enable Module', desc:'Habilitar módulo Docker', xp:35, ex:'Habilita el módulo de métricas de Docker.', h:['metricbeat modules enable docker']},
+{id:'elk28', cmd:'heartbeat setup --dashboards', title:'📊 Heartbeat Setup', desc:'Configurar dashboards de Heartbeat', xp:40, ex:'Configura los dashboards de monitoreo de uptime.', h:['heartbeat setup --dashboards']},
+{id:'elk29', cmd:'heartbeat monitor', title:'🔬 Heartbeat Monitor', desc:'Ejecutar monitor de uptime', xp:35, ex:'Ejecuta un monitor de disponibilidad.', h:['heartbeat monitor']},
+{id:'elk30', cmd:'curl -X GET "http://localhost:9200/_cat/health?v"', title:'🔍 Elasticsearch Health Detail', desc:'Ver salud detallada del cluster', xp:30, ex:'Muestra el estado de salud del cluster.', h:['curl -X GET "http://localhost:9200/_cat/health?v"']},
+{id:'elk31', cmd:'curl -X GET "http://localhost:9200/_cluster/health" 2>&1 | grep -i "connection refused"', title:'🔧 Elasticsearch Not Running', desc:'Elasticsearch no está corriendo', xp:40, ex:'El servicio de Elasticsearch no está activo.', h:['curl -X GET "http://localhost:9200/_cluster/health"']},
+{id:'elk32', cmd:'curl -X GET "http://localhost:9200/_cluster/health" 2>&1 | grep -i "red"', title:'🔧 Elasticsearch Red Status', desc:'Cluster en estado RED', xp:45, ex:'El cluster tiene problemas de salud graves.', h:['curl -X GET "http://localhost:9200/_cluster/health"']},
+{id:'elk33', cmd:'curl -X GET "http://localhost:9200/_cluster/health" 2>&1 | grep -i "yellow"', title:'🔧 Elasticsearch Yellow Status', desc:'Cluster en estado YELLOW', xp:40, ex:'El cluster tiene réplicas no asignadas.', h:['curl -X GET "http://localhost:9200/_cluster/health"']},
+{id:'elk34', cmd:'tail -50 /var/log/elasticsearch/elasticsearch.log | grep -i error', title:'🔧 Elasticsearch Errors', desc:'Errores en logs de Elasticsearch', xp:40, ex:'Busca errores en los logs de Elasticsearch.', h:['tail -50 /var/log/elasticsearch/elasticsearch.log | grep -i error']},
+{id:'elk35', cmd:'curl -X GET "http://localhost:5601/api/status" 2>&1 | grep -i "connection refused"', title:'🔧 Kibana Not Running', desc:'Kibana no está corriendo', xp:40, ex:'El servicio de Kibana no está activo.', h:['curl -X GET "http://localhost:5601/api/status"']},
+{id:'elk36', cmd:'curl -X GET "http://localhost:9200/_cat/indices?v" 2>&1 | grep -i "no such index"', title:'🔧 Index Not Found', desc:'Índice no encontrado en Elasticsearch', xp:35, ex:'El índice especificado no existe.', h:['curl -X GET "http://localhost:9200/_cat/indices?v"']},
+{id:'elk37', cmd:'filebeat test output 2>&1 | grep -i "connection refused"', title:'🔧 Filebeat Connection Refused', desc:'Filebeat no puede conectar a Elasticsearch', xp:40, ex:'Filebeat no puede conectar a Elasticsearch.', h:['filebeat test output']},
+{id:'elk38', cmd:'systemctl status elasticsearch 2>&1 | grep -i "failed"', title:'🔧 Elasticsearch Service Failed', desc:'El servicio Elasticsearch ha fallado', xp:40, ex:'El servicio de Elasticsearch no está corriendo.', h:['systemctl status elasticsearch']},
+{id:'elk39', cmd:'systemctl status kibana 2>&1 | grep -i "failed"', title:'🔧 Kibana Service Failed', desc:'El servicio Kibana ha fallado', xp:40, ex:'El servicio de Kibana no está corriendo.', h:['systemctl status kibana']},
+{id:'elk40', cmd:'systemctl status filebeat 2>&1 | grep -i "failed"', title:'🔧 Filebeat Service Failed', desc:'El servicio Filebeat ha fallado', xp:40, ex:'El servicio de Filebeat no está corriendo.', h:['systemctl status filebeat']}
+],
+labs:[
+{id:'labELK1', title:'🔍 ELK: Instalación y Configuración', desc:'Instalar Elasticsearch, Kibana y Filebeat', dif:'Senior', xp:450, steps:[
+{id:'s1', cmd:'curl -X GET "http://localhost:9200/_cluster/health"', desc:'Verificar Elasticsearch', hint:'curl elasticsearch'},
+{id:'s2', cmd:'curl -X GET "http://localhost:5601/api/status"', desc:'Verificar Kibana', hint:'curl kibana'},
+{id:'s3', cmd:'filebeat test config', desc:'Validar Filebeat', hint:'filebeat test config'},
+{id:'s4', cmd:'filebeat modules enable system', desc:'Habilitar módulo system', hint:'filebeat modules enable'},
+{id:'s5', cmd:'systemctl status elasticsearch kibana filebeat', desc:'Verificar servicios', hint:'systemctl status'}
+]},
+{id:'labELK2', title:'🔍 ELK: Indexación y Búsqueda', desc:'Indexar y buscar logs en Elasticsearch', dif:'Senior', xp:450, steps:[
+{id:'s1', cmd:'curl -X POST "http://localhost:9200/logs-2026.07.28/_doc" -H "Content-Type: application/json" -d \'{"message":"Test log","level":"INFO"}\'', desc:'Indexar documento', hint:'curl index'},
+{id:'s2', cmd:'curl -X GET "http://localhost:9200/logs-*/_search?q=ERROR"', desc:'Buscar logs ERROR', hint:'curl search'},
+{id:'s3', cmd:'curl -X GET "http://localhost:9200/_cat/indices?v"', desc:'Ver índices', hint:'curl indices'},
+{id:'s4', cmd:'curl -X GET "http://localhost:9200/logs-*/_search?q=level:INFO"', desc:'Buscar por nivel', hint:'curl search level'},
+{id:'s5', cmd:'curl -X DELETE "http://localhost:9200/logs-2026.07.28"', desc:'Eliminar índice', hint:'curl delete'}
+]},
+{id:'labELK3', title:'🔍 ELK: Kibana Dashboards', desc:'Crear dashboards en Kibana', dif:'Senior', xp:500, steps:[
+{id:'s1', cmd:'curl -X POST "http://localhost:5601/api/saved_objects/index-pattern" -H "Content-Type: application/json" -d \'{"attributes":{"title":"logs-*","timeFieldName":"@timestamp"}}\'', desc:'Crear index pattern', hint:'curl index pattern'},
+{id:'s2', cmd:'curl -X GET "http://localhost:5601/api/saved_objects/_find?type=index-pattern"', desc:'Ver index patterns', hint:'curl list patterns'},
+{id:'s3', cmd:'curl -X POST "http://localhost:5601/api/saved_objects/dashboard" -H "Content-Type: application/json" -d \'{"attributes":{"title":"Logs Dashboard"}}\'', desc:'Crear dashboard', hint:'curl dashboard'},
+{id:'s4', cmd:'curl -X GET "http://localhost:5601/api/saved_objects/_find?type=dashboard"', desc:'Listar dashboards', hint:'curl list dashboards'},
+{id:'s5', cmd:'curl -X DELETE "http://localhost:5601/api/saved_objects/dashboard/{id}"', desc:'Eliminar dashboard', hint:'curl delete dashboard'}
+]},
+{id:'labELK4', title:'🔍 ELK: Filebeat Configuración', desc:'Configurar Filebeat para logs del sistema', dif:'Senior', xp:450, steps:[
+{id:'s1', cmd:'filebeat modules list', desc:'Listar módulos', hint:'filebeat modules list'},
+{id:'s2', cmd:'filebeat modules enable system', desc:'Habilitar módulo system', hint:'filebeat modules enable'},
+{id:'s3', cmd:'filebeat test config', desc:'Validar configuración', hint:'filebeat test config'},
+{id:'s4', cmd:'filebeat test output', desc:'Probar salida', hint:'filebeat test output'},
+{id:'s5', cmd:'systemctl restart filebeat', desc:'Reiniciar Filebeat', hint:'systemctl restart filebeat'}
+]},
+{id:'labELK5', title:'🔍 ELK: Metricbeat Configuración', desc:'Configurar Metricbeat para métricas del sistema', dif:'Senior', xp:450, steps:[
+{id:'s1', cmd:'metricbeat modules list', desc:'Listar módulos', hint:'metricbeat modules list'},
+{id:'s2', cmd:'metricbeat modules enable system', desc:'Habilitar módulo system', hint:'metricbeat modules enable'},
+{id:'s3', cmd:'metricbeat test config', desc:'Validar configuración', hint:'metricbeat test config'},
+{id:'s4', cmd:'metricbeat test output', desc:'Probar salida', hint:'metricbeat test output'},
+{id:'s5', cmd:'systemctl restart metricbeat', desc:'Reiniciar Metricbeat', hint:'systemctl restart metricbeat'}
+]},
+{id:'labELK6', title:'🔍 ELK: Heartbeat Uptime Monitoring', desc:'Monitorear disponibilidad con Heartbeat', dif:'Senior', xp:500, steps:[
+{id:'s1', cmd:'heartbeat setup --dashboards', desc:'Configurar dashboards', hint:'heartbeat setup'},
+{id:'s2', cmd:'heartbeat test config', desc:'Validar configuración', hint:'heartbeat test config'},
+{id:'s3', cmd:'heartbeat test output', desc:'Probar salida', hint:'heartbeat test output'},
+{id:'s4', cmd:'heartbeat monitor', desc:'Ejecutar monitor', hint:'heartbeat monitor'},
+{id:'s5', cmd:'systemctl restart heartbeat-elastic', desc:'Reiniciar Heartbeat', hint:'systemctl restart heartbeat'}
+]},
+{id:'labELK7', title:'🟣 ELK: Cluster Management', desc:'Gestionar cluster de Elasticsearch', dif:'Experto', xp:550, steps:[
+{id:'s1', cmd:'curl -X GET "http://localhost:9200/_cluster/health"', desc:'Ver salud del cluster', hint:'curl health'},
+{id:'s2', cmd:'curl -X GET "http://localhost:9200/_cat/nodes?v"', desc:'Ver nodos', hint:'curl nodes'},
+{id:'s3', cmd:'curl -X GET "http://localhost:9200/_cat/shards?v"', desc:'Ver shards', hint:'curl shards'},
+{id:'s4', cmd:'curl -X GET "http://localhost:9200/_cluster/stats"', desc:'Ver estadísticas', hint:'curl stats'},
+{id:'s5', cmd:'curl -X GET "http://localhost:9200/_cat/plugins?v"', desc:'Ver plugins', hint:'curl plugins'}
+]},
+{id:'labELK8', title:'🟣 ELK: Master Challenge', desc:'Stack completo de logging', dif:'Experto', xp:700, steps:[
+{id:'s1', cmd:'curl -X GET "http://localhost:9200/_cluster/health" && curl -X GET "http://localhost:5601/api/status"', desc:'Verificar servicios', hint:'curl health+status'},
+{id:'s2', cmd:'curl -X GET "http://localhost:9200/_cat/indices?v"', desc:'Ver índices', hint:'curl indices'},
+{id:'s3', cmd:'filebeat test config && filebeat test output', desc:'Validar Filebeat', hint:'filebeat test'},
+{id:'s4', cmd:'curl -X GET "http://localhost:5601/api/saved_objects/_find?type=dashboard"', desc:'Ver dashboards', hint:'curl dashboards'},
+{id:'s5', cmd:'curl -X GET "http://localhost:9200/logs-*/_search?q=ERROR"', desc:'Buscar logs ERROR', hint:'curl search'}
+]}
 ],next:'security'},
 
-// ==================== 11. SECURITY (35 prácticas + 20 labs + 20 troubleshooting) ====================
+// ==================== 15. SECURITY ( prácticas +  labs +  troubleshooting) ====================
 {id:'security',name:'DevSecOps',icon:'🔒',
 misiones:[
 
@@ -1736,7 +2087,7 @@ labs:[
 {id:'s5', cmd:'echo "TODO: Integrar en CI/CD pipeline"', desc:'Plan de integración en CI/CD', hint:'Integrar secret scanning en pipeline'}]}
 ],next:'troubleshooting'},
 
-// ==================== 12. TROUBLESHOOTING (100 prácticas + 45 labs) ====================
+// ==================== 16. TROUBLESHOOTING ( prácticas +  labs) ====================
 {id:'troubleshooting',name:'Troubleshooting',icon:'🔧',
 misiones:[
 
@@ -1921,7 +2272,7 @@ labs:[
 {id:'s5', cmd:'systemctl reload nginx && curl -I https://localhost', desc:'Recargar NGINX y verificar SSL', hint:'systemctl reload nginx && curl -I https://localhost'}]}
 ],next:'azure'},
 
-// ==================== 13. AZURE (15 prácticas + 15 labs + 8 troubleshooting) ====================
+// ==================== 17. AZURE ( prácticas +  labs +  troubleshooting) ====================
 {id:'azure',name:'Microsoft Azure',icon:'🔷',
 misiones:[
 
@@ -2048,7 +2399,7 @@ labs:[
 {id:'s5', cmd:'az backup vault delete --resource-group myrg --name myvault --yes', desc:'Eliminar Backup Vault', hint:'az backup vault delete'}]}
 ],next:'gcp'},
 
-// ==================== 14. GCP (44 prácticas + 23 labs + 19 troubleshooting) ====================
+// ==================== 18. GCP ( prácticas +  labs +  troubleshooting) ====================
 {id:'gcp',name:'Google Cloud Platform',icon:'🌈',
 misiones:[
 
@@ -2183,7 +2534,7 @@ labs:[
 {id:'s5', cmd:'gcloud run services delete myapp --region us-central1 --quiet', desc:'Eliminar servicio', hint:'delete'}]}
 ],next:'finops'},
 
-// ==================== 15. FINOPS (35 prácticas + 18 labs + 18 troubleshooting) ====================
+// ==================== 19. FINOPS ( prácticas +  labs +  troubleshooting) ====================
 {id:'finops',name:'FinOps - Cost Optimization',icon:'💰',
 misiones:[
 
@@ -2310,7 +2661,7 @@ labs:[
 {id:'s5', cmd:'echo "AWS: \$aws_cost, Azure: \$azure_cost, GCP: \$gcp_cost" | jq -R \'split(", ") | {aws: .[0] | split(": ")[1], azure: .[1] | split(": ")[1], gcp: .[2] | split(": ")[1]}\'', desc:'Comparar costos multi-cloud', hint:'jq'}]}
 ],next:'chaos'},
 
-// ==================== 16. CHAOS ENGINEERING (39 prácticas + 20 labs + 20 troubleshooting) ====================
+// ==================== 20. CHAOS ENGINEERING ( prácticas +  labs +  troubleshooting) ====================
 {id:'chaos',name:'Chaos Engineering',icon:'🔥',
 misiones:[
 
@@ -2431,7 +2782,7 @@ labs:[
 ]}
 ],next:'mlops'},
 
-// ==================== 17. MLOPS (34 prácticas + 20 labs + 20 troubleshooting) ====================
+// ==================== 21. MLOPS ( prácticas +  labs +  troubleshooting) ====================
 {id:'mlops',name:'MLOps - Machine Learning Ops',icon:'🤖',
 misiones:[
 
@@ -2547,7 +2898,7 @@ labs:[
 {id:'s5', cmd:'feast teardown', desc:'Limpiar feature store', hint:'feast teardown'}]}
 ],next:'platform'},
 
-// ==================== 18. PLATFORM ENGINEERING (31 prácticas + 20 labs + 20 troubleshooting) ====================
+// ==================== 22. PLATFORM ENGINEERING ( prácticas +  labs +  troubleshooting) ====================
 {id:'platform',name:'Platform Engineering',icon:'🏗️',
 misiones:[
 
