@@ -33,30 +33,32 @@
 
 ---
 
-## 📊 Módulos del Laboratorio
+# 📋 LISTA DE 22 MÓDULOS
 
-| # |         Módulo                 | Prácticas | Troubleshooting | Labs   | **Total**|
-|---|--------------------------------|-----------|-----------------|--------|----------|
-| 1 | 🐧 Linux Fundamentals          |    62     |       25        |  18    | **105**  |
-| 2 | 🐧🐧 SysAdmin Linux            |    90     |       35        |  18    | **143**  |
-| 3 | 📝 Git Version Control         |    62     |       26        | 16     | **104**  |
-| 4 | 🐳 Docker Containers           |    65     |       29        | 15     | **109**  |
-| 5 | 🌐 Redes y Conectividad        |    95     |       29        | 21     | **145**  |
-| 6 | ☸️ Kubernetes                  |    25     |       32        | 20     | **77**   |
-| 7 | ☁️ AWS Cloud                   |    20     |       34        | 20     | **74**   |
-| 8 | 🏗️ Terraform IaC               |    15     |       28        | 20     | **63**   |
-| 9 | 🤖 Ansible Automation          |    15     |       38        | 20     | **73**   |
-| 10 | 🔄 CI/CD Pipelines            |    15     |       33        | 20     | **68**   |
-| 11 | 📊 Monitoring & Observability |    15     |       32        | 19     | **66**   |
-| 12 | 🔒 DevSecOps                  |    35     |       14        | 20     | **69**   |
-| 13 | 🔧 Troubleshooting            |   100     |      N/A        | 45     | **145**  |
-| 14 | 🔷 Microsoft Azure            |    43     |       23        | 19     | **85**   |
-| 15 | 🌈 Google Cloud Platform      |    44     |       23        | 19     | **86**   |
-| 16 | 💰 FinOps - Cost Optimization |    35     |       18        | 18     | **71**   |
-| 17 | 🔥 Chaos Engineering          |    39     |       20        | 20     | **79**   |
-| 18 | 🤖 MLOps                      |    34     |       20        | 20     | **74**   |
-| 19 | 🏗️ Platform Engineering       |    31     |       20        | 20     | **71**   |
-| **TOTALES**                        | **741**   |    **441**      |**379** | **1,561**|
+| # | Módulo | Ícono |
+|---|--------|-------|
+| 1 | Linux Fundamentals | 🐧 |
+| 2 | SysAdmin Linux | 🐧🐧 |
+| 3 | Git Version Control | 📝 |
+| 4 | Docker Containers | 🐳 |
+| 5 | Redes y Conectividad | 🌐 |
+| 6 | Kubernetes | ☸️ |
+| 7 | Service Mesh (Istio / Linkerd) | 🔗 |
+| 8 | AWS Cloud | ☁️ |
+| 9 | Terraform IaC | 🏗️ |
+| 10 | Ansible Automation | 🤖 |
+| 11 | CI/CD Pipelines | 🔄 |
+| 12 | GitOps (ArgoCD / Flux) | 🚀 |
+| 13 | Monitoring & Observability | 📊 |
+| 14 | ELK / OpenSearch (Logging) | 🔍 |
+| 15 | DevSecOps | 🔒 |
+| 16 | Troubleshooting | 🔧 |
+| 17 | Microsoft Azure | 🔷 |
+| 18 | Google Cloud Platform | 🌈 |
+| 19 | FinOps - Cost Optimization | 💰 |
+| 20 | Chaos Engineering | 🔥 |
+| 21 | MLOps | 🤖 |
+| 22 | Platform Engineering | 🏗️ |
 
 ---
 
